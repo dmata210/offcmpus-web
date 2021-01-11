@@ -4529,12 +4529,43 @@ a {
   background-color: #848CFF;
   color: white;
   font-family: sans-serif;
+  position: relative;
+
+  &:hover {
+    .edit-status {
+      width: 55px;
+    }
+  }
+
+  .edit-status {
+    overflow: hidden;
+    cursor: pointer;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+    display: flex;
+    width: 20px;
+    transition: width 0.25s;
+
+    .edit-icon {
+      transform: translateY(2px);
+      width: 20px;
+      min-width: 20px;
+      text-align: center;
+    }
+    .edit-text {
+      padding: 2px 8px 2px 2px;
+    }
+  }
 
   .status-icon_ {
     box-sizing: border-box;
     line-height: 35px;
     text-align: center;
     width: 40px;
+    cursor: pointer;
   }
 
   .key-label {

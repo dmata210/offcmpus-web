@@ -4,7 +4,7 @@ import {useSpring, useTransform, motion} from 'framer-motion'
 import AuthAPI from '../API/AuthAPI'
 
 import Popup, {PopupHeader, ConfirmLine} from '../components/toolbox/misc/Popup'
-import { HiOutlineNewspaper, HiCheckCircle, HiTerminal, 
+import { HiOutlineNewspaper, HiCheckCircle, HiTerminal, HiOutlinePencil,
   HiLogout, HiClipboard, HiOutlineChatAlt, HiOutlineAdjustments,
   HiOutlineChevronLeft, HiOutlineChevronRight, HiCog } from 'react-icons/hi';
 import {RiLayoutMasonryLine} from 'react-icons/ri';
@@ -440,7 +440,14 @@ const ViewWrapper = ({children,
                 opacity: menuCollapseInitSpring,
                 visibility: statusVisibilityTransform
               }}>
-                <div style={{fontWeight: 600}}>Status</div>
+
+                {/* Edit Status Button */}
+                <div className="edit-status">
+                  <div className="edit-icon"><HiOutlinePencil/></div>
+                  <div className="edit-text">Edit</div>
+                </div>
+
+                <div style={{fontWeight: 600, height: `20px`, lineHeight: `20px`}}>Status</div>
                 <div style={{margin: `3px 0 4px 0`, fontSize: `1.1rem`}}>Looking for lease</div>
                 
                 <div style={{
