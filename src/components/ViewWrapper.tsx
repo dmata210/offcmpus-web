@@ -15,6 +15,7 @@ import {useSelector} from 'react-redux'
 import {ReduxState} from '../redux/reducers/all_reducers'
 import {useSubmitFeedbackMutation} from '../API/queries/types/graphqlFragmentTypes'
 import {objectURI} from '../API/S3API'
+import StatusUpdateModule from './StatusUpdateModule';
 
 interface IFeedbackInfo {
   bug: boolean
@@ -403,14 +404,22 @@ const ViewWrapper = ({children,
       width: menuWidthCollapseTransform
     }}>
 
+      {/* Logo Area */}
       <div className="logo-line">
         <div className="logo-area"><div className="app-logo" /></div>
         <motion.div className="logo-text" style={{opacity: menuCollapseInitSpring}}>offcmpus</motion.div>
         <div className={`menu-collapse-btn ${menuCollapsed? 'collapsed' : ''}`} onClick={() => setMenuCollapsed(!menuCollapsed)}><HiOutlineChevronLeft /></div>
       </div>
 
+
       {/* Menu Area */}
       <div className="top-bottom-menu-separator">
+
+        {/* Status Update Module */}
+        <div>
+          <StatusUpdateModule />
+        </div>
+
         <div className="top-area">
           <motion.div className="menu-label" style={{
             opacity: menuSubtitleOpacityTransform,
