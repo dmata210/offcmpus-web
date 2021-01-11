@@ -45,6 +45,7 @@ import LandlordConfirmEmail from './views/LandlordConfirmEmail'
 import StudentConfirmEmail from './views/StudentConfirmEmail'
 import LandlordOnboarding from './views/LandlordOnboarding'
 import PushNotificationsPrompt from './views/PushNotificationsPrompt'
+import StudentStatus from './views/StudentStatus'
 
 import Testing from './views/Testing'
 
@@ -100,6 +101,7 @@ const Routes = () => {
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/register/complete" component={StudentRegisterComplete} />
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/search" component={SearchView_} />
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/collection" component={CollectionView} />
+            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/s/status" component={StudentStatus} /> 
 
               {/* Mod Console (Ownership Reviewer) */}
               <AuthRoute accessLevel={AccessLevels.OWNERSHIP_REVIEWER} exact path="/ownership/review" component={OwnershipReview} />
