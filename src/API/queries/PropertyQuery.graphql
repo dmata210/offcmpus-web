@@ -1,0 +1,176 @@
+query SearchProperties($offset: Int!, $count: Int!) {
+  searchProperties(searchOptions:{offset:$offset,count:$count}) {
+    ...PropertyListAPIResponseFields
+  }
+}
+
+query GetProperty(
+  $id:String!,
+  $withLandlord:Boolean!,
+  $withReviews:Boolean!,
+  $reviewCount:Int!,$reviewOffset:Int!) {
+  getProperty(_id:$id,withLandlord:$withLandlord,reviewOptions:{withReviews:$withReviews,offset:$reviewOffset,count:$reviewCount}) {
+    ...PropertyAPIResponseFields
+  }
+}
+
+query GetPropertyOwnedByLandlord(
+  $property_id: String!,
+  $landlord_id: String!
+) {
+  getPropertyOwnedByLandlord(
+    property_id: $property_id,
+    landlord_id: $landlord_id
+  ) {
+    ...PropertyAPIResponseFields
+  }
+}
+
+query GetPropertiesForLandlord(
+  $landlord_id: String!,
+  $status: String
+) {
+  getPropertiesForLandlord(landlord_id:$landlord_id, status: $status) {
+    ...PropertyListAPIResponseFields
+  }
+}
+
+query VerifyAddress(
+  $address_1: String!,
+  $address_2: String!,
+  $zip: String!,
+  $state: String!,
+  $city: String!
+) {
+  verifyAddress(
+    address_1:$address_1,
+    address_2:$address_2,
+    zip:$zip,
+    state:$state,
+    city:$city
+  ){
+    ...AddressVerificationAPIResponseFields
+  }
+}
+
+mutation AddImagesToProperty(
+  $property_id: String!,
+  $s3_keys: [String!]!
+) {
+  addImagesToProperty(
+    property_id:$property_id,
+    s3_keys:$s3_keys
+  ) {
+    ...PropertyAPIResponseFields
+  }
+}
+
+mutation RemoveImageFromProperty (
+  $property_id: String!,
+  $s3_key: String!
+) {
+  removeImageFromProperty(
+    property_id:$property_id,
+    s3_key:$s3_key
+  ){
+    ...PropertyAPIResponseFields
+  }
+}
+
+mutation UpdatePropertyDetails(
+  $property_id: String!,
+  $description: String,
+  $rooms: Int,
+  $bathrooms: Int,
+  $sq_ft: Int,
+  $furnished: Boolean,
+  $has_washer: Boolean,
+  $has_heater: Boolean,
+  $has_ac: Boolean
+) {
+  updatePropertyDetails (
+    property_id: $property_id,
+    description: $description,
+    rooms: $rooms,
+    bathrooms: $bathrooms,
+    sq_ft: $sq_ft,
+    furnished: $furnished,
+    has_washer: $has_washer,
+    has_heater: $has_heater,
+    has_ac: $has_ac
+  ) {
+    ...PropertyAPIResponseFields
+  }
+}
+
+fragment PropertyAPIResponseFields on PropertyAPIResponse {
+  success
+  error
+  data {
+    _id
+    landlord
+    address_line
+    address_line_2
+    city
+    state
+    zip
+    
+    details {
+      description
+      rooms
+      bathrooms
+      sq_ft
+      furnished
+      has_washer
+      has_heater
+      has_ac
+      property_images {
+        s3_key
+        date_uploaded
+      }
+    }
+  }
+}
+
+fragment PropertyListAPIResponseFields on PropertyListAPIResponse {
+  success
+  error
+  data {
+    properties {
+      _id
+      landlord
+      address_line
+      address_line_2
+      city
+      state
+      zip
+
+      details {
+        description
+        rooms
+        bathrooms
+        sq_ft
+        furnished
+        has_washer
+        has_heater
+        has_ac
+        property_images {
+          s3_key
+          date_uploaded
+        }
+      }
+    }
+  }
+}
+
+fragment AddressVerificationAPIResponseFields on AddressVerificationAPIResponse {
+  success
+  error
+  data {
+    address_1
+    address_2
+    city
+    state
+    zip
+  }
+}

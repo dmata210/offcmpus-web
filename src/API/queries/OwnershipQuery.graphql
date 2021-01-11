@@ -1,0 +1,230 @@
+# Queries
+query GetOwnershipsForLandlord($landlord_id: String!, 
+$with_properties: Boolean, $with_landlord: Boolean) {
+  getOwnershipsForLandlord(
+      landlord_id:$landlord_id,
+      with_properties:$with_properties,
+      with_landlord:$with_landlord
+    ) {
+    ...OwnershipCollectionAPIResponseFields
+  }
+}
+
+query GetOwnership($ownership_id: String!) {
+  getOwnership(_id:$ownership_id) {
+    ...OwnershipAPIResponseFields
+  }
+}
+
+query GetOwnershipsInReview {
+  getOwnershipsInReview {
+    ...OwnershipCollectionAPIResponseFields
+  }
+}
+
+query GetOwnershipConflicts ($ownership_id: String!) {
+  getOwnershipConflicts(ownership_id:$ownership_id) {
+    ...OwnershipCollectionAPIResponseFields
+  }
+}
+
+# Mutations
+mutation AddOwnershipConfirmationActivity (
+  $ownership_id: String!,
+  $user_id: String!,
+  $user_type: String!,
+  $message: String!,
+  $date_submitted: String!
+) {
+  addOwnershipConfirmationActivity(
+    ownership_id:$ownership_id,
+    user_id:$user_id,
+    user_type:$user_type,
+    message:$message,
+    date_submitted:$date_submitted
+  ) {
+     ...OwnershipAPIResponseFields
+  }
+}
+
+mutation AddOwnershipDocuments (
+  $ownership_id: String!,
+  $documents_info: [OwnershipDocumentInput!]!
+) {
+  addOwnershipDocuments(ownership_id: $ownership_id, documents_info: $documents_info) {
+    ...OwnershipAPIResponseFields
+  }
+}
+
+mutation ChangeOwnershipStatus (
+  $ownership_id: String!,
+  $new_status: String!,
+  $status_changer_user_id: String!,
+  $status_changer_user_type: String!,
+  $with_landlord: Boolean!,
+  $with_property: Boolean!
+) {
+  changeOwnershipStatus(
+    ownership_id:$ownership_id,
+    new_status:$new_status,
+    status_changer_user_id:$status_changer_user_id,
+    status_changer_user_type:$status_changer_user_type,
+    with_landlord:$with_landlord,
+    with_property:$with_property
+  ) {
+    ...OwnershipAPIResponseFields
+  }
+}
+
+mutation CreateOwnership(
+  $landlord_id: String!,
+  $address_line: String!,
+  $address_line_2: String!,
+  $city: String!,
+  $state: String!,
+  $zip_code: String!
+) {
+  createOwnershipReview(
+    landlord_id:$landlord_id,
+    address_line:$address_line,
+    address_line_2:$address_line_2,
+    city:$city,
+    state:$state,
+    zip_code:$zip_code
+  ) {
+    ...OwnershipAPIResponseFields
+  }
+}
+
+# Fragments
+fragment OwnershipAPIResponseFields on OwnershipAPIResponse {
+  success
+  error
+  data {
+    _id
+    property_id
+    landlord_id
+    date_submitted
+    status
+    property_doc {
+      _id
+      landlord
+      address_line
+      address_line_2
+      city
+      state
+      zip
+
+      details {
+        description
+        rooms
+        bathrooms
+        sq_ft
+        furnished
+        has_washer
+        has_heater
+        has_ac
+        property_images {
+          s3_key
+          date_uploaded
+        }
+      }
+    }
+    landlord_doc {
+      ...LandlordFields
+    }
+    ownership_documents {
+      ...ownershipDocumentFields
+    }
+    confirmation_activity {
+      ...confirmationActivityFields
+    }
+    status_change_history {
+      ...statusChangeInfoFields
+    }
+  }
+}
+
+fragment OwnershipCollectionAPIResponseFields on OwnershipCollectionAPIResponse {
+  success
+  error
+  data {
+    ownerships {
+      _id
+      property_id
+      confirmation_activity {
+        ...confirmationActivityFields
+      }
+      property_doc {
+        _id
+        address_line
+        address_line_2
+        city
+        state
+        zip
+        landlord
+
+        details {
+          description
+          rooms
+          bathrooms
+          sq_ft
+          furnished
+          has_washer
+          has_heater
+          has_ac
+          property_images {
+            s3_key
+            date_uploaded
+          }
+        }
+      }
+      landlord_id
+      landlord_doc {
+        ...LandlordFields
+      }
+      date_submitted
+      status
+      ownership_documents {
+        ...ownershipDocumentFields
+      }
+      confirmation_activity {
+        ...confirmationActivityFields
+      }
+      status_change_history {
+        ...statusChangeInfoFields
+      }
+    }
+  }
+}
+
+fragment ownershipDocumentFields on OwnershipDocument {
+  s3_doc_key
+  format
+  date_uploaded
+}
+
+fragment confirmationActivityFields on ConfirmationActivity {
+  user_id
+  user_type
+  message
+  date_submitted
+  full_name
+}
+
+fragment statusChangeInfoFields on StatusChangeInfo {
+  status_changer_user_id
+  status_changer_user_type
+  date_changed
+  changed_from
+  changed_to
+  status_changer_full_name
+}
+
+fragment LandlordFields on Landlord {
+  _id
+    first_name
+    last_name
+    email
+    phone_number
+}
