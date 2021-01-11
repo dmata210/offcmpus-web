@@ -26,13 +26,25 @@ const DatePicker = ({type}: DatePickerProps) => {
     const getDateStr = (): string => {
         if (type == 'range') {
             if (dateStart == null || dateEnd == null) return `No date selected`;
-            return `---`;
+            return `${dateStart.getMonth() + 1}/${dateStart.getDate()}/${dateStart.getFullYear()} - ${dateEnd.getMonth() + 1}/${dateEnd.getDate()}/${dateEnd.getFullYear()}`;
         }
         else if (type == 'single') {
             if (dateStart == null) return `No date selected`;
             return `---`;
         }
         return ``;
+    }
+
+    const isToday = (date_: Date) => {
+        let today_: Date = new Date();
+        return sameDate(date_, today_);
+    }
+
+    const sameDate = (date1: Date | null, date2: Date | null): boolean => {
+        if (date1 == null || date2 == null) return false;
+        return date1.getFullYear() == date2.getFullYear() 
+            && date1.getMonth() == date2.getMonth()
+            && date1.getDate() == date2.getDate();
     }
 
     const updateFocusMonth = (dir: number) => {
@@ -68,12 +80,60 @@ const DatePicker = ({type}: DatePickerProps) => {
                 </DateHeader>
 
                 <MonthDates>
-                    {Array.from(new Array(5), (i: number) => 
-                        <Week key={i}>
-                            {Array.from(new Array(7), (i: number) => <Day key={i}>{i}</Day>)}
-                        </Week>
-                    )}
+                    {function () {
+                        let month_: Date = new Date(focusMonth.year, focusMonth.monthIndex, 1);     
+                        let month_started: boolean = false;      
+                        let day = 0;             
+                        return [0, 1, 2, 3, 4, 5].map((i: number) => {
+                            return (<Week key={i}>
+                                {[0,1,2,3,4,5,6].map((j: number) => {
+                                    if (!month_started && j == month_.getDay()) month_started = true;
+                                    if (!month_started) return (<Day key={j}></Day>)
+                                    else {
+                                        ++day;
+                                        let day_: Date = new Date(focusMonth.year, focusMonth.monthIndex, day);
+
+                                        if (day_.getMonth() != month_.getMonth()) return <div key={j} />
+                                        else {
+                                            return (<Day 
+                                                onClick={() => {
+                                                    if (dateStart == null) setDateStart(day_);
+                                                    else if (sameDate(dateStart, day_)) {
+                                                        setDateStart(dateEnd);
+                                                        setDateEnd(null);
+                                                    }
+                                                    else if (sameDate(dateEnd, day_)) {
+                                                        setDateEnd(null);
+                                                    }
+                                                    else {
+                                                        if (day_ > dateStart) setDateEnd(day_);
+                                                        else {
+                                                            setDateEnd(dateStart);
+                                                            setDateStart(day_);
+                                                        }
+                                                    }
+                                                }}
+                                                className={`cursor no-select \
+                                                ${dateEnd != null && dateStart != null && day_ < dateEnd && day_ > dateStart ? `intermediate` : ``}\
+                                                ${sameDate(dateStart, day_) || sameDate(dateEnd, day_) ? 'active' : ''}\
+                                                ${dateStart != null && dateEnd != null && sameDate(dateStart, day_) ? `date-start` : ``}
+                                                ${dateStart != null && dateEnd != null && sameDate(dateEnd, day_) ? `date-end` : ``}
+                                                ${isToday(day_)? `today` : ``}`} key={j}>
+                                                    <DayPad><DayNum>{day_.getDate()}</DayNum></DayPad>
+                                                </Day>);
+                                        }
+                                    }
+                                })}
+                            </Week>)
+                        })
+                    }()}
                 </MonthDates>
+
+                <DatePopupFooter>
+                    <MiniBtn
+                        onClick={() => {setDateStart(null); setDateEnd(null);}} 
+                        className={`${dateStart != null || dateEnd != null ? `active` : ``}`}>clear</MiniBtn>
+                </DatePopupFooter>
 
             </DatePickerPopup>}
         </DatePickerContainer>
@@ -83,6 +143,27 @@ const DatePicker = ({type}: DatePickerProps) => {
 const MONTHS = ["January", "February", "March", "April", "May", "June", 
 "July", "August", "September", "October", "November", "December"];
 
+const DatePopupFooter = styled.div`
+    height: 20px;
+    border-top: 1px solid #9fb0bd;
+    margin-top: 5px;
+    text-align: right;
+    padding: 2px 4px;
+`
+const MiniBtn = styled.div`
+    background-color: #9fb0bd;
+    display: inline-block;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 2px;
+    color: white;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.25s;
+    &.active {
+        opacity: 1;
+    }
+`
 const CalendarIcon = styled.div``
 const DateInfo = styled.div``
 const DateHeader = styled.div``
@@ -90,6 +171,8 @@ const DateArrow = styled.div``
 const DateText = styled.div``
 const Week = styled.div``
 const Day = styled.div``
+const DayPad = styled.div``
+const DayNum = styled.div``
 const MonthDates= styled.div`
     ${Week} {
         height: 20px;
@@ -98,8 +181,80 @@ const MonthDates= styled.div`
 
         ${Day} {
             width: 30px;
+            min-width: 30px;
+            max-width: 30px;
             height: 20px;
-            border: 1px solid green;
+            line-height: 20px;
+            text-align: center;
+            font-family: sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            position: relative;
+
+            &.cursor { cursor: pointer; }
+
+            &.date-start {
+                &::before {
+                    content: '';
+                    position: absolute;
+                    right: 0;
+                    width: 50%;
+                    height: 20px;
+                    background-color: #ebeef5;
+                    z-index: 1;
+                }
+            }
+
+            &.date-end {
+                &::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    width: 50%;
+                    height: 20px;
+                    background-color: #ebeef5;
+                }
+            }
+
+            &.today {
+                ${DayPad} {
+                    border: 1px solid #E0777D;
+                    border-radius: 3px;
+                    position: relative;
+                    z-index: 2;
+                }
+            }
+
+            &.intermediate {
+
+                ${DayPad} {
+                    background-color: #ebeef5;
+                    height: 20px;
+                    width: 30px;
+                }
+            }
+
+            ${DayPad} {
+                background-color: rgba(0, 0, 0, 0);
+                transition: baclground-color 0.25s;
+                box-sizing: border-box;
+            }
+            &.active {
+                ${DayPad} {
+                    ${DayNum} {
+                        position: relative;
+                        z-index: 2;
+                        width: 20px;
+                        height: 20px;
+                        line-height: 20px;
+                        margin: 0 auto;
+                        border-radius: 20px;
+                        background-color: #7896ad;
+                        color: white;
+                        box-shadow: 0px 0px 5px rgba(120, 150, 173, 0.5);
+                    }
+                }
+            }
         }
     }
 `
@@ -111,7 +266,6 @@ const DatePickerPopup = styled.div`
     border-radius: 3px;
     cursor: default;
     box-shadow: 0px 0px 6px rgba(59, 67, 83, 0.07);
-    padding-bottom: 5px;
 
     ${DateHeader} {
         height: 25px;
