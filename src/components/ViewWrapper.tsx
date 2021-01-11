@@ -5,7 +5,7 @@ import AuthAPI from '../API/AuthAPI'
 
 import Popup, {PopupHeader, ConfirmLine} from '../components/toolbox/misc/Popup'
 import { HiOutlineNewspaper, HiCheckCircle, HiTerminal, 
-  HiLogout, HiClipboard, HiOutlineChatAlt,
+  HiLogout, HiClipboard, HiOutlineChatAlt, HiOutlineAdjustments,
   HiOutlineChevronLeft, HiOutlineChevronRight, HiCog } from 'react-icons/hi';
 import {RiLayoutMasonryLine} from 'react-icons/ri';
 import { FiFileText } from 'react-icons/fi';
@@ -15,7 +15,6 @@ import {useSelector} from 'react-redux'
 import {ReduxState} from '../redux/reducers/all_reducers'
 import {useSubmitFeedbackMutation} from '../API/queries/types/graphqlFragmentTypes'
 import {objectURI} from '../API/S3API'
-import StatusUpdateModule from './StatusUpdateModule';
 
 interface IFeedbackInfo {
   bug: boolean
@@ -206,8 +205,18 @@ const ViewWrapper = ({children,
   const menuCollapseInitSpring = useSpring(menuCollapsed ? 0 : 1)
   const menuLabelHeightTransform = useTransform(menuCollapseInitSpring, (x: number) => `${x * 30}px`)
   const menuSubtitleOpacityTransform = useTransform(menuCollapseInitSpring, [0, 1], [0, 0.5])
+  
+  // status module collapse transforms
+  const statusVisibilityTransform = useTransform(menuCollapseInitSpring, (x: number) => x < 0.1 ? `hidden` : `visible`)
+  const statusMaxHeightTransform = useTransform(menuCollapseInitSpring, [0, 1], [30, 200])
 
   const menuCollapseIntermediate = useSpring(menuCollapsed ? 0 : 1)
+  const inverseMenuCollapseIntermediate = useTransform(menuCollapseIntermediate, [0, 1], [1, 0])
+  const statusIconShowOnCollapseTransform = useTransform(menuCollapseIntermediate, (x: number) => x > 0.9 ? `hidden` : `visible`)
+  const statusIconHeight = useTransform(menuCollapseIntermediate, [0, 1], [30, 0])
+  const statusFontSizeTransform = useTransform(menuCollapseIntermediate, (x: number) => {
+    return `${0.95 + (0.4 * (1-x))}rem`
+  })
   const menuWidthCollapseTransform = useTransform(menuCollapseIntermediate, [0, 1], [60, 200])
   const userControlSettingsCollapsed = useTransform(menuCollapseIntermediate, [0, 1], [1, 0])
   const leftContainerMarginTransform = useTransform(menuCollapseIntermediate, (x: number) => {
@@ -416,9 +425,51 @@ const ViewWrapper = ({children,
       <div className="top-bottom-menu-separator">
 
         {/* Status Update Module */}
-        <div>
-          <StatusUpdateModule />
-        </div>
+        {user && user.type && user.type == "student" && <div>
+          <motion.div className="status-update-mod" style={{maxHeight: statusMaxHeightTransform}}>
+            <motion.div className="status-icon_" style={{
+              opacity: inverseMenuCollapseIntermediate,
+              visibility: statusIconShowOnCollapseTransform,
+              height: statusIconHeight,
+              fontSize: statusFontSizeTransform
+            }}>
+              <HiOutlineAdjustments />
+            </motion.div>
+            <motion.div style={{
+                padding: `5px 5px`,
+                opacity: menuCollapseInitSpring,
+                visibility: statusVisibilityTransform
+              }}>
+                <div style={{fontWeight: 600}}>Status</div>
+                <div style={{margin: `3px 0 4px 0`, fontSize: `1.1rem`}}>Looking for lease</div>
+                
+                <div style={{
+                    borderTop: `1px solid rgba(0, 0, 0, 0.05)`,
+                    paddingTop: `4px`
+                }}>
+                    <div className="key-label">
+                        <div className="key">From</div>
+                        <div className="label">Jan 6th, 2021</div>
+                    </div>
+                    
+                    <div className="key-label">
+                        <div className="key">To</div>
+                        <div className="label">Mar 6th, 2021</div>
+                    </div>
+                </div>
+            </motion.div>
+
+            <motion.div
+              style={{
+                opacity: menuCollapseInitSpring,
+                visibility: statusVisibilityTransform
+              }}
+              className="price-area">
+                <div style={{fontSize: `0.7rem`}}>Price Range</div>
+                <div>$300 - $600</div>
+            </motion.div>
+          </motion.div>
+        </div>}
 
         <div className="top-area">
           <motion.div className="menu-label" style={{

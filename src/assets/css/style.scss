@@ -4523,9 +4523,42 @@ a {
 }
 
 .status-update-mod {
-  border: 1px solid black;
-  padding: 5px 5px;
   margin: 0 10px;
   font-size: 0.85rem;
   border-radius: 3px;
+  background-color: #848CFF;
+  color: white;
+  font-family: sans-serif;
+
+  .status-icon_ {
+    box-sizing: border-box;
+    line-height: 35px;
+    text-align: center;
+    width: 40px;
+  }
+
+  .key-label {
+    display: flex;
+    margin-top: 4px;
+    .key {
+      font-size: 0.7rem;
+    }
+    .label {
+      background-color: rgba(0, 0, 0, 0.16);
+      margin-left: 3px;
+      font-size: 0.8rem;
+      letter-spacing: 0.7px;
+      padding: 2px 5px;
+      border-radius: 2px;
+    }
+  }
+
+  .price-area {
+    background-color: #7B83F1;
+    display: flex;
+     justify-content: space-between;
+     padding: 5px;
+     border-bottom-left-radius: 3px;
+     border-bottom-right-radius: 3px;
+  }
 }
