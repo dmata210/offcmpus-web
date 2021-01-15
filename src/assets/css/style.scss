@@ -4593,3 +4593,19 @@ a {
      border-bottom-right-radius: 3px;
   }
 }
+
+.form-control-end {
+  width: 100%;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0px 0px 6px rgba(59, 67, 83, 0.05);
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 10px;
+  box-sizing: border-box;
+
+
+  .btn-area {
+
+  }
+}

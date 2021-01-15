@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import styled from 'styled-components';
 import {HiOutlineCalendar, HiChevronLeft, HiChevronRight} from 'react-icons/hi';
 
@@ -9,8 +9,9 @@ interface MonthInfo {
 
 interface DatePickerProps {
     type: 'range' | 'single'
+    onChange: (start: Date | null, end: Date | null) => void
 }
-const DatePicker = ({type}: DatePickerProps) => {
+const DatePicker = ({type, onChange}: DatePickerProps) => {
 
     const [dateStart, setDateStart] = useState<Date | null>(null)
     const [dateEnd, setDateEnd] = useState<Date | null>(null)
@@ -21,7 +22,24 @@ const DatePicker = ({type}: DatePickerProps) => {
         year: new Date().getFullYear()
     })
 
-    const [showDatePicker, setShowDatePicker] = useState<boolean>(true)
+    const [showDatePicker, setShowDatePicker] = useState<boolean>(false)
+    const windowRef = useRef<HTMLDivElement>(null)
+
+    const closeOnClickOutside = (e: MouseEvent) => {
+        if (!windowRef.current) return;
+        if (!windowRef.current.contains(e.target as Node)) {
+            setShowDatePicker(false);
+        }
+    }
+    useEffect(() => {
+        if (showDatePicker) window.addEventListener('click', closeOnClickOutside);
+        return () => {
+            window.removeEventListener('click', closeOnClickOutside);
+        }
+    }, [showDatePicker]);
+    useEffect(() => {
+        onChange(dateStart, dateEnd);
+    }, [dateStart, dateEnd]);
 
     const getDateStr = (): string => {
         if (type == 'range') {
@@ -66,9 +84,9 @@ const DatePicker = ({type}: DatePickerProps) => {
     }
 
     return (<div className="date-picker_">
-        <DatePickerContainer>
+        <DatePickerContainer ref={windowRef}>
             <CalendarIcon><HiOutlineCalendar /></CalendarIcon>
-            <DateInfo>{getDateStr()}</DateInfo>
+            <DateInfo onClick={() => setShowDatePicker(!showDatePicker)}>{getDateStr()}</DateInfo>
 
             {showDatePicker && <DatePickerPopup>
                 
@@ -133,6 +151,9 @@ const DatePicker = ({type}: DatePickerProps) => {
                     <MiniBtn
                         onClick={() => {setDateStart(null); setDateEnd(null);}} 
                         className={`${dateStart != null || dateEnd != null ? `active` : ``}`}>clear</MiniBtn>
+                    <MainBtn
+                        style={{marginLeft: `5px`}}
+                        onClick={() => {setShowDatePicker(false);}}>Save</MainBtn>
                 </DatePopupFooter>
 
             </DatePickerPopup>}
@@ -149,6 +170,20 @@ const DatePopupFooter = styled.div`
     margin-top: 5px;
     text-align: right;
     padding: 2px 4px;
+`
+const MainBtn = styled.div`
+background-color: #E0777D;
+display: inline-block;
+font-size: 0.7rem;
+padding: 2px 8px;
+border-radius: 2px;
+color: white;
+cursor: pointer;
+opacity: 0.6;
+transition: opacity 0.25s;
+&.active {
+    opacity: 1;
+}
 `
 const MiniBtn = styled.div`
     background-color: #9fb0bd;
@@ -265,6 +300,7 @@ const DatePickerPopup = styled.div`
     background-color: white;
     border-radius: 3px;
     cursor: default;
+    z-index: 5;
     box-shadow: 0px 0px 6px rgba(59, 67, 83, 0.07);
 
     ${DateHeader} {
@@ -323,7 +359,7 @@ const DatePickerContainer = styled.div`
     }
 
     ${DateInfo} {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         transform: translateY(1px);
     }
 `
