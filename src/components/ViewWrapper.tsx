@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useRef, ChangeEvent} from 'react'
 import {useSpring, useTransform, motion} from 'framer-motion'
+import {useHistory} from 'react-router'
 
 import AuthAPI from '../API/AuthAPI'
 
@@ -47,6 +48,7 @@ const ViewWrapper = ({children,
 
   const [DEBUG_MODE, SET_DEBUG_MODE] = useState<boolean>(false)
 
+  const history = useHistory();
   const contentStartRef = useRef<HTMLDivElement>(null)
   const contentEndRef = useRef<HTMLDivElement>(null)
   const [SubmitFeedback, {data: submissionData}] = useSubmitFeedbackMutation()
@@ -432,7 +434,8 @@ const ViewWrapper = ({children,
               visibility: statusIconShowOnCollapseTransform,
               height: statusIconHeight,
               fontSize: statusFontSizeTransform
-            }}>
+            }}
+            onClick={() => history.push('/s/status')}>
               <HiOutlineAdjustments />
             </motion.div>
             <motion.div style={{
@@ -442,13 +445,13 @@ const ViewWrapper = ({children,
               }}>
 
                 {/* Edit Status Button */}
-                <div className="edit-status">
+                <div className="edit-status" onClick={() => history.push('/s/status')}>
                   <div className="edit-icon"><HiOutlinePencil/></div>
                   <div className="edit-text">Edit</div>
                 </div>
 
                 <div style={{fontWeight: 600, height: `20px`, lineHeight: `20px`}}>Status</div>
-                <div style={{margin: `3px 0 4px 0`, fontSize: `1.1rem`}}>Looking for lease</div>
+                <div style={{margin: `3px 0 4px 0`, fontSize: `0.9rem`}}>Looking for lease</div>
                 
                 <div style={{
                     borderTop: `1px solid rgba(0, 0, 0, 0.05)`,
