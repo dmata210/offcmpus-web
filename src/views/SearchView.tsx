@@ -84,7 +84,8 @@ const SearchView = () => {
                         // border: `1px solid black`
                     }}>
                         <div className="input-label_">Price Per Room</div>
-                        <Slider 
+                        <RangeSlider 
+                            forceUpdate={leftFilterWidth}
                             range={{start: 300, end: 1200}}
                             toStr={(val: any): string => {return `$${(val as number).toFixed(2)}`}}
                         />
