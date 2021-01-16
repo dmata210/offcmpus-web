@@ -21,6 +21,16 @@ mutation ConfirmStudentEmail($email: String!, $confirm_key: String!) {
   }
 }
 
+mutation UpdateStudentSearchStatus($id: String!, $searching: Boolean!, $search_start: String,
+  $search_end: String, $price_start: Float, $price_end: Float) {
+
+    updateStudentSearchStatus(id: $id, searching: $searching, 
+    search_start: $search_start, search_end: $search_end,
+    price_start: $price_start, price_end: $price_end) {
+      ...StudentAPIResponseFields
+    }
+  }
+
 fragment StudentAPIResponseFields on StudentAPIResponse {
   data {
     _id
@@ -41,6 +51,14 @@ fragment StudentAPIResponseFields on StudentAPIResponse {
           auth
         }
       }
+    }
+    search_status {
+      date_updated
+      searching
+      search_start
+      search_end
+      price_start
+      price_end
     }
   }
   success

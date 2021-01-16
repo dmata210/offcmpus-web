@@ -6,6 +6,7 @@ import RatioInput from '../components/toolbox/form/RadioInput'
 import DatePicker from '../components/toolbox/form/DatePicker'
 import RangeSlider from '../components/toolbox/form/RangeSlider'
 import Button from '../components/toolbox/form/Button'
+import {useUpdateStudentSearchStatusMutation} from '../API/queries/types/graphqlFragmentTypes'
 
 const StudentStatus = () => {
 
@@ -33,7 +34,9 @@ const StudentStatus = () => {
     }, [])
 
     const saveForm = () => {
-        console.log(`TODO submit form!`);
+        if (searching == undefined) {
+            
+        }
     }
 
     return (<Centered width="400" height="600">

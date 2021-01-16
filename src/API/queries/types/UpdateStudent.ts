@@ -31,6 +31,16 @@ export interface UpdateStudent_updateStudent_data_user_settings {
   push_subscriptions: UpdateStudent_updateStudent_data_user_settings_push_subscriptions[];
 }
 
+export interface UpdateStudent_updateStudent_data_search_status {
+  __typename: "SearchStatus";
+  date_updated: string;
+  searching: boolean;
+  search_start: string | null;
+  search_end: string | null;
+  price_start: number | null;
+  price_end: number | null;
+}
+
 export interface UpdateStudent_updateStudent_data {
   __typename: "Student";
   _id: string;
@@ -40,6 +50,7 @@ export interface UpdateStudent_updateStudent_data {
   elevated_privileges: string[] | null;
   auth_info: UpdateStudent_updateStudent_data_auth_info | null;
   user_settings: UpdateStudent_updateStudent_data_user_settings | null;
+  search_status: UpdateStudent_updateStudent_data_search_status | null;
 }
 
 export interface UpdateStudent_updateStudent {
