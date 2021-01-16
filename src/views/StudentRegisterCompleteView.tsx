@@ -121,34 +121,6 @@ const StudentRegisterCompleteView = () => {
         email: regData.email
       }
     })
-
-    /*
-    StudentAPI.updateInfo(
-      user.user._id,
-      regData.first_name,
-      regData.last_name,
-      regData.email
-    )
-    .then((res: any) => {
-      console.log(`Update Info response:`)
-      console.log(res)
-
-      if (res.data.success) {
-        // successfully updated the user data,
-        // redux user data should be re-fetched
-        dispatch(fetchUser(user, { update: true }))
-
-        // history.push('/search')
-      }
-      else {
-        // error occurred
-        setFormError({
-          hasError: true,
-          message: "Problem occurred on the server. Please try again at a later time."
-        })
-      }
-    })
-    */
   }
 
   useEffect(() => {

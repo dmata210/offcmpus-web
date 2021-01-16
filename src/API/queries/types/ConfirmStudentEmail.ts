@@ -31,6 +31,16 @@ export interface ConfirmStudentEmail_confirmStudentEmail_data_user_settings {
   push_subscriptions: ConfirmStudentEmail_confirmStudentEmail_data_user_settings_push_subscriptions[];
 }
 
+export interface ConfirmStudentEmail_confirmStudentEmail_data_search_status {
+  __typename: "SearchStatus";
+  date_updated: string;
+  searching: boolean;
+  search_start: string | null;
+  search_end: string | null;
+  price_start: number | null;
+  price_end: number | null;
+}
+
 export interface ConfirmStudentEmail_confirmStudentEmail_data {
   __typename: "Student";
   _id: string;
@@ -40,6 +50,7 @@ export interface ConfirmStudentEmail_confirmStudentEmail_data {
   elevated_privileges: string[] | null;
   auth_info: ConfirmStudentEmail_confirmStudentEmail_data_auth_info | null;
   user_settings: ConfirmStudentEmail_confirmStudentEmail_data_user_settings | null;
+  search_status: ConfirmStudentEmail_confirmStudentEmail_data_search_status | null;
 }
 
 export interface ConfirmStudentEmail_confirmStudentEmail {

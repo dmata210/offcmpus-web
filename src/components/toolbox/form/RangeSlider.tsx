@@ -172,7 +172,7 @@ const RangeSlider = ({ range, toStr, forceUpdate, updateDimensionTrigger, onChan
 
     const getValueAt = (ratio: number) => {
         if (Object.prototype.hasOwnProperty.call(range, 'start') && Object.prototype.hasOwnProperty.call(range, 'end')) {
-            let val_ = ((range as any).end - (range as any).start) * ratio
+            let val_ = (((range as any).end - (range as any).start) * ratio) + (range as any).start;
             if (toStr) return toStr(val_)
             return val_
         }
@@ -189,8 +189,7 @@ const RangeSlider = ({ range, toStr, forceUpdate, updateDimensionTrigger, onChan
         return Math.max(0, sliderBounds_.right - sliderBounds_.left)
     }
 
-    useEffect(() => {
-    }, [updateDimensionTrigger])
+    useEffect(() => {}, [updateDimensionTrigger])
 
     return (<div className="form-input-slider" ref={sliderContainerRef}>
 
@@ -278,4 +277,5 @@ export const MONTHS_ABRV = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
     "Nov", "Dec"
 ]
+export const dateToMonthAndYear = (_: Date) => `${MONTHS_ABRV[_.getMonth()]} ${_.getDate()}, ${_.getFullYear()}`;
 export default RangeSlider;

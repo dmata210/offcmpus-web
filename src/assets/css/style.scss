@@ -4523,9 +4523,90 @@ a {
 }
 
 .status-update-mod {
-  border: 1px solid black;
-  padding: 5px 5px;
   margin: 0 10px;
   font-size: 0.85rem;
   border-radius: 3px;
+  background-color: #848CFF;
+  color: white;
+  font-family: sans-serif;
+  position: relative;
+
+  &:hover {
+    .edit-status {
+      width: 55px;
+    }
+  }
+
+  .edit-status {
+    overflow: hidden;
+    cursor: pointer;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+    display: flex;
+    width: 20px;
+    transition: width 0.25s;
+
+    .edit-icon {
+      transform: translateY(2px);
+      width: 20px;
+      min-width: 20px;
+      text-align: center;
+    }
+    .edit-text {
+      padding: 2px 8px 2px 2px;
+    }
+  }
+
+  .status-icon_ {
+    box-sizing: border-box;
+    line-height: 35px;
+    text-align: center;
+    width: 40px;
+    cursor: pointer;
+  }
+
+  .key-label {
+    display: flex;
+    margin-top: 4px;
+    .key {
+      font-size: 0.7rem;
+    }
+    .label {
+      background-color: rgba(0, 0, 0, 0.16);
+      margin-left: 3px;
+      font-size: 0.7rem;
+      letter-spacing: 0.7px;
+      padding: 2px 5px;
+      border-radius: 2px;
+    }
+  }
+
+  .price-area {
+    background-color: #7B83F1;
+    display: flex;
+     justify-content: space-between;
+     padding: 5px;
+     font-size: 0.7rem;
+     border-bottom-left-radius: 3px;
+     border-bottom-right-radius: 3px;
+  }
+}
+
+.form-control-end {
+  width: 100%;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0px 0px 6px rgba(59, 67, 83, 0.05);
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 10px;
+  box-sizing: border-box;
+
+
+  .btn-area {
+
+  }
 }

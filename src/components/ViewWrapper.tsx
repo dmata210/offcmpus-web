@@ -1,11 +1,14 @@
 import React, {useState, useEffect, useRef, ChangeEvent} from 'react'
 import {useSpring, useTransform, motion} from 'framer-motion'
+import {useHistory, useLocation} from 'react-router'
 
 import AuthAPI from '../API/AuthAPI'
 
+import {dateToMonthAndYear} from './toolbox/form/RangeSlider'
+import {pushRedirect} from './hooks/usePushRedirect'
 import Popup, {PopupHeader, ConfirmLine} from '../components/toolbox/misc/Popup'
-import { HiOutlineNewspaper, HiCheckCircle, HiTerminal, 
-  HiLogout, HiClipboard, HiOutlineChatAlt,
+import { HiOutlineNewspaper, HiCheckCircle, HiTerminal, HiOutlinePencil,
+  HiLogout, HiClipboard, HiOutlineChatAlt, HiOutlineAdjustments,
   HiOutlineChevronLeft, HiOutlineChevronRight, HiCog } from 'react-icons/hi';
 import {RiLayoutMasonryLine} from 'react-icons/ri';
 import { FiFileText } from 'react-icons/fi';
@@ -15,7 +18,6 @@ import {useSelector} from 'react-redux'
 import {ReduxState} from '../redux/reducers/all_reducers'
 import {useSubmitFeedbackMutation} from '../API/queries/types/graphqlFragmentTypes'
 import {objectURI} from '../API/S3API'
-import StatusUpdateModule from './StatusUpdateModule';
 
 interface IFeedbackInfo {
   bug: boolean
@@ -48,6 +50,8 @@ const ViewWrapper = ({children,
 
   const [DEBUG_MODE, SET_DEBUG_MODE] = useState<boolean>(false)
 
+  const history = useHistory();
+  const location = useLocation();
   const contentStartRef = useRef<HTMLDivElement>(null)
   const contentEndRef = useRef<HTMLDivElement>(null)
   const [SubmitFeedback, {data: submissionData}] = useSubmitFeedbackMutation()
@@ -206,8 +210,18 @@ const ViewWrapper = ({children,
   const menuCollapseInitSpring = useSpring(menuCollapsed ? 0 : 1)
   const menuLabelHeightTransform = useTransform(menuCollapseInitSpring, (x: number) => `${x * 30}px`)
   const menuSubtitleOpacityTransform = useTransform(menuCollapseInitSpring, [0, 1], [0, 0.5])
+  
+  // status module collapse transforms
+  const statusVisibilityTransform = useTransform(menuCollapseInitSpring, (x: number) => x < 0.1 ? `hidden` : `visible`)
+  const statusMaxHeightTransform = useTransform(menuCollapseInitSpring, [0, 1], [30, 200])
 
   const menuCollapseIntermediate = useSpring(menuCollapsed ? 0 : 1)
+  const inverseMenuCollapseIntermediate = useTransform(menuCollapseIntermediate, [0, 1], [1, 0])
+  const statusIconShowOnCollapseTransform = useTransform(menuCollapseIntermediate, (x: number) => x > 0.9 ? `hidden` : `visible`)
+  const statusIconHeight = useTransform(menuCollapseIntermediate, [0, 1], [30, 0])
+  const statusFontSizeTransform = useTransform(menuCollapseIntermediate, (x: number) => {
+    return `${0.95 + (0.4 * (1-x))}rem`
+  })
   const menuWidthCollapseTransform = useTransform(menuCollapseIntermediate, [0, 1], [60, 200])
   const userControlSettingsCollapsed = useTransform(menuCollapseIntermediate, [0, 1], [1, 0])
   const leftContainerMarginTransform = useTransform(menuCollapseIntermediate, (x: number) => {
@@ -416,9 +430,67 @@ const ViewWrapper = ({children,
       <div className="top-bottom-menu-separator">
 
         {/* Status Update Module */}
-        <div>
-          <StatusUpdateModule />
-        </div>
+        {user && user.type && user.type == "student" && <div>
+          <motion.div className="status-update-mod" style={{maxHeight: statusMaxHeightTransform}}>
+            <motion.div className="status-icon_" style={{
+              opacity: inverseMenuCollapseIntermediate,
+              visibility: statusIconShowOnCollapseTransform,
+              height: statusIconHeight,
+              fontSize: statusFontSizeTransform
+            }}
+            onClick={() => {
+              pushRedirect(history, `/s/status`, location.pathname);
+            }}>
+              <HiOutlineAdjustments />
+            </motion.div>
+            <motion.div style={{
+                padding: `5px 5px`,
+                opacity: menuCollapseInitSpring,
+                visibility: statusVisibilityTransform
+              }}>
+
+                {/* Edit Status Button */}
+                <div className="edit-status" onClick={() => {
+                  pushRedirect(history, `/s/status`, location.pathname);
+                }}>
+                  <div className="edit-icon"><HiOutlinePencil/></div>
+                  <div className="edit-text">Edit</div>
+                </div>
+
+                <div style={{fontWeight: 600, height: `20px`, lineHeight: `20px`}}>Status</div>
+                {user.user && user.user.search_status && user.user.search_status.searching  
+                        && <div style={{margin: `3px 0 4px 0`, fontSize: `0.9rem`}}>Looking for lease</div>}
+
+                {user.user && user.user.search_status && !user.user.search_status.searching  
+                        && <div style={{margin: `3px 0 4px 0`, fontSize: `0.9rem`}}>Not looking for lease</div>}
+                
+                {user.user && user.user.search_status && user.user.search_status.searching  && <div style={{
+                    borderTop: `1px solid rgba(0, 0, 0, 0.05)`,
+                    paddingTop: `4px`
+                    }}>
+                    <div className="key-label">
+                        <div className="key">From</div>
+                        <div className="label">{dateToMonthAndYear(new Date(user.user.search_status.search_start!))}</div>
+                    </div>
+                    
+                    <div className="key-label">
+                        <div className="key">To</div>
+                        <div className="label">{dateToMonthAndYear(new Date(user.user.search_status.search_end!))}</div>
+                    </div>
+                </div>}
+            </motion.div>
+
+            {user.user && user.user.search_status && user.user.search_status.searching && <motion.div
+              style={{
+                opacity: menuCollapseInitSpring,
+                visibility: statusVisibilityTransform
+              }}
+              className="price-area">
+                <div style={{fontSize: `0.7rem`}}>Price Range</div>
+                <div>${user.user.search_status.price_start?.toFixed(2)} - ${user.user.search_status.price_end?.toFixed(2)}</div>
+            </motion.div>}
+          </motion.div>
+        </div>}
 
         <div className="top-area">
           <motion.div className="menu-label" style={{
