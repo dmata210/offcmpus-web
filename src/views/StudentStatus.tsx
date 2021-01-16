@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import {useHistory} from 'react-router'
-import {useSelector} from 'react-redux'
+import {useSelector, useDispatch} from 'react-redux'
 
 import {resolveRedirect} from '../components/hooks/usePushRedirect'
 import Centered from '../components/toolbox/layout/Centered'
@@ -10,9 +10,11 @@ import RangeSlider from '../components/toolbox/form/RangeSlider'
 import Button from '../components/toolbox/form/Button'
 import {useUpdateStudentSearchStatusMutation} from '../API/queries/types/graphqlFragmentTypes'
 import {ReduxState} from '../redux/reducers/all_reducers'
+import {fetchUser} from '../redux/actions/user'
 
 const StudentStatus = () => {
 
+    const dispatch = useDispatch()
     const user = useSelector((state: ReduxState) => state.user)
     const [searching, setSearching] = useState<boolean | undefined>(false);
     const [dateInfo, setDateInfo] = useState<(Date | null)[]>([null, null]);
@@ -47,7 +49,7 @@ const StudentStatus = () => {
                 setFormError({hasError: true, message: "Problem updating status. Please try again."});
             }
             else {
-                console.log("Status updated!");
+                dispatch(fetchUser(user, {update: true}));
                 resolveRedirect(history);
             }
         }
@@ -163,7 +165,7 @@ const StudentStatus = () => {
                         text="Cancel"
                         textColor="#1E2019"
                         background="#F6F7F9"
-                        onClick={() => history.push('/')}
+                        onClick={() => resolveRedirect(history)}
                     />     
                 </div> 
                 <div className="confirm-btn btn-area" style={{width: `150px`}}>

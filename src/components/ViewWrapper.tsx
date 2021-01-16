@@ -4,6 +4,7 @@ import {useHistory, useLocation} from 'react-router'
 
 import AuthAPI from '../API/AuthAPI'
 
+import {dateToMonthAndYear} from './toolbox/form/RangeSlider'
 import {pushRedirect} from './hooks/usePushRedirect'
 import Popup, {PopupHeader, ConfirmLine} from '../components/toolbox/misc/Popup'
 import { HiOutlineNewspaper, HiCheckCircle, HiTerminal, HiOutlinePencil,
@@ -457,33 +458,37 @@ const ViewWrapper = ({children,
                 </div>
 
                 <div style={{fontWeight: 600, height: `20px`, lineHeight: `20px`}}>Status</div>
-                <div style={{margin: `3px 0 4px 0`, fontSize: `0.9rem`}}>Looking for lease</div>
+                {user.user && user.user.search_status && user.user.search_status.searching  
+                        && <div style={{margin: `3px 0 4px 0`, fontSize: `0.9rem`}}>Looking for lease</div>}
+
+                {user.user && user.user.search_status && !user.user.search_status.searching  
+                        && <div style={{margin: `3px 0 4px 0`, fontSize: `0.9rem`}}>Not looking for lease</div>}
                 
-                <div style={{
+                {user.user && user.user.search_status && user.user.search_status.searching  && <div style={{
                     borderTop: `1px solid rgba(0, 0, 0, 0.05)`,
                     paddingTop: `4px`
-                }}>
+                    }}>
                     <div className="key-label">
                         <div className="key">From</div>
-                        <div className="label">Jan 6th, 2021</div>
+                        <div className="label">{dateToMonthAndYear(new Date(user.user.search_status.search_start!))}</div>
                     </div>
                     
                     <div className="key-label">
                         <div className="key">To</div>
-                        <div className="label">Mar 6th, 2021</div>
+                        <div className="label">{dateToMonthAndYear(new Date(user.user.search_status.search_end!))}</div>
                     </div>
-                </div>
+                </div>}
             </motion.div>
 
-            <motion.div
+            {user.user && user.user.search_status && user.user.search_status.searching && <motion.div
               style={{
                 opacity: menuCollapseInitSpring,
                 visibility: statusVisibilityTransform
               }}
               className="price-area">
                 <div style={{fontSize: `0.7rem`}}>Price Range</div>
-                <div>$300 - $600</div>
-            </motion.div>
+                <div>${user.user.search_status.price_start?.toFixed(2)} - ${user.user.search_status.price_end?.toFixed(2)}</div>
+            </motion.div>}
           </motion.div>
         </div>}
 

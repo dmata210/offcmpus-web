@@ -277,4 +277,5 @@ export const MONTHS_ABRV = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
     "Nov", "Dec"
 ]
+export const dateToMonthAndYear = (_: Date) => `${MONTHS_ABRV[_.getMonth()]} ${_.getDate()}, ${_.getFullYear()}`;
 export default RangeSlider;
