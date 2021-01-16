@@ -3,8 +3,9 @@ import {Route, Redirect} from 'react-router'
 import AccessLevels from './accessLevels.json'
 // import AuthAPI from '../../API/AuthAPI'
 import Cookies from 'universal-cookie'
-import {useHistory} from 'react-router'
+import {useHistory, useLocation} from 'react-router'
 import NoInternetConnection from '../../views/NoInternetConnection'
+import {pushRedirect} from '../../components/hooks/usePushRedirect'
 
 import _ from 'lodash'
 
@@ -18,6 +19,7 @@ import {Student, Landlord} from '../../API/queries/types/graphqlFragmentTypes'
 const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
 
   const history = useHistory()
+  const location = useLocation()
   const cookie = new Cookies()
   const [pageReachTimeout, setPageRechTimeout] = useState<boolean>(false)
 
@@ -108,6 +110,13 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
       || user.user.last_name == undefined
       || user.user.email == undefined ) {
         history.push('/student/register/complete')
+      }
+      
+      // check when the student last updated their status.
+      // If it has been a month, take them to the status update page.
+      if (!user.user.search_status 
+        || new Date().getTime() - new Date(user.user.search_status.date_updated).getTime() >= 1000 * 60 * 60 * 24 * 30) {
+        pushRedirect(history, '/s/status', '/');
       }
 
       if (user.user && user.user.auth_info && user.user.auth_info.institution_id) {
