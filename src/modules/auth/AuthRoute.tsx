@@ -60,6 +60,8 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
 
   useEffect(() => {
 
+    console.log(`Page: ${window.location.href}`)
+
     let t_ = setTimeout(() => {
       setPageRechTimeout(true);
     }, 10000)

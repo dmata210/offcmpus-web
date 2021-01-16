@@ -2,6 +2,8 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -28,6 +30,7 @@ export type Query = {
   getOwnershipsInReview: OwnershipCollectionApiResponse;
   getOwnershipsForLandlord: OwnershipCollectionApiResponse;
   getOwnershipConflicts: OwnershipCollectionApiResponse;
+  getFeedback: FeedbackCollectionApiResponse;
 };
 
 
@@ -111,6 +114,12 @@ export type QueryGetOwnershipConflictsArgs = {
   ownership_id: Scalars['String'];
 };
 
+
+export type QueryGetFeedbackArgs = {
+  limit: Scalars['Float'];
+  offset: Scalars['Float'];
+};
+
 export type LandlordApiResponse = {
   __typename?: 'LandlordAPIResponse';
   success: Scalars['Boolean'];
@@ -175,6 +184,7 @@ export type Student = {
   elevated_privileges?: Maybe<Array<Scalars['String']>>;
   confirmation_key?: Maybe<Array<Scalars['String']>>;
   user_settings?: Maybe<StudentUserSettings>;
+  search_status?: Maybe<SearchStatus>;
 };
 
 /** Cas Auth Information */
@@ -189,6 +199,17 @@ export type StudentUserSettings = {
   __typename?: 'StudentUserSettings';
   recieve_email_notifications: Scalars['Boolean'];
   push_subscriptions: Array<PushSubscription>;
+};
+
+/** Status of student search */
+export type SearchStatus = {
+  __typename?: 'SearchStatus';
+  date_updated: Scalars['String'];
+  searching: Scalars['Boolean'];
+  search_start?: Maybe<Scalars['String']>;
+  search_end?: Maybe<Scalars['String']>;
+  price_start?: Maybe<Scalars['Float']>;
+  price_end?: Maybe<Scalars['Float']>;
 };
 
 export type PropertyCollectionEntriesApiResponse = {
@@ -394,12 +415,36 @@ export type OwnershipCollection = {
   ownerships: Array<Ownership>;
 };
 
+export type FeedbackCollectionApiResponse = {
+  __typename?: 'FeedbackCollectionAPIResponse';
+  success: Scalars['Boolean'];
+  error?: Maybe<Scalars['String']>;
+  data?: Maybe<FeedbackCollection>;
+};
+
+/** a collection of feedback response */
+export type FeedbackCollection = {
+  __typename?: 'FeedbackCollection';
+  feedback_collection: Array<Feedback>;
+};
+
+/** Feedback submission entry */
+export type Feedback = {
+  __typename?: 'Feedback';
+  submitter_id: Scalars['String'];
+  user_type: Scalars['String'];
+  message: Scalars['String'];
+  date_submitted: Scalars['String'];
+  tags: Array<Scalars['String']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createLandlord: LandlordApiResponse;
   updatePhoneNumber: LandlordApiResponse;
   confirmLandlordEmail: LandlordApiResponse;
   setLandlordOnboarded: LandlordApiResponse;
+  updateStudentSearchStatus: StudentApiResponse;
   addPropertyToStudentCollection: PropertyCollectionEntriesApiResponse;
   removePropertyFromStudentCollection: PropertyCollectionEntriesApiResponse;
   updateStudent: StudentApiResponse;
@@ -434,6 +479,16 @@ export type MutationConfirmLandlordEmailArgs = {
 
 export type MutationSetLandlordOnboardedArgs = {
   landlord_id: Scalars['String'];
+};
+
+
+export type MutationUpdateStudentSearchStatusArgs = {
+  price_end?: Maybe<Scalars['Float']>;
+  price_start?: Maybe<Scalars['Float']>;
+  search_end?: Maybe<Scalars['String']>;
+  search_start?: Maybe<Scalars['String']>;
+  searching: Scalars['Boolean'];
+  id: Scalars['String'];
 };
 
 
@@ -557,16 +612,6 @@ export type FeedbackApiResponse = {
   data?: Maybe<Feedback>;
 };
 
-/** Feedback submission entry */
-export type Feedback = {
-  __typename?: 'Feedback';
-  submitter_id: Scalars['String'];
-  user_type: Scalars['String'];
-  message: Scalars['String'];
-  date_submitted: Scalars['String'];
-  tags: Array<Scalars['String']>;
-};
-
 export type CollectionQueryVariables = Exact<{
   id: Scalars['String'];
   offset: Scalars['Int'];
@@ -646,7 +691,7 @@ export type SubmitFeedbackMutationVariables = Exact<{
   submitter_id: Scalars['String'];
   user_type: Scalars['String'];
   message: Scalars['String'];
-  tags: Array<Scalars['String']>;
+  tags: Array<Scalars['String']> | Scalars['String'];
 }>;
 
 
@@ -884,7 +929,7 @@ export type AddOwnershipConfirmationActivityMutation = (
 
 export type AddOwnershipDocumentsMutationVariables = Exact<{
   ownership_id: Scalars['String'];
-  documents_info: Array<OwnershipDocumentInput>;
+  documents_info: Array<OwnershipDocumentInput> | OwnershipDocumentInput;
 }>;
 
 
@@ -1100,7 +1145,7 @@ export type VerifyAddressQuery = (
 
 export type AddImagesToPropertyMutationVariables = Exact<{
   property_id: Scalars['String'];
-  s3_keys: Array<Scalars['String']>;
+  s3_keys: Array<Scalars['String']> | Scalars['String'];
 }>;
 
 

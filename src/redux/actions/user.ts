@@ -46,7 +46,8 @@ const fetchUser = (user: any, {update}: {update: boolean}) => {
             },
             saved_collection: user_.user.saved_collection,
             elevated_privileges: user_.user.elevated_privileges,
-            user_settings: user_.user.user_settings
+            user_settings: user_.user.user_settings,
+            search_status: user_.user.search_status
           }
     
           let student_auth: StudentInfo = {
