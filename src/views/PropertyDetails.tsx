@@ -16,6 +16,7 @@ import ImageUploadPopup, {FileTypes} from '../components/toolbox/misc/ImageUploa
 import {uploadObjects, deleteObject, objectURI} from '../API/S3API'
 import Checkbox from '../components/toolbox/form/Checkbox'
 import NoEntries from '../components/toolbox/misc/NoEnties'
+import MoreDetails from '../components/toolbox/misc/MoreDetails2'
 
 const PropertyDetailsView = (
     {property_id}: {property_id: string}
@@ -240,9 +241,9 @@ const PropertyDetailsView = (
                     <div className="split-body">
                         <div className="left">
                             <Card header="Leases">
-                                <LeaseInfo id={1} info={true} />
-                                <LeaseInfo id={2} info={true} />
-                                <LeaseInfo id={3} info={false} />
+                                <LeaseInfo id={1} type={"external"} />
+                                <LeaseInfo id={2} type={"empty"} />
+                                <LeaseInfo id={3} type={"occupied"} />
                             </Card>
                         </div>
 
@@ -391,16 +392,41 @@ const Card = ({children, header, right_side}: CardProps) => {
     </div>
 }
 
-const LeaseInfo = ({info, id}: {info: boolean, id: number}) => {
+interface LeaseInfoProps {
+    id: number
+    type: 'external' | 'empty' | 'occupied'
+}
+const LeaseInfo = ({type, id}: LeaseInfoProps) => {
 
     return (<div className="lease-info">
         <div className="header__">
             <div className="left__">Room {id}</div>
-            {info && <div className="right__">
-                <Button textColor="white" background="#8AE59C" text="Create Lease" />    
+
+            {/* Empty Lease -> Can create lease */}
+            {type == 'empty' && <div className="right__">
+                <Button bold={true} textColor="white" background="#8AE59C" text="Create Lease" transformDisabled={true} />    
             </div>}
+
+            {/* External Lease -> Lease is not managed through offcmpus */}
+            {type == 'external' && <div className="right__">
+                <div style={{display: `flex`}}>
+                    <div style={{width: `20px`,
+                        position: `relative`,
+                        top: `4px`,
+                        marginRight: `8px`}}>
+                        <MoreDetails 
+                            width={200}
+                            details={`You have previously declared that this room is occupied through means not provided by offcmpus.
+                            You can migrate this property onto offcmpus platform if it is no longer being occupied externally.`} />
+                    </div>
+                    <div>
+                        <Button bold={true} textColor="white" background="#E0777D" text="Migrate Lease" transformDisabled={true} />    
+                    </div>
+                </div>
+            </div>}
+
         </div>
-        {!info && <div className="body__">
+        {type == 'occupied' && <div className="body__">
             <div className="paragraph-text">
                 Active from December 10th, 2020 through March 1st, 2021.
                 <div className="leased-by"><span className="icon"><HiOutlineArrowNarrowRight /></span>
