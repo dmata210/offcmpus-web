@@ -109,7 +109,7 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
       || user.user.first_name == undefined
       || user.user.last_name == undefined
       || user.user.email == undefined ) {
-        history.push('/student/register/complete')
+        history.push('/student/register/complete');
       }
       
       // check when the student last updated their status.
