@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import {useHistory} from 'react-router'
+import {useSelector} from 'react-redux'
 
 import Centered from '../components/toolbox/layout/Centered'
 import RatioInput from '../components/toolbox/form/RadioInput'
@@ -7,13 +8,19 @@ import DatePicker from '../components/toolbox/form/DatePicker'
 import RangeSlider from '../components/toolbox/form/RangeSlider'
 import Button from '../components/toolbox/form/Button'
 import {useUpdateStudentSearchStatusMutation} from '../API/queries/types/graphqlFragmentTypes'
+import {ReduxState} from '../redux/reducers/all_reducers'
 
 const StudentStatus = () => {
 
+    const user = useSelector((state: ReduxState) => state.user)
     const [searching, setSearching] = useState<boolean | undefined>(false);
     const [dateInfo, setDateInfo] = useState<(Date | null)[]>([null, null]);
     const [priceRange, setPriceRange] = useState<(number | null)[]>([null, null]);
+    const [formError, setFormError] = useState<{hasError: boolean, message: string}>({hasError: false, message: ""})
+
     const history = useHistory();
+
+    const [UpdateStatus, {data: updateStatusResponse}] = useUpdateStudentSearchStatusMutation();
 
     const [_update, setUpdate] = useState<boolean>(false);
     const updateRef_ = useRef<boolean>(false);
@@ -33,9 +40,64 @@ const StudentStatus = () => {
         }
     }, [])
 
+    useEffect(() => {
+        if (updateStatusResponse && updateStatusResponse.updateStudentSearchStatus) {
+            if (updateStatusResponse.updateStudentSearchStatus.error || !updateStatusResponse.updateStudentSearchStatus.data) {
+                setFormError({hasError: true, message: "Problem updating status. Please try again."});
+            }
+            else {
+                console.log("Status updated!");
+            }
+        }
+    }, [updateStatusResponse])
+
     const saveForm = () => {
         if (searching == undefined) {
+            setFormError({hasError: true, message: "No answer provided for search status"});
+            return;
+        }
+        if (user && user.user && user.user.type == "student") {
             
+            // if the student is not searching for a property, no other information
+            // needs to be provided.
+            if (searching == false) {
+                UpdateStatus({
+                    variables: {
+                        id: user.user._id,
+                        searching: false
+                    }
+                });
+            }
+
+            // if the student is searching for a property, they must provide the time range
+            // they are looking for a property for and the price range they'd prefer.
+            else {
+
+                if (dateInfo[0] == null || dateInfo[1] == null) {
+                    setFormError({hasError: true, message: "Invalid date range provided"});
+                    return;
+                }
+                else if (dateInfo[0] < new Date()) {
+                    setFormError({hasError: true, message: "Cannot set date in the past"});
+                    return;
+                }
+                else if (priceRange[0] == null || priceRange[1] == null) {
+                    setFormError({hasError: true, message: "Must provide a preferred price range"});
+                    return;
+                }
+                else {
+                    UpdateStatus({
+                        variables: {
+                            id: user.user._id,
+                            searching: true,
+                            search_start: dateInfo[0].toISOString(),
+                            search_end: dateInfo[1].toISOString(),
+                            price_start: priceRange[0],
+                            price_end: priceRange[1]
+                        }
+                    });
+                }
+            }
         }
     }
 
