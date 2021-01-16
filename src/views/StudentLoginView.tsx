@@ -28,12 +28,37 @@ const StudentLoginView = () => {
     console.log(`name: ${name_}`)
     switch (name_.toLowerCase()) {
       case 'rensselaer polytechnic institute':
-      window.location.replace(getCASURL())
+        // window.location.replace(getCASURL())
+        handleAuthContext({auth_url: getCASURL()});
         break;
 
       default:
         setError({error: institutionName.length == 0 ? `No institution selected` : `Unrecognized institution: ${institutionName}`})
     }
+  }
+
+  const handleAuthContext = ({auth_url}: {auth_url: string}) => {
+    console.log(`Auth redirect to => ${auth_url}`);
+    let window_ = createAuthContext(auth_url);
+  }
+
+  const triggerAuthComplete = () => {
+    alert("Auth Complete Triggered.");
+  }
+
+  const createAuthContext = (url: string) => {
+    const ctxWindow = window.open(url, undefined, "height=700,width=500,status=yes,toolbar=no,menubar=no,location=yes");
+    window.addEventListener('message', (message) => {
+      if (message.data && message.data.authSuccess == true) {
+        console.log(`CAS Auth successful!`);
+        ctxWindow?.close();
+        // history.push('/');
+        window.location.reload();
+      }
+      else console.log(`CAS Auth failed`);
+    });
+
+    return ctxWindow;
   }
 
   const getCASURL = (): string => {
