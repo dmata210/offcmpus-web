@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef, ChangeEvent} from 'react'
 import {useSpring, useTransform, motion} from 'framer-motion'
-import {useHistory} from 'react-router'
+import {useHistory, useLocation} from 'react-router'
 
 import AuthAPI from '../API/AuthAPI'
 
@@ -50,6 +50,7 @@ const ViewWrapper = ({children,
   const [DEBUG_MODE, SET_DEBUG_MODE] = useState<boolean>(false)
 
   const history = useHistory();
+  const location = useLocation();
   const contentStartRef = useRef<HTMLDivElement>(null)
   const contentEndRef = useRef<HTMLDivElement>(null)
   const [SubmitFeedback, {data: submissionData}] = useSubmitFeedbackMutation()
@@ -437,7 +438,7 @@ const ViewWrapper = ({children,
               fontSize: statusFontSizeTransform
             }}
             onClick={() => {
-              pushRedirect(history, `/s/status`, `/search`);
+              pushRedirect(history, `/s/status`, location.pathname);
             }}>
               <HiOutlineAdjustments />
             </motion.div>
@@ -449,7 +450,7 @@ const ViewWrapper = ({children,
 
                 {/* Edit Status Button */}
                 <div className="edit-status" onClick={() => {
-                  pushRedirect(history, `/s/status`, `/search`);
+                  pushRedirect(history, `/s/status`, location.pathname);
                 }}>
                   <div className="edit-icon"><HiOutlinePencil/></div>
                   <div className="edit-text">Edit</div>

@@ -1,4 +1,5 @@
 import urlencode from 'urlencode'
+import queryString from 'query-string'
 
 /**
  * usePushRedirect
@@ -9,6 +10,16 @@ import urlencode from 'urlencode'
  * @param target_route
  */
 export const pushRedirect = (history: any, target_route: string, redirect_route: string) => {
-    // const history = useHistory();
     history.push({pathname: target_route, search: `?r=${urlencode(redirect_route)}`})
+}
+
+/**
+ * resolveRedirect
+ * @desc Take the redirect search query parameter and return to that path.
+ * @param history 
+ */
+export const resolveRedirect = (history: any) => {
+    history.push({
+        pathname: queryString.parse(window.location.search).r || '/'
+    });
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import {useHistory} from 'react-router'
 import {useSelector} from 'react-redux'
 
+import {resolveRedirect} from '../components/hooks/usePushRedirect'
 import Centered from '../components/toolbox/layout/Centered'
 import RatioInput from '../components/toolbox/form/RadioInput'
 import DatePicker from '../components/toolbox/form/DatePicker'
@@ -47,16 +48,27 @@ const StudentStatus = () => {
             }
             else {
                 console.log("Status updated!");
+                resolveRedirect(history);
             }
         }
     }, [updateStatusResponse])
 
+    useEffect(() => {
+        console.log(formError);
+    }, [formError])
+
     const saveForm = () => {
+
+        console.log(`Searching? ${searching}`);
+        console.log(`Date Range: `, dateInfo);
+        console.log(`Price Range: `, priceRange);
+        console.log(`User: `, user);
+
         if (searching == undefined) {
             setFormError({hasError: true, message: "No answer provided for search status"});
             return;
         }
-        if (user && user.user && user.user.type == "student") {
+        if (user && user.user && user.type == "student") {
             
             // if the student is not searching for a property, no other information
             // needs to be provided.
