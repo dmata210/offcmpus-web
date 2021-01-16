@@ -4,6 +4,7 @@ import {useHistory} from 'react-router'
 
 import AuthAPI from '../API/AuthAPI'
 
+import {pushRedirect} from './hooks/usePushRedirect'
 import Popup, {PopupHeader, ConfirmLine} from '../components/toolbox/misc/Popup'
 import { HiOutlineNewspaper, HiCheckCircle, HiTerminal, HiOutlinePencil,
   HiLogout, HiClipboard, HiOutlineChatAlt, HiOutlineAdjustments,
@@ -435,7 +436,9 @@ const ViewWrapper = ({children,
               height: statusIconHeight,
               fontSize: statusFontSizeTransform
             }}
-            onClick={() => history.push('/s/status')}>
+            onClick={() => {
+              pushRedirect(history, `/s/status`, `/search`);
+            }}>
               <HiOutlineAdjustments />
             </motion.div>
             <motion.div style={{
@@ -445,7 +448,9 @@ const ViewWrapper = ({children,
               }}>
 
                 {/* Edit Status Button */}
-                <div className="edit-status" onClick={() => history.push('/s/status')}>
+                <div className="edit-status" onClick={() => {
+                  pushRedirect(history, `/s/status`, `/search`);
+                }}>
                   <div className="edit-icon"><HiOutlinePencil/></div>
                   <div className="edit-text">Edit</div>
                 </div>
