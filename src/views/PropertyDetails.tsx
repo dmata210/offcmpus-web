@@ -7,8 +7,13 @@ import {PropertyDetails, Property,
     PropertyImageInfo,
     useGetPropertyOwnedByLandlordLazyQuery,
     useAddImagesToPropertyMutation,
+    useGetLeasesAndOccupantsLazyQuery,
+    useGetOwnershipForPropertyLazyQuery,
     useRemoveImageFromPropertyMutation,
-    useUpdatePropertyDetailsMutation} from '../API/queries/types/graphqlFragmentTypes'
+    useUpdatePropertyDetailsMutation,
+    Ownership,
+    Lease,
+    LeaseCollection} from '../API/queries/types/graphqlFragmentTypes'
 import Button from '../components/toolbox/form/Button'
 import {HiOutlineArrowNarrowRight, HiCheck} from 'react-icons/hi'
 import {DashboardSidebar} from './LandlordDashboard'
@@ -27,6 +32,8 @@ const PropertyDetailsView = (
     const [showUpdateImagePopup, setShowUpdateImagePopup] = useState<boolean>(false)
     const [detailsEditMode, setDetailsEditMode] = useState<boolean>(false)
     const [property, setProperty] = useState<Property | null>(null)
+    const [ownership, setOwnership] = useState<Ownership | null>(null)
+    const [leases, setLeases] = useState<Lease[] | null>(null)
     const [updatedDetails, setUpdatedDetails] = useState<{
         description: string | null, furnished: boolean | null, has_washer: boolean | null, has_heater: boolean | null,
         has_ac: boolean | null
@@ -38,6 +45,8 @@ const PropertyDetailsView = (
         has_ac: null
     })
 
+    const [GetOwnership, {data: propertyQueryResponse}] = useGetOwnershipForPropertyLazyQuery();
+    const [GetLeases, {data: leaseQueryResponse}] = useGetLeasesAndOccupantsLazyQuery();
     const [UpdatePropertyDetails, {data: updatedPropertyDetailsResponse}] = useUpdatePropertyDetailsMutation()
     const [GetPropertyOwnedByLandlord, {data: propertyResponse}] = useGetPropertyOwnedByLandlordLazyQuery()
     const [AddImagesToProperty, {data: addImagesToPropertyResponse}] = useAddImagesToPropertyMutation()
@@ -46,6 +55,31 @@ const PropertyDetailsView = (
     const isSet = (_: any) => _ != null && _ != undefined
 
     const propertyDetailsSet = (details: PropertyDetails | null | undefined): boolean => isSet(details)
+
+    useEffect(() => {
+        if (leaseQueryResponse && leaseQueryResponse.getLeasesAndOccupants 
+            && leaseQueryResponse.getLeasesAndOccupants.data && leaseQueryResponse.getLeasesAndOccupants.data.leases) {
+
+                setLeases(leaseQueryResponse.getLeasesAndOccupants.data.leases);
+            }
+    }, [leaseQueryResponse])
+
+    useEffect(() => {
+        if (ownership != null) {
+            GetLeases({
+                variables: {
+                    ownership_id: ownership._id
+                }
+            });
+        }
+    }, [ownership])
+
+    useEffect(() => {
+        if (propertyQueryResponse && propertyQueryResponse.getOwnershipForProperty
+            && propertyQueryResponse.getOwnershipForProperty.data) {
+                setOwnership( propertyQueryResponse.getOwnershipForProperty.data );
+            }
+    }, [propertyQueryResponse]);
 
     useEffect(() => {
 
@@ -101,6 +135,14 @@ const PropertyDetailsView = (
                 }
                 else {
                     setProperty(propertyResponse.getPropertyOwnedByLandlord.data)
+                    // Get the ownership for the property
+                    GetOwnership({
+                        variables: {
+                            property_id: property_id,
+                            landlord_id: user && user.user ? user.user._id : 'null'
+                        }
+                    })
+                    
                 }
             }
         }
@@ -241,9 +283,12 @@ const PropertyDetailsView = (
                     <div className="split-body">
                         <div className="left">
                             <Card header="Leases">
-                                <LeaseInfo id={1} type={"external"} />
+                                {/* <LeaseInfo id={1} type={"external"} />
                                 <LeaseInfo id={2} type={"empty"} />
-                                <LeaseInfo id={3} type={"occupied"} />
+                                <LeaseInfo id={3} type={"occupied"} /> */}
+                                {leases != null && leases.map((lease: Lease, i: number) => {
+                                    return (<LeaseInfo key={i} id={i+1} lease={lease} />)
+                                })}
                             </Card>
                         </div>
 
@@ -394,21 +439,22 @@ const Card = ({children, header, right_side}: CardProps) => {
 
 interface LeaseInfoProps {
     id: number
-    type: 'external' | 'empty' | 'occupied'
+    // type: 'external' | 'empty' | 'occupied'
+    lease: Lease
 }
-const LeaseInfo = ({type, id}: LeaseInfoProps) => {
+const LeaseInfo = ({lease, id}: LeaseInfoProps) => {
 
     return (<div className="lease-info">
         <div className="header__">
             <div className="left__">Room {id}</div>
 
             {/* Empty Lease -> Can create lease */}
-            {type == 'empty' && <div className="right__">
-                <Button bold={true} textColor="white" background="#8AE59C" text="Create Lease" transformDisabled={true} />    
+            {!lease.external_occupant && lease.occupant_id == null && <div className="right__">
+                <Button bold={true} link_to={`/landlord/property/lease/new/${lease._id}`} textColor="white" background="#8AE59C" text="Create Lease" transformDisabled={true} />    
             </div>}
 
             {/* External Lease -> Lease is not managed through offcmpus */}
-            {type == 'external' && <div className="right__">
+            {lease.external_occupant == true && <div className="right__">
                 <div style={{display: `flex`}}>
                     <div style={{width: `20px`,
                         position: `relative`,
@@ -420,13 +466,13 @@ const LeaseInfo = ({type, id}: LeaseInfoProps) => {
                             You can migrate this property onto offcmpus platform if it is no longer being occupied externally.`} />
                     </div>
                     <div>
-                        <Button bold={true} textColor="white" background="#E0777D" text="Migrate Lease" transformDisabled={true} />    
+                        <Button bold={true} link_to={`/landlord/property/lease/new/${lease._id}`} textColor="white" background="#E0777D" text="Migrate Lease" transformDisabled={true} />    
                     </div>
                 </div>
             </div>}
 
         </div>
-        {type == 'occupied' && <div className="body__">
+        {!lease.external_occupant && lease.occupant_id != null && <div className="body__">
             <div className="paragraph-text">
                 Active from December 10th, 2020 through March 1st, 2021.
                 <div className="leased-by"><span className="icon"><HiOutlineArrowNarrowRight /></span>

@@ -14,6 +14,7 @@ export interface LeaseUpdateInput {
   lease_id: string;
   price_per_month?: number | null;
   external_occupant?: boolean | null;
+  active?: boolean | null;
   lease_priority?: number | null;
   priority_start_date?: string | null;
   priority_end_date?: string | null;
