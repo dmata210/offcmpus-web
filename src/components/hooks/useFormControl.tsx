@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef, createRef, useLayoutEffect} from 'react'
 // @ts-ignore
 import {Form, FormSelect , FormCheckbox, FormTextarea, FormInput, FormGroup} from 'shards-react'
+import {HiOutlineCloudUpload, HiX} from 'react-icons/hi'
 
 interface RadioInputConfig {
     type: 'radio'
@@ -32,12 +33,23 @@ interface SelectInputConfig {
     options: string[]
 }
 
+interface FileUploadConfig {
+    type: 'fileupload'
+    text: string
+    fileInputType: 'single' | 'multiple'
+    allowed_filetypes: string[]
+    // maximum size for each file in bytes
+    max_filesize: number
+}
+
 type FormInputConfig = ((InputFieldConfig | RadioInputConfig | TextareaInputConfig | SelectInputConfig) & {
     // a function that, when given the value of the input, return a 
     // boolean representing if the value is a valid form input or not
     validator?: (value: string) => boolean
 }) | (CheckboxInputConfig & {
     validator?: (value: string[]) => boolean
+}) | (FileUploadConfig & {
+    validator?: (file: File[]) => boolean
 })
 
 interface FormControlHookConfig {
@@ -92,7 +104,8 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
             // skip setting onchange event for radio ref
             if (config[keys[i]].type == 'radio' 
             || config[keys[i]].type == 'checkbox'
-            || config[keys[i]].type == 'textarea') continue;
+            || config[keys[i]].type == 'textarea'
+            || config[keys[i]].type == 'fileupload') continue;
 
             let ref_ = formInputRefs[keys[i]].current;
             if (!ref_) console.log(`Ref for key ${keys[i]} is not set.`)
@@ -113,7 +126,7 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
         let states: {[key: string]: any} = {}
         for (let i = 0; i < keys.length; ++i) {
             if (config[keys[i]].type == 'radio' || config[keys[i]].type == 'checkbox'
-                || config[keys[i]].type == 'textarea') {
+                || config[keys[i]].type == 'textarea' || config[keys[i]].type == 'fileupload') {
                 states[keys[i]] = formInputRefs[keys[i]].current;
                 continue;
             }
@@ -124,6 +137,51 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
                 states[keys[i]] = formInputRefs[keys[i]].current.value;
         }
         return states;
+    }
+
+    /*
+    * @desc Initialize the file upload ctx window to select files based on
+    * config provided.
+    */
+    const handleFileUpload = (field_key: string, input_config: FileUploadConfig) => {
+
+        // create input
+        let fileCtx = document.createElement('input');
+        fileCtx.setAttribute('type', 'file');
+        if (input_config.fileInputType == 'multiple') fileCtx.setAttribute('multiple', 'multiple');
+        
+        // set the file types to accept
+        fileCtx.setAttribute('accept', input_config.allowed_filetypes.join(', '));
+
+        // handle change event
+        fileCtx.addEventListener('change', (e: any) => {
+            // filter out the files that are not of the right filetype
+            // or that exceed the max file size
+            let files: FileList = e.target.files;
+            let accepted_files: File[] = [];
+
+            for (let i = 0; i < files.length; ++i) {
+                if (files[i].size > input_config.max_filesize) continue;
+                if (!input_config.allowed_filetypes.includes(files[i].type)) continue;
+                accepted_files.push(files[i]);
+            }
+
+            // set the ref and update state
+            let newState = {...formInputStates};
+
+            let new_files_arr: File[] = []
+            if (newState[field_key] == null) new_files_arr = accepted_files;
+            else new_files_arr = [...newState[field_key], ...accepted_files]
+
+            formInputRefs[field_key].current = new_files_arr;
+            newState[field_key] = new_files_arr;
+
+            setFormInputStates(newState);
+        })
+
+        // trigger file ctx open
+        fileCtx.click();
+
     }
 
     // input generator
@@ -142,6 +200,61 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
         }
 
         switch (input.type) {
+            case 'fileupload':
+                return (<FormGroup>
+                    <label htmlFor={`#${field_key}_${formId}`}>{input.text}</label>
+                    <div 
+                        className="form-ctrl-file-upload-container" 
+                        onClick={() => {
+                            if (formInputStates[field_key] == null) handleFileUpload(field_key, input)
+                        }}>
+                            
+                            {/* Shown when no files are uploaded */}
+                            {formInputStates[field_key] == null &&
+                            <div className="no-upload">
+                                <div className="icon_"><HiOutlineCloudUpload /></div>
+                                <div className="text_">Click here to upload a file</div>
+                                <div className="subtext_">
+                                    {/* {input.allowed_filetypes.map((allowed: string, i: number)
+                                    => <span className="allowed_"></span>)} */}
+                                </div>
+                            </div>}
+
+                            {/* Shown when there's at least 1 file TODO */}
+                            {formInputStates[field_key] != null && <div className="file-holder_">
+                                <div className="upload-count">
+                                    <div>{formInputStates[field_key].length} {formInputStates[field_key].length == 1 ? 'document' : 'documents'} uploaded</div>
+                                    <div className="upload-button" onClick={() => handleFileUpload(field_key, input)}>Upload</div>
+                                </div>  
+
+                                {/* Show files */}
+                                <div className="file-list">
+                                    {formInputStates[field_key].map((file_: File, i: number) => {
+                                        return (<div className="file-entry" key={i}>
+                                            <div className="file-text-name">{file_.name}</div>
+                                            <div className="remove-file-icon" onClick={() => {
+
+                                                let newState = {...formInputStates};
+                                                if (newState[field_key] != null && newState[field_key].length > 1) {
+                                                    newState[field_key].splice(newState[field_key].indexOf(file_), 1);
+
+                                                    formInputRefs[field_key].current = newState[field_key];
+                                                    setFormInputStates(newState);
+                                                }
+                                                else {
+                                                    newState[field_key] = null;
+                                                    formInputRefs[field_key].current = null;
+                                                    setFormInputStates(newState);
+                                                }
+
+                                            }}><HiX /></div>
+                                        </div>);
+                                    })}
+                                </div> 
+                            </div>}
+
+                    </div>
+                </FormGroup>)
             case 'select':
                 return (<FormGroup>
                     <label htmlFor={`#${field_key}_${formId}`}>{input.text}</label>
@@ -276,4 +389,22 @@ export const $or = (fnA: (value: string) => boolean, fnB: (value: string) => boo
 const RadioBubble = ({text, selected, onClick}: {text: string, selected: boolean, onClick: Function}) => {
 
     return (<div className={`form-control-radio ${selected ? `active` : ``}`} onClick={() => onClick()}>{text}</div>)
+}
+
+// Filetype Specifiers
+// more mimetypes can be found at: 
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+export const Filetype = {
+    image: {
+        png:    `image/png`,
+        jpeg:   `image/jpeg`,
+        gif:    `image/gif`
+    },
+    application: {
+        pdf:    `application/pdf`,
+        doc:    `application/msword`,
+        docx:   `application/vnd.openxmlformats-officedocument.wordprocessingml.document`,
+        json:   `application/json`,
+        jsonld: `application/ld+json`,
+    }
 }

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 
 import Centered from '../components/toolbox/layout/Centered'
-import {useFormControl, noSpace, $and, alphaNumeric} from '../components/hooks/useFormControl'
+import {useFormControl, Filetype, noSpace, $and, alphaNumeric} from '../components/hooks/useFormControl'
 
 
 /*
@@ -27,6 +27,13 @@ const NewLeaseView = () => {
         label: {
           text: "Enter your password below."
         }
+      },
+      fileUploadTest: {
+        type: 'fileupload',
+        text: "Upload your parcel document here",
+        fileInputType: 'multiple',
+        allowed_filetypes: [Filetype.image.png, Filetype.application.json],
+        max_filesize: 10000 /* bytes */
       },
       radioTest: {
         type: 'radio',
