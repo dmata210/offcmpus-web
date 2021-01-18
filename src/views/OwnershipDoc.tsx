@@ -199,7 +199,7 @@ const OwnershipDoc = ({ownership_id}: {ownership_id: string}) => {
         <div>
 
             {/* Header */}
-            <div className="section-header-2" ref={headerRef}>
+            <div className="section-header-2" style={{marginBottom: `20px`}} ref={headerRef}>
                 <div className="title-area">Ownership Form</div>
             </div>
 

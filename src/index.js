@@ -15,6 +15,8 @@ import { config, backendPath } from './config'
 import './assets/css/style.scss'
 import './assets/css/layout.scss'
 import './assets/css/fonts.scss'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'shards-ui/dist/css/shards.min.css'
 
 // router paths
 import SearchView_ from './views/SearchView'

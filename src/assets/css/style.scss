@@ -23,6 +23,7 @@
 // general style
 body {
   font-family:  khumbh-sans;
+  background-color: $navyVeryLight !important;
 }
 
 // Scrollbar style
@@ -383,13 +384,14 @@ body {
   border: none;
   cursor: pointer;
   font-weight: 100;
-  transition: box-shadow 0.15s, transform 0.15s;
+  transition: box-shadow 0.15s, transform 0.15s, background 0.15s;
   transition-timing-function: ease-in-out;
   position: relative;
   text-align: center;
 
   .button-holder {
     margin: 0 auto;
+    line-height: 15px;
     
   .text-area {
     text-transform: capitalize;
@@ -470,7 +472,7 @@ body {
     width: 30px;
     min-width: 30px;
     max-width: 30px;
-    line-height: 50px;
+    line-height: 35px;
     text-align: center;
     font-size: 1.2rem;
     transition: color 0.25s;
@@ -487,8 +489,8 @@ body {
       width: 100%;
       box-sizing: border-box;
       padding: 0 10px;
-      transform: translateY(16px);
-      height: 23px;
+      transform: translateY(13px);
+      height: 25px;
       border: none;
       background: none;
       outline: none;
@@ -2478,7 +2480,7 @@ body {
   .menu-collapse-btn {
     width: 25px;
     height: 25px;
-    line-height: 32px;
+    line-height: 20px;
     border: 1px solid #cad3d9;
     text-align: center;
     border-radius: 3px;
@@ -2491,6 +2493,11 @@ body {
     box-shadow: 0px 0px 2.5px rgba(0, 0, 0, 0.0);
     transform: translateX(0px) rotate(180deg);
     transition: box-shadow 0.15s, color 0.15s, border 0.15s, transform 0.25s;
+
+    &:hover {
+      border: 1px solid $navyLightText;
+      color: $navyLightText;
+    }
 
     &.collapsed {
       transform: translateX(-8px) rotate(0deg);
@@ -2594,7 +2601,7 @@ body {
                 height: 20px;
                 margin-right: 5px;
                 text-align: center;
-                line-height: 25px;
+                line-height: 18px;
               }
             }
           }
@@ -2627,7 +2634,7 @@ body {
 
           &.icon {
             text-align: center;
-            line-height: 40px;
+            line-height: 26px;
             border: none;
             font-size: 1.25rem;
             transition: background 0.25s, font-size 0.25s, line-height 0.25s;
@@ -2637,7 +2644,7 @@ body {
             width: 25px;
             height: 25px;
             text-align: center;
-            line-height: 35px;
+            line-height: 20px;
             background-color: rgba(0, 0, 0, 0);
             border-radius: 10px;
             position: absolute;
@@ -2719,7 +2726,7 @@ body {
     .menu-collapse-btn {
       width: 25px;
       height: 25px;
-      line-height: 32px;
+      line-height: 20px;
       border: 1px solid #cad3d9;
       text-align: center;
       border-radius: 3px;
@@ -2811,7 +2818,7 @@ body {
       min-width: 30px;
       text-align: center;
       font-size: 1.25rem;
-      line-height: 34px;
+      line-height: 26px;
       margin-right: 10px;
       box-sizing: border-box;
       position: relative;
@@ -2823,7 +2830,7 @@ body {
         max-width: 40px;
         width: 40px;
         font-size: 1.35rem;
-        line-height: 38px;
+        line-height: 28px;
       }
     }
     .text {
@@ -2894,13 +2901,15 @@ body {
     width: 8px;
     height: 8px;
     background-color: $navy;
-    border: 2px solid white;
+    border: 3px solid white;
+    box-sizing: content-box;
     border-radius: 10px;
-    transform: translateY(-3px) translateX(-6px) scale(1);
+    transform: translateY(-4px) translateX(-6px) scale(1);
     transition: transform 0.15s;
     transform-origin: center;
     cursor: pointer;
     position: absolute;
+    box-shadow: 0px 0px 8px rgba(59, 67, 83, 0.4);
     top: 0;
 
     .text-bubble {
@@ -3002,7 +3011,7 @@ body {
     color: white;
     font-size: 0.7rem;
     text-align: center;
-    line-height: 20px;
+    line-height: 13px;
 
     &:hover {
       box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
@@ -3150,7 +3159,7 @@ body {
 .section-header-2 {
   padding: 8px 0;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   height: 30px;
 
   .title-area {
@@ -3208,7 +3217,6 @@ body {
     .sub-address-line {
       font-size: 0.7rem;
       color: $navyLightText;
-      margin-top: 5px;
     }
   }
 }
@@ -3851,7 +3859,7 @@ a {
       .close_ {
         height: 25px;
         width: 25px;
-        line-height: 28px;
+        line-height: 22px;
         text-align: center;
         color: $navyLightText;
         cursor: pointer;
@@ -4332,16 +4340,18 @@ a {
   .text-info {
     margin-top: 40px;
     font-family: sans-serif;
-    color: $navy;
+    color: $navy !important;
 
     .title__ {
       font-size: 1.1rem;
       font-weight: 600;
+      color: $navy !important;
       margin-bottom: 10px;
     }
 
     .pg__ {
       font-size: 0.9rem;
+      color: $navy !important;
     }
   }
 }
@@ -4562,7 +4572,7 @@ a {
 
   .status-icon_ {
     box-sizing: border-box;
-    line-height: 35px;
+    line-height: 28px;
     text-align: center;
     width: 40px;
     cursor: pointer;
@@ -4654,5 +4664,12 @@ a {
     transition: transform 0.25s, opacity 0.25s;
     opacity: 0;
     visibility: hidden;
+  }
+}
+
+a.subtle-link {
+  &:hover {
+    text-decoration: none !important;
+    color: initial !important;
   }
 }

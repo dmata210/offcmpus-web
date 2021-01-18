@@ -362,7 +362,7 @@ const ViewWrapper = ({children,
       width={500}
       height={`auto`}
       show={showFeedbackPopup}>
-      <PopupHeader withClose={true}>Feedback</PopupHeader>
+      <PopupHeader withClose={true} onClose={() => setShowFeedbackPopup(false)}>Feedback</PopupHeader>
 
       {feedbackSubmitted && <div className="feedback-submitted"
         style={{
@@ -500,7 +500,7 @@ const ViewWrapper = ({children,
           <div className={`collapse-separator ${menuCollapsed ? 'collapsed' : ''}`} />
 
           {Object.keys(pageLinks).map((page_: any, index: number) => 
-          (<Link to={pageLinks[page_].target} key={index}>
+          (<Link className="subtle-link" to={pageLinks[page_].target} key={index}>
             <div className={`menu-link ${window.location.pathname.toLowerCase() === pageLinks[page_].target.toLowerCase() ? 'active' : ''}`}>
               <div className={`icon ${menuCollapsed ? 'collapsed' : ''}`}>{pageLinks[page_].icon}</div>
               <motion.div className="text" style={{opacity: menuCollapseInitSpring}}>{pageLinks[page_].name}</motion.div>
@@ -516,7 +516,7 @@ const ViewWrapper = ({children,
             <div className={`collapse-separator ${menuCollapsed ? 'collapsed' : ''}`} />
           
             {Object.keys(reviewerLinks).map((page_: any, index: number) => 
-            (<Link to={(reviewerLinks as any)[page_].target} key={index}>
+            (<Link className="subtle-link" to={(reviewerLinks as any)[page_].target} key={index}>
               <div className={`menu-link ${window.location.pathname.toLowerCase() === (reviewerLinks as any)[page_].target.toLowerCase() ? 'active' : ''}`}>
                 <div className={`icon ${menuCollapsed ? 'collapsed' : ''}`}>{(reviewerLinks as any)[page_].icon}</div>
                 <motion.div className="text" style={{opacity: menuCollapseInitSpring}}>{(reviewerLinks as any)[page_].name}</motion.div>

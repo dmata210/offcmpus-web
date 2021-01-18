@@ -28,7 +28,9 @@ const LandlordDashboard = () => {
   const user = useSelector((state: ReduxState) => state.user)
 
   const [ResendEmailConfirmation, {data: resendConfirmResponse}] = useResendEmailConfirmationLazyQuery()
-  const [GetOwnershipsForLandlord, {data: ownershipsResponse}] = useGetOwnershipsForLandlordLazyQuery()
+  const [GetOwnershipsForLandlord, {data: ownershipsResponse}] = useGetOwnershipsForLandlordLazyQuery({
+    fetchPolicy: 'no-cache'
+  })
   const [propertyOwnerships, setProperyOwnerships] = useState<Ownership[]>([])
   const [propertyOwnershipsInReview, setProperyOwnershipsInReview] = useState<Ownership[]>([])
 
@@ -61,6 +63,7 @@ const LandlordDashboard = () => {
   useEffect(() => {
     if (ownershipsResponse && ownershipsResponse.getOwnershipsForLandlord && ownershipsResponse.getOwnershipsForLandlord.data) {
       let ownerships_: Ownership[] = ownershipsResponse.getOwnershipsForLandlord.data.ownerships;
+      console.log("ownerships", ownerships_);
       setProperyOwnerships(
         ownerships_.filter((ownership_: Ownership) => ownership_.status == 'confirmed')
       )
@@ -261,18 +264,20 @@ const LandlordDashboard = () => {
 
         {/* Property Map */}
         <div className="property-preview-container">
-          {propertyOwnerships.length > 0 && propertyOwnerships.map((property: Ownership, i: number) => 
-          <PropertyItem 
-            key={i}
-            property={property.property_doc!}
-          />)}
+          {propertyOwnerships.length > 0 && propertyOwnerships.map((property: Ownership, i: number) => {
+            if (property == null || property.property_doc == null) return <span key={i} />
+            return (<PropertyItem 
+              key={i}
+              property={property.property_doc!}
+            />)
+          })}
           {propertyOwnerships.length == 0 && 
           <NoEnties message="No properties on record" />}
         </div>
       </div>
 
       {/* In-Review Section */}
-      {propertyOwnershipsInReview.length > 0 && <div>
+      {propertyOwnershipsInReview.length > 0 && <div style={{marginTop: `30px`}}>
 
         {/* Header */}
         <div style={{
@@ -302,7 +307,7 @@ const LandlordDashboard = () => {
 
 const PropertyItem = ({property}: {property: Property}) => {
 
-  return (<Link to={`/landlord/property/${property._id}`}><div className="property-preview">
+  return (<Link to={`/landlord/property/${property._id}`}><div className="subtle-link property-preview">
     
     <RectMouseTransform
       rotateXStrength={2.5}
@@ -317,7 +322,7 @@ const PropertyItem = ({property}: {property: Property}) => {
 
 const ReviewListItem = ({ownership}: {ownership: Ownership}) => {
 
-  return (<Link to={`/landlord/ownership-documents/${ownership._id}`}>
+  return (<Link to={`/landlord/ownership-documents/${ownership._id}`} className="subtle-link ">
     <div className="list-style-2">
       <div className="primary">{ownership.property_doc!.address_line} {ownership.property_doc!.address_line_2}</div>
       <div className="secondary">{ownership.property_doc!.city} {ownership.property_doc!.state}, {ownership.property_doc!.zip}</div>
@@ -337,7 +342,9 @@ export const DashboardSidebar = ({
   landlord_id
 }: DashboardSidebarProps) => {
 
-  const [GetOwnerships, {data: ownershipsResponse}] = useGetOwnershipsForLandlordLazyQuery()
+  const [GetOwnerships, {data: ownershipsResponse}] = useGetOwnershipsForLandlordLazyQuery({
+    fetchPolicy: 'no-cache'
+  })
   const [ownerships, setOwnerships] = useState<Ownership[]>([])
   const [ownershipsInReview, setOwnershipsInReview] = useState<Ownership[]>([])
 
@@ -380,7 +387,7 @@ export const DashboardSidebar = ({
   <CollapsableTab counter_on_end={true} collapsed={true} tab_name="Properties" count={getOwnerships().length}>
     <div className="list-style-4">
       {getOwnerships().map((ownership: Ownership, i: number) => 
-      <Link key={i} to={`/landlord/property/${ownership.property_doc ? ownership.property_doc._id: '_'}`}>
+      <Link className="subtle-link" key={i} to={`/landlord/property/${ownership.property_doc ? ownership.property_doc._id: '_'}`}>
         <div className="list-item">
           <div className="primary">{ownership.property_doc ? ownership.property_doc.address_line : ''}</div>
         </div>
@@ -394,7 +401,7 @@ export const DashboardSidebar = ({
   <CollapsableTab counter_on_end={true} tab_name="In-Review" count={getOwnershipsInReview().length}>
     <div className="list-style-4">
       {getOwnershipsInReview().map((ownership: Ownership, i: number) => 
-      <Link to={`/landlord/ownership-documents/${ownership._id}`} key={i}>
+      <Link className="subtle-link" to={`/landlord/ownership-documents/${ownership._id}`} key={i}>
         <div className="list-item">
           <div className="primary">{ownership.property_doc ? ownership.property_doc.address_line : ''}</div>
         </div>

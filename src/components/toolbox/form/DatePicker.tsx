@@ -165,7 +165,7 @@ const MONTHS = ["January", "February", "March", "April", "May", "June",
 "July", "August", "September", "October", "November", "December"];
 
 const DatePopupFooter = styled.div`
-    height: 20px;
+    height: 30px;
     border-top: 1px solid #9fb0bd;
     margin-top: 5px;
     text-align: right;
@@ -352,10 +352,10 @@ const DatePickerContainer = styled.div`
     }
 
     ${CalendarIcon} {
-        width: 25px;
-        height: 23px;
+        width: 20px;
+        height: 20px;
+        font-size: 0.8rem;
         text-align: center;
-        transform: translateY(3px);
     }
 
     ${DateInfo} {
