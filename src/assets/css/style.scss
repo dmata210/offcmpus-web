@@ -4674,3 +4674,46 @@ a.subtle-link {
     color: initial !important;
   }
 }
+
+.form-control_hk {
+
+  .form-title {
+    font-weight: 600;
+    font-family: khumbh-sans;
+    color: $navy;
+    margin-bottom: 15px;
+  }
+}
+
+
+.radio-group_ {
+  display: flex;
+  flex-wrap: wrap;
+
+  .form-control-radio {
+    border: 1px solid #6b9fc2;
+    width: 40%;
+    box-sizing: border-box;
+    margin: 5px 10px 5px 0;
+    border-radius: 5px;
+    font-family: khumbh-sans;
+    font-size: 0.8rem;
+    padding: 5px 10px;
+    cursor: pointer;
+    background-color: #F9FDFF;
+    font-weight: 600;
+    color: #6b9fc2;
+    transition: border 0.25s, background 0.25s;
+
+    &:hover {
+      border: 1px solid #4a7ea0;
+      color: #4a7ea0;
+    }
+
+    &.active {
+      background-color: #BBDBF1;
+      border: 1px solid #4a7ea0;
+      color: #4a7ea0;
+    }
+  }
+}
