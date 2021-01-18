@@ -230,6 +230,7 @@ const SearchResult = ({delay}: {delay: number}) => {
 
             <div className="action-area">
                 <Button 
+                    bold={true}
                     text="View"
                     textColor="white"
                     background="#3B4353"

@@ -297,6 +297,7 @@ const PropertyDetailsView = (
                             <Card 
                                 header="Info"
                                 right_side={<Button 
+                                    bold={true}
                                     text={detailsEditMode ? `Save Changes` : `Edit`}
                                     background={detailsEditMode ? "#8AE59C" : "#3B4353"}
                                     textColor="white"
@@ -387,6 +388,7 @@ const PropertyDetailsView = (
                             <Card 
                                 header="Photos"
                                 right_side={<Button 
+                                    bold={true}
                                     text="Manage"
                                     onClick={() => setShowUpdateImagePopup(true)}
                                     textColor="white"

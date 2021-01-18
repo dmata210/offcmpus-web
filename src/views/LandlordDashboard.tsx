@@ -255,6 +255,7 @@ const LandlordDashboard = () => {
           <div>
             <Button 
               text="Add Property"
+              bold={true}
               link_to="/landlord/new-property"
               background="#3B4353"
               textColor="white"

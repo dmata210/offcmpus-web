@@ -334,6 +334,7 @@ body {
             user-select: none;
   
   position: relative;
+  font-weight: 600;
 
   .label-container {
     padding: 6px 20px;
@@ -4623,7 +4624,7 @@ a {
 
 .more-details-2 {
   position: relative;
-  background-color: $black;
+  background-color: $navy;
   width: 20px;
   height: 20px;
   border-radius: 30px;
@@ -4655,7 +4656,7 @@ a {
     position: absolute;
     left: 50%;
     transform: translateX(-50%) translateY(10px);
-    background-color: $black;
+    background-color: $navy;
     color: white;
     font-size: 0.9rem;
     box-sizing: border-box;
