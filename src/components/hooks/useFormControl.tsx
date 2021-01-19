@@ -215,8 +215,12 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
                                 <div className="icon_"><HiOutlineCloudUpload /></div>
                                 <div className="text_">Click here to upload a file</div>
                                 <div className="subtext_">
-                                    {/* {input.allowed_filetypes.map((allowed: string, i: number)
-                                    => <span className="allowed_"></span>)} */}
+                                    {input.allowed_filetypes.map((allowed: string, i: number) => 
+                                        <span className="allowed_" key={i}>
+                                            {Object.prototype.hasOwnProperty.call(FileToAbbr, allowed) 
+                                            && FileToAbbr[allowed]}
+                                            {i < input.allowed_filetypes.length - 1 && ', '}
+                                        </span>)}
                                 </div>
                             </div>}
 
@@ -407,4 +411,15 @@ export const Filetype = {
         json:   `application/json`,
         jsonld: `application/ld+json`,
     }
+}
+
+const FileToAbbr: {[key: string]: string} = {
+    'image/png': 'PNG',
+    'image/jpeg': 'JPEG',
+    'image/gif': 'GIF',
+    'application/pdf': 'PDF',
+    'application/msword': 'DOC',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
+    'application/json': 'JSON',
+    'application/ld+json': 'LD JSON'
 }

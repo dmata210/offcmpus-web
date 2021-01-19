@@ -4721,7 +4721,7 @@ a.subtle-link {
 .form-ctrl-file-upload-container {
   border: 1px solid #6b9fc2;
   background-color: #F9FDFF;
-  height: 120px;
+  height: 130px;
   border-radius: 5px;
   overflow-y: scroll;
   position: relative;
@@ -4742,6 +4742,10 @@ a.subtle-link {
     .text_ {
       font-size: 0.9rem;
       color: #4a7ea0;
+    }
+    .subtext_ {
+      font-size: 0.7rem;
+      color: $black;
     }
   }
 
