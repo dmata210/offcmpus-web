@@ -22,6 +22,7 @@ import {uploadObjects, deleteObject, objectURI} from '../API/S3API'
 import Checkbox from '../components/toolbox/form/Checkbox'
 import NoEntries from '../components/toolbox/misc/NoEnties'
 import MoreDetails from '../components/toolbox/misc/MoreDetails2'
+import urlencode from 'urlencode'
 
 const PropertyDetailsView = (
     {property_id}: {property_id: string}
@@ -446,13 +447,15 @@ interface LeaseInfoProps {
 }
 const LeaseInfo = ({lease, id}: LeaseInfoProps) => {
 
+    const getLeaseCreationLink = (): string => `/landlord/property/lease/new/${lease.ownership_id}?lease=${urlencode(lease._id)}`
+
     return (<div className="lease-info">
         <div className="header__">
             <div className="left__">Room {id}</div>
 
             {/* Empty Lease -> Can create lease */}
             {!lease.external_occupant && lease.occupant_id == null && <div className="right__">
-                <Button bold={true} link_to={`/landlord/property/lease/new/${lease._id}`} textColor="white" background="#8AE59C" text="Create Lease" transformDisabled={true} />    
+                <Button bold={true} link_to={getLeaseCreationLink()} textColor="white" background="#8AE59C" text="Create Lease" transformDisabled={true} />    
             </div>}
 
             {/* External Lease -> Lease is not managed through offcmpus */}
@@ -468,7 +471,7 @@ const LeaseInfo = ({lease, id}: LeaseInfoProps) => {
                             You can migrate this property onto offcmpus platform if it is no longer being occupied externally.`} />
                     </div>
                     <div>
-                        <Button bold={true} link_to={`/landlord/property/lease/new/${lease._id}`} textColor="white" background="#E0777D" text="Migrate Lease" transformDisabled={true} />    
+                        <Button bold={true} link_to={getLeaseCreationLink()} textColor="white" background="#E0777D" text="Migrate Lease" transformDisabled={true} />    
                     </div>
                 </div>
             </div>}

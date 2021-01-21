@@ -7,7 +7,7 @@ import {useFormControl, Filetype, noSpace, $and, alphaNumeric} from '../componen
 /*
  * View for landlords to create new leases for their properties.
  */
-const NewLeaseView = () => {
+const NewLeaseView = ({ownership_id}: {ownership_id: string}) => {
 
   const [leaseFormCtrl, leaseFormView] = useFormControl({
     formTitle: `New Lease`,
@@ -35,6 +35,7 @@ const NewLeaseView = () => {
         allowed_filetypes: [Filetype.image.png, Filetype.application.json],
         max_filesize: 10000 /* bytes */
       },
+      /*
       radioTest: {
         type: 'radio',
         text: "What is your favorite fruit?",
@@ -55,6 +56,7 @@ const NewLeaseView = () => {
         text: 'What is your favorite type of food?',
         options: ['Pizza', 'Chocolate', 'Fries', 'Chicken']
       }
+      */
     }
   })
 
