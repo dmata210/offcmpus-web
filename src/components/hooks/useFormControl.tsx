@@ -2,11 +2,17 @@ import React, {useState, useEffect, useRef, createRef, useLayoutEffect} from 're
 // @ts-ignore
 import {Form, FormSelect , FormCheckbox, FormTextarea, FormInput, FormGroup} from 'shards-react'
 import {HiOutlineCloudUpload, HiX} from 'react-icons/hi'
+import DatePicker from '../toolbox/form/DatePicker'
 
 interface RadioInputConfig {
     type: 'radio'
     text: string
     options: string[]
+}
+
+interface DataRangeInputConfig {
+    type: 'date-range',
+    text: string
 }
 
 interface InputFieldConfig {
@@ -42,7 +48,7 @@ interface FileUploadConfig {
     max_filesize: number
 }
 
-type FormInputConfig = ((InputFieldConfig | RadioInputConfig | TextareaInputConfig | SelectInputConfig) & {
+type FormInputConfig = ((InputFieldConfig | DataRangeInputConfig | RadioInputConfig | TextareaInputConfig | SelectInputConfig) & {
     // a function that, when given the value of the input, return a 
     // boolean representing if the value is a valid form input or not
     validator?: (value: string) => boolean
@@ -78,6 +84,8 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
         let newFormInputRefs: {[key: string]: any} = {}
         let newformInputStates: {[key: string]: any} = {}
 
+        console.log(`config keys: `, config_keys);
+
         for (let i = 0; i < config_keys.length; ++i) {
             if (Object.prototype.hasOwnProperty.call( formInputRefs, config_keys[i] )) {
                 newFormInputRefs[config_keys[i]] = formInputRefs[config_keys[i]];
@@ -105,6 +113,7 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
             if (config[keys[i]].type == 'radio' 
             || config[keys[i]].type == 'checkbox'
             || config[keys[i]].type == 'textarea'
+            || config[keys[i]].type == 'date-range'
             || config[keys[i]].type == 'fileupload') continue;
 
             let ref_ = formInputRefs[keys[i]].current;
@@ -126,6 +135,7 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
         let states: {[key: string]: any} = {}
         for (let i = 0; i < keys.length; ++i) {
             if (config[keys[i]].type == 'radio' || config[keys[i]].type == 'checkbox'
+                || config[keys[i]].type == 'date-range'
                 || config[keys[i]].type == 'textarea' || config[keys[i]].type == 'fileupload') {
                 states[keys[i]] = formInputRefs[keys[i]].current;
                 continue;
@@ -200,6 +210,23 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
         }
 
         switch (input.type) {
+            case 'date-range':
+                return (<FormGroup>
+                    <label htmlFor={`#${field_key}_${formId}`}>{input.text}</label>
+                    <DatePicker 
+                        type='range'
+                        onChange={(start: Date | null, end: Date | null) => {
+
+                            if (formInputRefs[field_key] == undefined) return;
+                            
+                            formInputRefs[field_key].current = [start, end];
+                            let newState = {...formInputStates};
+                            newState[field_key] = [start, end];
+                            setFormInputStates(newState);
+
+                        }}
+                    />
+                </FormGroup>)
             case 'fileupload':
                 return (<FormGroup>
                     <label htmlFor={`#${field_key}_${formId}`}>{input.text}</label>
@@ -379,6 +406,7 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
 // Provided Validators
 export const noSpace = (value: string): boolean => value.indexOf(' ') == -1;
 export const alphaNumeric = (value: string): boolean => value.match(/^[0-9a-z]+$/) != null
+export const numbersOnly = (value: string): boolean => value.match(/^[0-9]+$/) != null
 export const validateEmail = (email: string): boolean => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email)
 export const maxLen = (maxLen_: number): ((value: string) => boolean) => ((val: string) => val.length <= maxLen_)
 

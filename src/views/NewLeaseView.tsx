@@ -12,8 +12,8 @@ import {
   Property,
   Lease
 } from '../API/queries/types/graphqlFragmentTypes'
-import {useFormControl, Filetype, noSpace, $and, alphaNumeric} from '../components/hooks/useFormControl'
-
+import {useFormControl, Filetype, noSpace, numbersOnly, $and, alphaNumeric} from '../components/hooks/useFormControl'
+import Button from '../components/toolbox/form/Button'
 import {ReduxState} from '../redux/reducers/all_reducers'
 
 /*
@@ -145,26 +145,105 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
   /**
    * Form Control Setup
   */
-  // const [leaseFormCtrl, leaseFormView] = useFormControl({
-  //   formTitle: "New Lease",
+  const [leaseFormCtrl, leaseFormView] = useFormControl({
+    formTitle: "New Lease",
+    config: {
 
-  // })
+      leasePrice: {
+        type: 'input',
+        inputType: 'text',
+        label: {
+          placeholder: false,
+          text: 'What is the monthly price for this lease? (USD)'
+        },
+        validator: numbersOnly
+      },
 
+      dateAvailable: {
+        type: 'date-range',
+        text: "Pick the start and end time that this lease is available for (the date that students can move in)."
+      },
+
+      newOrOldLease: {
+        type: 'radio',
+        text: 'Do you want to upload a new lease document or reuse a previous lease document?',
+        options: ["New Lease", "Saved Lease"]
+      }
+    }
+  });
+
+  const [savedLeaseDropdown, savedLeaseDropdownView] = useFormControl({
+    config: {
+      savedLeaseOptions: {
+        type: 'select',
+        text: 'Select which previous lease document you would like to use',
+        options: ["Lease #1", "Lease #2", "Lease #3", "Lease #4"]
+      }
+    }
+  })
+
+  const [newLeaseUpload, newLeaseUploadView] = useFormControl({
+    config: {
+      newLeaseUpload: {
+        type: 'fileupload',
+        fileInputType: 'multiple',
+        text: "Upload the lease document from your computer",
+        allowed_filetypes: [Filetype.application.pdf, Filetype.application.doc, Filetype.application.docx],
+        max_filesize: 10000
+      },
+
+      leaseDocumentName: {
+        type: 'input',
+        inputType: 'text',
+        label: {
+          placeholder: false,
+          text: "Save this lease under a name to easily reuse for later"
+        }
+      }
+    }
+  })
 
   return (<div style={{
-    width: `400px`, margin: `0 auto`, border: `1px solid black`, paddingTop: `30px`
+    width: `400px`, height: `900px`, borderBottom: `1px solid red`, margin: `0 auto`, paddingTop: `30px`
   }}>
 
      {property != undefined && leases != undefined && ownership != undefined && targetLeaseId != undefined &&
      <div>
        {/* Property & Room Area */}
-       <div>{propertyAddr(property)}</div>
+       <div style={{fontWeight: 600}}>{propertyAddr(property)}</div>
        <div>Room #{leases.map((lease: Lease, i: number) => ({_id: lease._id, roomNum: i+1 }) )
                          .filter((info: {_id: string, roomNum: number}) => info._id == targetLeaseId )[0].roomNum}</div>
 
      </div>
      }
 
+     {/* Lease Form Control Area */}
+     <div style={{marginTop: `30px`}}>
+        {leaseFormView}
+      </div>
+
+      {/* Old Lease Dropdown */}
+      {Object.prototype.hasOwnProperty.call(leaseFormCtrl, 'newOrOldLease') && 
+        leaseFormCtrl.newOrOldLease == "Saved Lease"  && savedLeaseDropdownView}
+
+      {/* New Lease Dropdown */}
+      {Object.prototype.hasOwnProperty.call(leaseFormCtrl, 'newOrOldLease') && 
+        leaseFormCtrl.newOrOldLease == "New Lease"  && newLeaseUploadView}
+
+      {/* Submit Button */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'flex-end'
+      }}>
+        <Button 
+          text="Next"
+          background="#E0777D"
+          textColor="white"
+          bold={true}
+          transformDisabled={true}
+        />
+      </div>
+    
   </div>)
 };
 
