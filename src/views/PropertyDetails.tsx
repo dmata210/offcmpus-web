@@ -288,7 +288,9 @@ const PropertyDetailsView = (
                                 <LeaseInfo id={2} type={"empty"} />
                                 <LeaseInfo id={3} type={"occupied"} /> */}
                                 {leases != null && leases.map((lease: Lease, i: number) => {
-                                    return (<LeaseInfo key={i} id={i+1} lease={lease} />)
+                                    return (<LeaseInfo 
+                                                property_id={property_id}
+                                                key={i} id={i+1} lease={lease} />)
                                 })}
                             </Card>
                         </div>
@@ -444,10 +446,11 @@ interface LeaseInfoProps {
     id: number
     // type: 'external' | 'empty' | 'occupied'
     lease: Lease
+    property_id: string
 }
-const LeaseInfo = ({lease, id}: LeaseInfoProps) => {
+const LeaseInfo = ({property_id, lease, id}: LeaseInfoProps) => {
 
-    const getLeaseCreationLink = (): string => `/landlord/property/lease/new/${lease.ownership_id}?lease=${urlencode(lease._id)}`
+    const getLeaseCreationLink = (): string => `/landlord/property/lease/new/${property_id}?lease=${urlencode(lease._id)}`
 
     return (<div className="lease-info">
         <div className="header__">
