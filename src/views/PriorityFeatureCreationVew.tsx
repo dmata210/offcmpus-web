@@ -1,10 +1,56 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Logo from '../components/Logo'
 import {HiCheck} from 'react-icons/hi'
 import Button from '../components/toolbox/form/Button'
 import RectMouseManget from '../components/toolbox/misc/RectMouseMagnet'
+import API from '../API/API'
+import {loadStripe, Stripe} from '@stripe/stripe-js';
 
 const PriorityFeatureCreationVew = () => {
+
+    const stripe = loadStripe(process.env.REACT_APP_STRIPE_TEST_API_TOKEN as string);
+
+    const createCheckoutSession = (tier: string) => {
+        
+        let price_id: string | null = null;
+        if (tier.toLowerCase() == "starters") price_id = process.env.REACT_APP_STRIPE_STARTER_TIER_PRICE_ID as string;
+        if (tier.toLowerCase() == "pro") price_id = process.env.REACT_APP_STRIPE_PRO_TIER_PRICE_ID as string;
+
+        console.log(`Price ID: ${price_id}`)
+        if (price_id == null) return;
+
+        API.post('/payments/create-checkout-session', {
+            priceId: price_id
+        }, {
+            headers: { "Content-Type": "application/json" }
+        })
+        .then((result: any) => {
+            console.log(`Result: `, result)
+
+            // http://localhost:3000/landlord/property/lease/priority/600af7c25c42c636e02e3a47?lease=600af7e55c42c636e02e3a61
+            
+            if (stripe == null) {
+                console.log(`Stripe obj is null...`)
+            }
+            else {
+                stripe.then((stripe: Stripe | null) => {
+                    if (stripe == null) {
+                        console.error(`Stripe failed to load...`)
+                    }
+                    else {
+                        stripe.redirectToCheckout({
+                            sessionId: result.data.sessionId
+                        }).then((result: any) => console.log(`Result, `, result))
+                    }
+                })
+                // (stripe as any).redirectToCheckout({
+                //     sessionId: result.data.sessionId
+                // }).then((result: any) => {
+                //     console.log(`Result `, result)
+                // })
+            }
+        });
+    }
     
     return (<div style={{
         width: `600px`,
@@ -12,6 +58,7 @@ const PriorityFeatureCreationVew = () => {
         marginTop: `50px`,
         paddingBottom: `50px`
     }}>
+
         {/* Logo */}
         <div style={{marginBottom: `20px`}}>
             <Logo withText={true} />
@@ -53,11 +100,11 @@ const PriorityFeatureCreationVew = () => {
         {/* Tier Area */}
         <div style={{display: `flex`, justifyContent: `space-between`}}>
             <div style={{width: `48%`}}>
-                <TierModal name="Starters" features={["Placeholder"]} />
+                <TierModal name="Starters" processTier={createCheckoutSession} features={["Placeholder"]} />
             </div>
             
             <div style={{width: `48%`}}>
-                <TierModal name="Pro" features={["Placeholder"]} />
+                <TierModal name="Pro" processTier={createCheckoutSession} features={["Placeholder"]} />
             </div>
         </div>
 
@@ -71,6 +118,7 @@ const PriorityFeatureCreationVew = () => {
                     text="Continue for Free"
                     background="#F6F9FB"
                     border="#c9c9c9"
+                    link_to="/landlord/dashboard"
                     transformDisabled={true}
                 />
             </div>
@@ -82,8 +130,9 @@ const PriorityFeatureCreationVew = () => {
 interface TierProps {
     name: string
     features: string[]
+    processTier: (arg: string) => void
 }
-const TierModal = ({name, features}: TierProps) => {
+const TierModal = ({name, processTier, features}: TierProps) => {
     
     return (<RectMouseManget
             rotateXStrength={1}
@@ -103,6 +152,9 @@ const TierModal = ({name, features}: TierProps) => {
             {/* Advance Button */}
             <div style={{marginTop: `20px`}}> 
                 <Button 
+                    onClick={() => {
+                        processTier(name)
+                    }}
                     text={`Continue with ${name}`}
                     bold={true}
                     background={`#E0777D`}
