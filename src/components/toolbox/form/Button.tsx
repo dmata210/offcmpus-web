@@ -77,6 +77,7 @@ const Button = ({ text, disabled, transformDisabled, icon, bold, width, large, b
     style={{
       cursor: disabled == true ? `not-allowed` : `pointer`,
       backgroundColor: bgColor(),
+      border: border ? `1px solid ${border}` : ``,
       color: (() => {if (disabled == true) return `white`; return textColor ? textColor : `black`; })(),
       width: `${width ?? width}px`,
       padding: large ? `8px 20px` : `6px 20px`
@@ -109,6 +110,7 @@ const Button = ({ text, disabled, transformDisabled, icon, bold, width, large, b
     style={{
       cursor: disabled == true ? `not-allowed` : `pointer`,
       backgroundColor: bgColor(),
+      border: border ? `1px solid ${border}` : ``,
       color: textColor ? textColor : `black`,
       width: `${width ?? width}px`,
       padding: large ? `8px 20px` : `6px 20px`

@@ -4827,3 +4827,37 @@ a.subtle-link {
     border: 1px solid red;
   }
 }
+
+.tier-modal {
+  border: 1px solid #c9c9c9;
+  border-radius: 10px;
+  padding: 15px 15px;
+  box-shadow: 0px 20px 30px rgba(40, 39, 54, 0.2);
+
+  .tier-name {
+    font-family: khumbh-sans;
+    font-weight: 600;
+    color: $navy;
+  }
+
+  .tier-features {
+    .tier-feat {
+      display: flex;
+
+      .check_ {
+        margin-right: 10px;
+        color: #82dab4;
+      }
+    }
+  }
+}
+
+.standard-holder {
+
+  border: 1px solid #c9c9c9;
+  border-radius: 10px;
+  box-shadow: 0px 10px 30px rgba(40, 39, 54, 0.1);
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 15px;
+}
