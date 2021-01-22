@@ -2,6 +2,9 @@ import React, {useEffect, useState} from 'react'
 import {useMediaQuery} from 'react-responsive'
 import {useHistory} from 'react-router'
 import {useSelector} from 'react-redux'
+// @ts-ignore
+import { Breadcrumb, BreadcrumbItem } from "shards-react";
+import {Link} from 'react-router-dom'
 
 import {OwnershipDocument, Property} from '../API/queries/types/graphqlFragmentTypes'
 import {ReduxState} from '../redux/reducers/all_reducers'
@@ -226,7 +229,17 @@ const LandlordOwnershipDocuments = ({ownership_id}:ILandlordOwnershipDocuments) 
 
   const isMobile = useMediaQuery({ query: '(max-width: 500px)' })
   return (<Centered width={isMobile ? 300 : 600} height={`100%`}>
+
     <div style={{paddingTop: '80px'}}>
+    
+      <Breadcrumb>
+        <BreadcrumbItem>
+          <Link to="/landlord/dashboard">Dashboard</Link>
+        </BreadcrumbItem>
+        <BreadcrumbItem active>Property Ownership</BreadcrumbItem>
+      </Breadcrumb>
+
+
       <FloatingLogo />
       {/* Button Area */}
       <div style={{marginBottom: '20px', width: '40%'}}>

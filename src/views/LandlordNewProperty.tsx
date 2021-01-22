@@ -15,6 +15,9 @@ import Button from '../components/toolbox/form/Button'
 import CommentBubble from '../components/toolbox/misc/CommentBubble'
 import Centered from '../components/toolbox/layout/Centered'
 import SuggestedInput from '../components/toolbox/form/SuggestionInput'
+// @ts-ignore
+import { Breadcrumb, BreadcrumbItem } from "shards-react";
+import {Link} from 'react-router-dom'
 
 
 interface IPropertyInfo {
@@ -200,6 +203,15 @@ const LandlordNewProperty = () => {
   const isMobile = useMediaQuery({ query: '(max-width: 500px)' })
   return (<Centered width={isMobile ? 300 : 400} height={500}>
     <div>
+
+      
+      <Breadcrumb>
+        <BreadcrumbItem>
+          <Link to="/landlord/dashboard">Dashboard</Link>
+        </BreadcrumbItem>
+        <BreadcrumbItem active>Add Property</BreadcrumbItem>
+      </Breadcrumb>
+
 
       <div className="section-header-3">
         <div className="title-area">Property Registration</div>

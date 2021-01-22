@@ -3,7 +3,10 @@ import React, { useEffect, useState } from 'react'
 import queryString from 'query-string' 
 import {useHistory} from 'react-router'
 import {useSelector} from 'react-redux'
+import {Link} from 'react-router-dom'
 
+// @ts-ignore
+import { Breadcrumb, BreadcrumbItem } from "shards-react";
 import {
   useGetLeasesAndOccupantsLazyQuery,
   useGetOwnershipForPropertyLazyQuery,
@@ -21,6 +24,7 @@ import Button from '../components/toolbox/form/Button'
 import {ReduxState} from '../redux/reducers/all_reducers'
 import {uploadObjects} from '../API/S3API'
 import Error from '../components/toolbox/form/Error'
+import Logo from '../components/Logo'
 
 /*
  * View for landlords to create new leases for their properties.
@@ -389,6 +393,20 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
   return (<div style={{
     width: `400px`, height: `900px`, borderBottom: `1px solid red`, margin: `0 auto`, paddingTop: `30px`
   }}>
+
+    <div style={{marginBottom: `20px`}}>
+      <Logo withText={true} />
+    </div>
+
+    <Breadcrumb>
+        <BreadcrumbItem>
+          <Link to="/landlord/dashboard">Dashboard</Link>
+        </BreadcrumbItem>
+        <BreadcrumbItem>
+          <Link to={`/landlord/property/${property_id}`}>Property Details</Link>
+        </BreadcrumbItem>
+      <BreadcrumbItem active>New Lease</BreadcrumbItem>
+    </Breadcrumb>
 
      {property != undefined && leases != undefined && ownership != undefined && targetLeaseId != undefined &&
      <div>
