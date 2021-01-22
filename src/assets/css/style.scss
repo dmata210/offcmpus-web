@@ -4880,3 +4880,37 @@ a.subtle-link {
   padding: 10px 15px;
   align-items: center;
 }
+
+.property-feed-entry {
+  background-color: white;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  box-shadow: 0px 8px 20px rgba(59, 67, 83, 0.2);
+  border-radius: 10px;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+
+  .feed-entry-title {
+    color: $navy;
+    font-family: khumbh-sans;
+    font-weight: 600;
+  }
+}
+
+.feed-list {
+  .feed-list-entry {
+    display: flex;
+
+    .check {
+      margin-right: 5px;
+      margin-left: 8px;
+    }
+  }
+}
+
+.image-filler {
+  width: 100%;
+  height: 100%;
+  background-color: $navyLight;
+  border-radius: 5px;
+}
