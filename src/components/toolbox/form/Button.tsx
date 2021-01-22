@@ -13,12 +13,15 @@ interface ButtonInterface {
   onClick?: Function
   bold?: boolean
   large?: boolean
+  disabled?: boolean
+  transformDisabled?:boolean
 }
 
-const Button = ({ text, icon, bold, width, large, border, link_to, iconLocation, onClick, textColor, background }: ButtonInterface) => {
+const Button = ({ text, disabled, transformDisabled, icon, bold, width, large, border, link_to, iconLocation, onClick, textColor, background }: ButtonInterface) => {
 
   const buttonRef = useRef<HTMLDivElement>(null)
   const bgColor = (): string => {
+    if (disabled == true) return `#ced5db`;
     // default black
     return background ? background : "#1E2019"
   }
@@ -31,6 +34,7 @@ const Button = ({ text, icon, bold, width, large, border, link_to, iconLocation,
   }
 
   const initTransforms = () => {
+    if (transformDisabled == true) return;
     window.addEventListener(`mouseout`, endTransforms)
     window.addEventListener(`mousemove`, handleTransform)
   }
@@ -44,6 +48,11 @@ const Button = ({ text, icon, bold, width, large, border, link_to, iconLocation,
     buttonRef.current.style.transform 
     = `perspective(6.5cm) rotateX(${(bounds_.height * 0.03) * r_y}deg) rotateY(${(bounds_.width * 0.03) * -1 * r_x}deg)`;
     buttonRef.current.style.boxShadow = `${r_x * 5}px ${r_y * 5}px 10px rgba(59, 67, 83, 0.1)`;
+  }
+
+  const handleOnClick = () => {
+    if (disabled == true) return;
+    if (onClick) onClick();
   }
 
   const endTransforms = () => {
@@ -63,11 +72,13 @@ const Button = ({ text, icon, bold, width, large, border, link_to, iconLocation,
     className={`app-button ${getIconLocation()}-icon`}
     onMouseOver={initTransforms}
     onClick={() => {
-      if (onClick) onClick ()
+      handleOnClick();
     }}
     style={{
+      cursor: disabled == true ? `not-allowed` : `pointer`,
       backgroundColor: bgColor(),
-      color: textColor ? textColor : `black`,
+      border: border ? `1px solid ${border}` : ``,
+      color: (() => {if (disabled == true) return `white`; return textColor ? textColor : `black`; })(),
       width: `${width ?? width}px`,
       padding: large ? `8px 20px` : `6px 20px`
     }}
@@ -94,10 +105,12 @@ const Button = ({ text, icon, bold, width, large, border, link_to, iconLocation,
     className={`app-button ${getIconLocation()}-icon`}
     onMouseOver={initTransforms}
     onClick={() => {
-      if (onClick) onClick ()
+      handleOnClick();
     }}
     style={{
+      cursor: disabled == true ? `not-allowed` : `pointer`,
       backgroundColor: bgColor(),
+      border: border ? `1px solid ${border}` : ``,
       color: textColor ? textColor : `black`,
       width: `${width ?? width}px`,
       padding: large ? `8px 20px` : `6px 20px`

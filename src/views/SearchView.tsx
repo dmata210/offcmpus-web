@@ -3,7 +3,7 @@ import ViewWrapper from '../components/ViewWrapper';
 import Slider from '../components/toolbox/form/Slider';
 import RangeSlider, {date,MONTHS_ABRV} from '../components/toolbox/form/RangeSlider';
 import Counter, {positiveOnly, maxVal} from '../components/toolbox/form/Counter';
-import MoreDetails from '../components/toolbox/misc/MoreDetails'
+import MoreDetails from '../components/toolbox/misc/MoreDetails2'
 import {useNumberCounter} from '../components/hooks/useNumberCounter'
 import Button from '../components/toolbox/form/Button'
 import {useMediaQuery} from 'react-responsive'
@@ -67,7 +67,7 @@ const SearchView = () => {
         left_attachment={<div className="filter-map-attachment">
 
             {/* Left Side */}
-            <div className="section-header-2" style={{height: `30px`}}>
+            <div className="section-header-2" style={{height: `30px`, marginBottom: `16px`}}>
                 <div className="title-area">Search</div>
                 <div className="counter_">{resultsCount} Properties</div>
             </div>
@@ -118,9 +118,12 @@ const SearchView = () => {
                         }}>
                             <div className="input-label_">
                                 <span style={{marginRight: `5px`}}>Rooms</span>
-                                <MoreDetails 
-                                    details="Choose how many rooms you are looking for."
-                                />
+                                <div style={{display: 'inline-block'}}>
+                                    <MoreDetails
+                                        width={150}
+                                        details="Choose how many rooms you are looking for."
+                                    />
+                                </div>
                             </div>
                             <div className="input-area_">
                                 <Counter
@@ -135,9 +138,14 @@ const SearchView = () => {
                         }}>
                             <div className="input-label_">
                                 <span style={{marginRight: `5px`}}>Distance (mi.)</span>
-                                <MoreDetails 
-                                    details="Choose the maximum distance from campus you are looking for"
-                                />
+                                <div style={{
+                                    display: 'inline-block'
+                                }}>
+                                    <MoreDetails 
+                                        width={150}
+                                        details="Choose the maximum distance from campus you are looking for"
+                                    />
+                                </div>
                             </div>
                             <div className="input-area_">
                                 <Counter
@@ -222,6 +230,7 @@ const SearchResult = ({delay}: {delay: number}) => {
 
             <div className="action-area">
                 <Button 
+                    bold={true}
                     text="View"
                     textColor="white"
                     background="#3B4353"

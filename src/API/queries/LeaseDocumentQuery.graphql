@@ -1,0 +1,49 @@
+query GetLeaseDocumentsForLandlord ($landlord_id: String!) {
+    getLeaseDocumentsForLandlord(landlord_id: $landlord_id) {
+        ...MultipleLeaseDocumentsAPIResponseFields
+    }
+}
+
+mutation AddNewLeaseDocument (
+    $lease_name: String!,
+    $landlord_id: String!,
+    $document_keys: [String!]!,
+    $document_mimes: [String!]!
+) {
+    addNewLeaseDocument(
+        lease_name: $lease_name,
+        landlord_id: $landlord_id,
+        document_keys: $document_keys,
+        document_mimes: $document_mimes
+    ) {
+        ...LeaseDocumentAPIResponseFields
+    }
+}
+
+fragment MultipleLeaseDocumentsAPIResponseFields on MultipleLeaseDocumentsAPIResponse {
+    success
+    error
+    data {
+        lease_documents {
+            ...LeaseDocumentFields
+        }
+    }
+}
+
+fragment LeaseDocumentAPIResponseFields on LeaseDocumentAPIResponse {
+    success
+    error
+    data {
+        ...LeaseDocumentFields
+    }
+}
+
+fragment LeaseDocumentFields on LeaseDocument {
+    _id
+    lease_name
+    documents {
+        mime_type
+        s3_key
+    }
+    landlord_id
+}

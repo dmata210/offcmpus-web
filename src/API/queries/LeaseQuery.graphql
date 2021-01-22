@@ -1,0 +1,101 @@
+query GetLeasesAndOccupants ($ownership_id: String!) {
+    getLeasesAndOccupants (ownership_id: $ownership_id) {
+        ...LeaseCollectionAPIResponseFields
+    }
+}
+
+mutation ActivateLease (
+    $lease_id: String!,
+    $lease_document_id: String!,
+    $price_per_month: Float!,
+    $lease_start_date: String!,
+    $lease_end_date: String!
+) {
+    activateLease(
+        lease_id: $lease_id,
+        lease_document_id: $lease_document_id,
+        price_per_month: $price_per_month,
+        lease_start_date: $lease_start_date,
+        lease_end_date: $lease_end_date
+    ) {
+        ...LeaseAPIResponseFields
+    }
+}
+
+mutation UpdateUnoccupiedLeases (
+    $ownership_id: String!,
+    $leases_info: [LeaseUpdateInput!]!
+) {
+    updateUnoccupiedLeases(ownership_id: $ownership_id, leases_info:$leases_info) {
+        ...LeaseCollectionAPIResponseFields
+    }
+}
+
+fragment LeaseAPIResponseFields on LeaseAPIResponse {
+    success
+    error
+    data {
+        ...LeaseFields
+    }
+}
+
+fragment LeaseCollectionAPIResponseFields on LeaseCollectionAPIResponse {
+    success
+    error
+    data {
+        leases {
+            ...LeaseFields
+        }
+    }
+}
+
+fragment LeaseFields on Lease {
+    _id
+    active
+    ownership_id
+    price_per_month
+    occupant_id
+    occupant_doc {
+        ...LeaseOccupant
+    }
+    external_occupant
+    priority {
+        level
+        start_date
+        end_date
+    }
+    lease_document_id
+    lease_availability_start_date
+    lease_availability_end_date
+}
+
+fragment LeaseOccupant on Student {
+    _id
+    first_name
+    phone_number
+    last_name
+    email
+    elevated_privileges
+    auth_info {
+      cas_id
+      institution_id
+    }
+    user_settings {
+      recieve_email_notifications
+      push_subscriptions {
+        endpoint
+        keys {
+          p256dh
+          auth
+        }
+      }
+    }
+    search_status {
+      date_updated
+      searching
+      search_start
+      search_end
+      price_start
+      price_end
+    }
+}

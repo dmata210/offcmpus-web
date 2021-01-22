@@ -34,7 +34,7 @@ const OwnershipReview = () => {
   return (<ViewWrapper>
     <div>
       
-    <div className="section-header-2" ref={headerRef}>
+    <div style={{ marginBottom: `20px` }} className="section-header-2" ref={headerRef}>
       <div className="title-area">Ownership Forms</div>
       <div className="counter_">{formCounter} forms</div>
       <div className="extra" style={{minWidth: `250px`, maxWidth: `300px`, width: `300px`}}>

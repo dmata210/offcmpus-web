@@ -114,7 +114,7 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
       
       // check when the student last updated their status.
       // If it has been a month, take them to the status update page.
-      if (!user.user.search_status 
+      else if (!user.user.search_status 
         || new Date().getTime() - new Date(user.user.search_status.date_updated).getTime() >= 1000 * 60 * 60 * 24 * 30) {
         pushRedirect(history, '/s/status', '/');
       }

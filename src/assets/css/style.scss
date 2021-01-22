@@ -23,6 +23,7 @@
 // general style
 body {
   font-family:  khumbh-sans;
+  background-color: $navyVeryLight !important;
 }
 
 // Scrollbar style
@@ -333,6 +334,7 @@ body {
             user-select: none;
   
   position: relative;
+  font-weight: 600;
 
   .label-container {
     padding: 6px 20px;
@@ -383,13 +385,14 @@ body {
   border: none;
   cursor: pointer;
   font-weight: 100;
-  transition: box-shadow 0.15s, transform 0.15s;
+  transition: box-shadow 0.15s, transform 0.15s, background 0.15s;
   transition-timing-function: ease-in-out;
   position: relative;
   text-align: center;
 
   .button-holder {
     margin: 0 auto;
+    line-height: 15px;
     
   .text-area {
     text-transform: capitalize;
@@ -470,7 +473,7 @@ body {
     width: 30px;
     min-width: 30px;
     max-width: 30px;
-    line-height: 50px;
+    line-height: 35px;
     text-align: center;
     font-size: 1.2rem;
     transition: color 0.25s;
@@ -487,8 +490,8 @@ body {
       width: 100%;
       box-sizing: border-box;
       padding: 0 10px;
-      transform: translateY(16px);
-      height: 23px;
+      transform: translateY(13px);
+      height: 25px;
       border: none;
       background: none;
       outline: none;
@@ -2478,7 +2481,7 @@ body {
   .menu-collapse-btn {
     width: 25px;
     height: 25px;
-    line-height: 32px;
+    line-height: 20px;
     border: 1px solid #cad3d9;
     text-align: center;
     border-radius: 3px;
@@ -2491,6 +2494,11 @@ body {
     box-shadow: 0px 0px 2.5px rgba(0, 0, 0, 0.0);
     transform: translateX(0px) rotate(180deg);
     transition: box-shadow 0.15s, color 0.15s, border 0.15s, transform 0.25s;
+
+    &:hover {
+      border: 1px solid $navyLightText;
+      color: $navyLightText;
+    }
 
     &.collapsed {
       transform: translateX(-8px) rotate(0deg);
@@ -2594,7 +2602,7 @@ body {
                 height: 20px;
                 margin-right: 5px;
                 text-align: center;
-                line-height: 25px;
+                line-height: 18px;
               }
             }
           }
@@ -2627,7 +2635,7 @@ body {
 
           &.icon {
             text-align: center;
-            line-height: 40px;
+            line-height: 26px;
             border: none;
             font-size: 1.25rem;
             transition: background 0.25s, font-size 0.25s, line-height 0.25s;
@@ -2637,7 +2645,7 @@ body {
             width: 25px;
             height: 25px;
             text-align: center;
-            line-height: 35px;
+            line-height: 20px;
             background-color: rgba(0, 0, 0, 0);
             border-radius: 10px;
             position: absolute;
@@ -2719,7 +2727,7 @@ body {
     .menu-collapse-btn {
       width: 25px;
       height: 25px;
-      line-height: 32px;
+      line-height: 20px;
       border: 1px solid #cad3d9;
       text-align: center;
       border-radius: 3px;
@@ -2811,7 +2819,7 @@ body {
       min-width: 30px;
       text-align: center;
       font-size: 1.25rem;
-      line-height: 34px;
+      line-height: 26px;
       margin-right: 10px;
       box-sizing: border-box;
       position: relative;
@@ -2823,7 +2831,7 @@ body {
         max-width: 40px;
         width: 40px;
         font-size: 1.35rem;
-        line-height: 38px;
+        line-height: 28px;
       }
     }
     .text {
@@ -2894,13 +2902,15 @@ body {
     width: 8px;
     height: 8px;
     background-color: $navy;
-    border: 2px solid white;
+    border: 3px solid white;
+    box-sizing: content-box;
     border-radius: 10px;
-    transform: translateY(-3px) translateX(-6px) scale(1);
+    transform: translateY(-4px) translateX(-6px) scale(1);
     transition: transform 0.15s;
     transform-origin: center;
     cursor: pointer;
     position: absolute;
+    box-shadow: 0px 0px 8px rgba(59, 67, 83, 0.4);
     top: 0;
 
     .text-bubble {
@@ -3002,7 +3012,7 @@ body {
     color: white;
     font-size: 0.7rem;
     text-align: center;
-    line-height: 20px;
+    line-height: 13px;
 
     &:hover {
       box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
@@ -3150,7 +3160,7 @@ body {
 .section-header-2 {
   padding: 8px 0;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   height: 30px;
 
   .title-area {
@@ -3208,7 +3218,6 @@ body {
     .sub-address-line {
       font-size: 0.7rem;
       color: $navyLightText;
-      margin-top: 5px;
     }
   }
 }
@@ -3851,7 +3860,7 @@ a {
       .close_ {
         height: 25px;
         width: 25px;
-        line-height: 28px;
+        line-height: 22px;
         text-align: center;
         color: $navyLightText;
         cursor: pointer;
@@ -4332,16 +4341,18 @@ a {
   .text-info {
     margin-top: 40px;
     font-family: sans-serif;
-    color: $navy;
+    color: $navy !important;
 
     .title__ {
       font-size: 1.1rem;
       font-weight: 600;
+      color: $navy !important;
       margin-bottom: 10px;
     }
 
     .pg__ {
       font-size: 0.9rem;
+      color: $navy !important;
     }
   }
 }
@@ -4562,7 +4573,7 @@ a {
 
   .status-icon_ {
     box-sizing: border-box;
-    line-height: 35px;
+    line-height: 28px;
     text-align: center;
     width: 40px;
     cursor: pointer;
@@ -4609,4 +4620,263 @@ a {
   .btn-area {
 
   }
+}
+
+.more-details-2 {
+  position: relative;
+  background-color: $navy;
+  width: 20px;
+  height: 20px;
+  border-radius: 30px;
+  text-align: center;
+  opacity: 0.8;
+  transition: opacity 0.25s;
+  cursor: pointer;
+  z-index: 3;
+
+  &:hover {
+    opacity: 1;
+
+    .details_ {
+      transform: translateX(-50%) translateY(5px);
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  span {
+    color: white;
+    text-align: center;
+    font-size: 0.7rem;
+    line-height: 20px;
+    font-weight: 600;
+  }
+
+  .details_ {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background-color: $navy;
+    color: white;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border-radius: 5px;
+    transition: transform 0.25s, opacity 0.25s;
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+a.subtle-link {
+  &:hover {
+    text-decoration: none !important;
+    color: initial !important;
+  }
+}
+
+.form-control_hk {
+
+  .form-title {
+    font-weight: 600;
+    font-family: khumbh-sans;
+    color: $navy;
+    margin-bottom: 15px;
+  }
+}
+
+
+.radio-group_ {
+  display: flex;
+  flex-wrap: wrap;
+
+  .form-control-radio {
+    border: 1px solid #6b9fc2;
+    width: 40%;
+    box-sizing: border-box;
+    margin: 5px 10px 5px 0;
+    border-radius: 5px;
+    font-family: khumbh-sans;
+    font-size: 0.8rem;
+    padding: 5px 10px;
+    cursor: pointer;
+    background-color: #F9FDFF;
+    font-weight: 600;
+    color: #6b9fc2;
+    transition: border 0.25s, background 0.25s;
+
+    &:hover {
+      border: 1px solid #4a7ea0;
+      color: #4a7ea0;
+    }
+
+    &.active {
+      background-color: #BBDBF1;
+      border: 1px solid #4a7ea0;
+      color: #4a7ea0;
+    }
+  }
+}
+
+.form-ctrl-file-upload-container {
+  border: 1px solid #6b9fc2;
+  background-color: #F9FDFF;
+  height: 130px;
+  border-radius: 5px;
+  overflow-y: scroll;
+  position: relative;
+
+  .no-upload {
+    cursor: pointer;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    text-align: center;
+    .icon_ {
+      color: #6b9fc2;
+      font-size: 2.5rem;
+      transform: translateY(8px);
+    }
+    .text_ {
+      font-size: 0.9rem;
+      color: #4a7ea0;
+    }
+    .subtext_ {
+      font-size: 0.7rem;
+      color: $black;
+    }
+  }
+
+  .file-holder_ {
+    padding: 0 0 0 8px;
+
+    .upload-count {
+      font-family: khumbh-sans;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 5px 0;
+      color: #4a7ea0;
+      display: flex;
+      justify-content: space-between;
+
+      .upload-button {
+        background-color: #6AD68B;
+        padding: 0px 12px;
+        border-radius: 3px;
+        font-size: 0.7rem;
+        color: white;
+        line-height: 25px;
+        cursor: pointer;
+      }
+    }
+
+    .file-list {
+      display: flex;
+      flex-wrap: wrap;
+
+      .file-entry {
+        width: 47%;
+        background-color: #BBDBF1;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        font-size: 0.8rem;
+        box-sizing: border-box;
+        padding: 2px 8px 6px 8px;
+        color: $navy;
+        border-radius: 5px;
+        text-overflow: ellipsis;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+
+        .remove-file-icon {
+          font-size: 0.8rem;
+          background-color: rgba(0, 0, 0, 0);
+          width: 18px;
+          height: 18px;
+          line-height: 15px;
+          transform: translateY(2px) translateX(2px);
+          border-radius: 3px;
+          text-align: center;
+          transition: background 0.25s;
+          cursor: pointer;
+
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+          }
+        }
+      }
+    }
+  }
+}
+
+.minimal-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1px solid $navy;
+
+  &.valid {
+    border: 1px solid green;
+  }
+
+  &.invalid {
+    border: 1px solid red;
+  }
+}
+
+.tier-modal {
+  border: 1px solid #c9c9c9;
+  border-radius: 10px;
+  padding: 15px 15px;
+  box-shadow: 0px 20px 30px rgba(40, 39, 54, 0.2);
+
+  .tier-name {
+    font-family: khumbh-sans;
+    font-weight: 600;
+    color: $navy;
+  }
+
+  .tier-price {
+    .price_ {
+      font-family: khumbh-sans;
+      font-weight: 600;
+      color: $navy;
+      font-size: 1.5rem;
+      margin-top: 10px;
+    }
+    .price_sub {
+      font-size: 1rem;
+    }
+    
+    margin-top: 10px;
+    padding-bottom: 15px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid $navyLight
+  }
+
+  .tier-features {
+    .tier-feat {
+      display: flex;
+
+      .check_ {
+        margin-right: 10px;
+        color: #82dab4;
+      }
+    }
+  }
+}
+
+.standard-holder {
+
+  border: 1px solid #c9c9c9;
+  border-radius: 10px;
+  box-shadow: 0px 10px 30px rgba(40, 39, 54, 0.1);
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 15px;
+  align-items: center;
 }

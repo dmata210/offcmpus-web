@@ -1,6 +1,8 @@
 import React, {useState, useEffect, useRef, ChangeEvent} from 'react'
 import {useSpring, useTransform, motion} from 'framer-motion'
 import {useHistory, useLocation} from 'react-router'
+import Cookies from 'universal-cookie';
+import urlencode from 'urlencode'
 
 import AuthAPI from '../API/AuthAPI'
 
@@ -90,8 +92,22 @@ const ViewWrapper = ({children,
   const userControlMenuRef = useRef<HTMLDivElement>(null)
   const userControlInitiatorRef = useRef<HTMLDivElement>(null)
 
+  const [initCollapseSet, setInitCollapseSet] = useState<boolean>(false);
+
   useEffect(() => {
     if (user){
+
+      if (user && user.user && !initCollapseSet) {
+        let collapsed_val = getUserCookieSettings({
+          cookieName: `clpsd`,
+          userId: user.user._id
+        });
+
+        if (collapsed_val == "true") setMenuCollapsed(true);
+        if (collapsed_val == "false") setMenuCollapsed(false);
+
+        setInitCollapseSet(true);
+      }
       
       if (user.type && user.type == "student") {
         setPageLinks({
@@ -273,6 +289,19 @@ const ViewWrapper = ({children,
    * menuCollapsed effector
    */
   useEffect(() => {
+
+    /**
+     * When menuCollapsed value changes, store their settings in the
+     * cookies.
+     */
+    if (user && user.user) {
+      updateUserCookieSettings<boolean>({
+        cookieName: `clpsd`,
+        userId: user.user._id, 
+        value: menuCollapsed
+      });
+    }
+
     if (menuCollapsed) {
       menuCollapseInitSpring.set(0)
     }
@@ -362,7 +391,7 @@ const ViewWrapper = ({children,
       width={500}
       height={`auto`}
       show={showFeedbackPopup}>
-      <PopupHeader withClose={true}>Feedback</PopupHeader>
+      <PopupHeader withClose={true} onClose={() => setShowFeedbackPopup(false)}>Feedback</PopupHeader>
 
       {feedbackSubmitted && <div className="feedback-submitted"
         style={{
@@ -500,7 +529,7 @@ const ViewWrapper = ({children,
           <div className={`collapse-separator ${menuCollapsed ? 'collapsed' : ''}`} />
 
           {Object.keys(pageLinks).map((page_: any, index: number) => 
-          (<Link to={pageLinks[page_].target} key={index}>
+          (<Link className="subtle-link" to={pageLinks[page_].target} key={index}>
             <div className={`menu-link ${window.location.pathname.toLowerCase() === pageLinks[page_].target.toLowerCase() ? 'active' : ''}`}>
               <div className={`icon ${menuCollapsed ? 'collapsed' : ''}`}>{pageLinks[page_].icon}</div>
               <motion.div className="text" style={{opacity: menuCollapseInitSpring}}>{pageLinks[page_].name}</motion.div>
@@ -516,7 +545,7 @@ const ViewWrapper = ({children,
             <div className={`collapse-separator ${menuCollapsed ? 'collapsed' : ''}`} />
           
             {Object.keys(reviewerLinks).map((page_: any, index: number) => 
-            (<Link to={(reviewerLinks as any)[page_].target} key={index}>
+            (<Link className="subtle-link" to={(reviewerLinks as any)[page_].target} key={index}>
               <div className={`menu-link ${window.location.pathname.toLowerCase() === (reviewerLinks as any)[page_].target.toLowerCase() ? 'active' : ''}`}>
                 <div className={`icon ${menuCollapsed ? 'collapsed' : ''}`}>{(reviewerLinks as any)[page_].icon}</div>
                 <motion.div className="text" style={{opacity: menuCollapseInitSpring}}>{(reviewerLinks as any)[page_].name}</motion.div>
@@ -655,5 +684,56 @@ const ViewWrapper = ({children,
 
   </React.Fragment>)
 }
+
+interface CookieSettingsSetProps<T> {
+  cookieName: string
+  userId: string 
+  value: T
+}
+interface CookieSettingsProps {
+  cookieName: string
+  userId: string
+}
+
+
+export function getUserCookieSettings ({cookieName, userId}: CookieSettingsProps): string | undefined {
+  const cookies = new Cookies();
+  let cookie_ = cookies.get(cookieName);
+  if (cookie_ == undefined) return undefined;
+  if (cookie_.search(userId) == -1) return undefined;
+
+  let start = cookie_.indexOf('(', cookie_.search(userId));
+  let end = cookie_.indexOf(')', start);
+  return cookie_.substring(start+1, end);
+
+}
+
+export function updateUserCookieSettings <T>({
+  cookieName,
+  userId, 
+  value
+}: CookieSettingsSetProps<T>) {
+  // TODO
+  const cookies = new Cookies();
+  let cookie_str = `${ userId.replaceAll('(', '').replaceAll(')', '') }(${value});`;
+
+  let cookie_ = cookies.get(cookieName);
+  cookie_ = cookie_ == undefined ? undefined : urlencode.decode(cookie_);
+
+  if (cookie_ == undefined) {
+    cookies.set(cookieName, cookie_str, {path: '/'});
+  }
+  else if (cookie_.search(userId) == -1) {
+    cookies.set(cookieName, `${cookie_}${cookie_str}`, {path: `/`} );
+  }
+  else {
+    let i_ = cookie_.search(userId);
+    let new_cookie = cookie_.substr( 0, i_ ) + cookie_.substr( cookie_.indexOf(';', i_) + 1 );
+    new_cookie += cookie_str;
+
+    cookies.set(cookieName, new_cookie, {path: '/'});
+  }
+
+};
 
 export default ViewWrapper
