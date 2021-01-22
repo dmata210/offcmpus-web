@@ -68,7 +68,7 @@ const PropertyFeedEntry = () => {
                     </div>
 
                 </div>
-                <div>
+                <div style={{width: `30%`}}>
 
                     <div style={{marginLeft: `10px`}}>
                     
@@ -95,6 +95,38 @@ const PropertyFeedEntry = () => {
                             </div>
                         </div>
 
+                        {/* Review And Pictures Count */}
+                        <div style={{
+                            marginTop: `10px`,
+                            paddingTop: `10px`,
+                            borderTop: `1px solid #E1E6EA`,
+                            paddingLeft: `10px`
+                        }}>
+                            <div
+                                style={{
+                                    fontSize: `0.85rem`
+                                }}
+                            >10 Pictures</div>
+                            <div
+                                style={{
+                                    fontSize: `0.85rem`
+                                }}
+                            >5 Reviews</div>
+                        </div>
+
+                        <div style={{
+                            marginTop: `10px`
+                        }}>
+                            <Button 
+                                text="See Info"
+                                textColor="black"
+                                border="#c2c2c2"
+                                background="white"
+                                transformDisabled={true}
+                            />
+                        </div>
+                        
+
                     </div>
                 </div>
             </div>
@@ -111,6 +143,7 @@ const PropertyFeedEntry = () => {
                         textColor="white"
                         bold={true}
                         background="#E0777D"
+                        transformDisabled={true}
                     />
                 </div>
             </div>
