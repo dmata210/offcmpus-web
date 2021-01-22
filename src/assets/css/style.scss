@@ -4916,3 +4916,20 @@ a.subtle-link {
   border-radius: 5px;
 
 }
+
+.tabs {
+  display: flex;
+
+  .tab {
+    padding: 8px 10px;
+    box-sizing: border-box;
+    border-bottom: 2px solid rgba(0, 0, 0, 0);
+    transition: border 0.25s;
+    cursor: pointer;
+    font-weight: 600;
+    
+    &.active {
+      border-bottom: 2px solid $navy;
+    }
+  }
+}

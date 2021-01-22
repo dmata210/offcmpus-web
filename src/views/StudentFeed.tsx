@@ -1,12 +1,53 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {HiCheck} from 'react-icons/hi'
 
 import ViewWrapper from '../components/ViewWrapper'
 import Button from '../components/toolbox/form/Button'
+import Popup, {PopupHeader} from '../components/toolbox/misc/Popup'
 
 const StudentFeed = () => {
 
+    const [showPropertyPopup, setShowPropertyPopup] = useState<boolean>(false)
+    const [popupTab, setPopupTab] = useState<number>(0)
+
+    const showPropertyInfo = () => {
+        setShowPropertyPopup(true);
+        setPopupTab(0);
+    }
+
     return (<ViewWrapper>
+
+        {/* Property Info Popup */}
+        <Popup
+            show={showPropertyPopup}
+            width={600}
+            height={850}
+        >
+            <PopupHeader 
+                withClose={true}
+                children={<div>Property Info</div>}
+                onClose={() => {
+                    setShowPropertyPopup(false);
+                }}
+            />
+
+            {/* Popup Property Info */}
+            <div style={{
+                margin: `8px 15px`
+            }}>
+                <div>1999 Burdett Ave</div>
+                <div style={{fontSize: `0.8rem`, opacity: 0.7}}>Troy NY, 1280</div>
+            </div>
+
+            {/* Popup Tabs */}
+            <div className="tabs">
+                <div className={`tab ${popupTab == 0 ? 'active' : ''}`}
+                    onClick={() => setPopupTab(0)}>Photos</div>
+                    <div className={`tab ${popupTab == 1 ? 'active' : ''}`}
+                        onClick={() => setPopupTab(1)}>Reviews</div>
+            </div>
+
+        </Popup>
         <div 
             style={{
                 width: `600px`,
@@ -22,7 +63,9 @@ const StudentFeed = () => {
                     let entries: any[] = [];
 
                     for (let i = 0; i < 5; ++i) {
-                        entries.push(<PropertyFeedEntry />);
+                        entries.push(<PropertyFeedEntry 
+                            showPropertyInfo={showPropertyInfo}
+                        />);
                     }
                     return entries;
                 })()}
@@ -31,7 +74,7 @@ const StudentFeed = () => {
     </ViewWrapper>)
 }
 
-const PropertyFeedEntry = () => {
+const PropertyFeedEntry = ({showPropertyInfo}: {showPropertyInfo: Function}) => {
 
     return (<div className="property-feed-entry">
         <div>
@@ -118,6 +161,7 @@ const PropertyFeedEntry = () => {
                             marginTop: `10px`
                         }}>
                             <Button 
+                                onClick={() => {showPropertyInfo()}}
                                 text="See Info"
                                 textColor="black"
                                 border="#c2c2c2"
