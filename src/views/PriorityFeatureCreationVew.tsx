@@ -100,11 +100,11 @@ const PriorityFeatureCreationVew = () => {
         {/* Tier Area */}
         <div style={{display: `flex`, justifyContent: `space-between`}}>
             <div style={{width: `48%`}}>
-                <TierModal name="Starters" processTier={createCheckoutSession} features={["Placeholder"]} />
+                <TierModal price_usd={50} name="Starters" processTier={createCheckoutSession} features={["Placeholder"]} />
             </div>
             
             <div style={{width: `48%`}}>
-                <TierModal name="Pro" processTier={createCheckoutSession} features={["Placeholder"]} />
+                <TierModal price_usd={100} name="Pro" processTier={createCheckoutSession} features={["Placeholder"]} />
             </div>
         </div>
 
@@ -129,10 +129,11 @@ const PriorityFeatureCreationVew = () => {
 
 interface TierProps {
     name: string
+    price_usd: number
     features: string[]
     processTier: (arg: string) => void
 }
-const TierModal = ({name, processTier, features}: TierProps) => {
+const TierModal = ({name, price_usd, processTier, features}: TierProps) => {
     
     return (<RectMouseManget
             rotateXStrength={1}
@@ -141,6 +142,12 @@ const TierModal = ({name, processTier, features}: TierProps) => {
 
         <div className="tier-modal">
             <div className="tier-name">{name}</div>
+
+            <div className="tier-price">
+                <div className="price_">${price_usd}</div>
+                <div className="price_sub">for 1 month</div>
+            </div>
+
             <div className="tier-features">
                 {features.map((feature: string, key: number) => 
                     (<div className="tier-feat" key={key}>

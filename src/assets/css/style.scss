@@ -4840,6 +4840,24 @@ a.subtle-link {
     color: $navy;
   }
 
+  .tier-price {
+    .price_ {
+      font-family: khumbh-sans;
+      font-weight: 600;
+      color: $navy;
+      font-size: 1.5rem;
+      margin-top: 10px;
+    }
+    .price_sub {
+      font-size: 1rem;
+    }
+    
+    margin-top: 10px;
+    padding-bottom: 15px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid $navyLight
+  }
+
   .tier-features {
     .tier-feat {
       display: flex;
