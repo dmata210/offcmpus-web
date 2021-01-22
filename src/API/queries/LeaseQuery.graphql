@@ -4,6 +4,24 @@ query GetLeasesAndOccupants ($ownership_id: String!) {
     }
 }
 
+mutation ActivateLease (
+    $lease_id: String!,
+    $lease_document_id: String!,
+    $price_per_month: Float!,
+    $lease_start_date: String!,
+    $lease_end_date: String!
+) {
+    activateLease(
+        lease_id: $lease_id,
+        lease_document_id: $lease_document_id,
+        price_per_month: $price_per_month,
+        lease_start_date: $lease_start_date,
+        lease_end_date: $lease_end_date
+    ) {
+        ...LeaseAPIResponseFields
+    }
+}
+
 mutation UpdateUnoccupiedLeases (
     $ownership_id: String!,
     $leases_info: [LeaseUpdateInput!]!
@@ -13,13 +31,13 @@ mutation UpdateUnoccupiedLeases (
     }
 }
 
-# fragment LeaseAPIResponseFields on LeaseAPIResponse {
-#     success
-#     error
-#     data {
-#         ...LeaseFields
-#     }
-# }
+fragment LeaseAPIResponseFields on LeaseAPIResponse {
+    success
+    error
+    data {
+        ...LeaseFields
+    }
+}
 
 fragment LeaseCollectionAPIResponseFields on LeaseCollectionAPIResponse {
     success
@@ -46,6 +64,9 @@ fragment LeaseFields on Lease {
         start_date
         end_date
     }
+    lease_document_id
+    lease_availability_start_date
+    lease_availability_end_date
 }
 
 fragment LeaseOccupant on Student {

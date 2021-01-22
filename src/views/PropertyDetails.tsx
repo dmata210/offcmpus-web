@@ -457,7 +457,7 @@ const LeaseInfo = ({property_id, lease, id}: LeaseInfoProps) => {
             <div className="left__">Room {id}</div>
 
             {/* Empty Lease -> Can create lease */}
-            {!lease.external_occupant && lease.occupant_id == null && <div className="right__">
+            {!lease.external_occupant && lease.occupant_id == null && !lease.active && <div className="right__">
                 <Button bold={true} link_to={getLeaseCreationLink()} textColor="white" background="#8AE59C" text="Create Lease" transformDisabled={true} />    
             </div>}
 
@@ -480,6 +480,17 @@ const LeaseInfo = ({property_id, lease, id}: LeaseInfoProps) => {
             </div>}
 
         </div>
+
+        {/* If the lease is searchable by students... */}
+        {!lease.external_occupant && lease.occupant_id == null && lease.active 
+            && <div className="body__" style={{
+                fontSize: `0.8rem`
+            }}>
+            <div>This lease is on the market for the period {dateToStr(new Date(lease.lease_availability_start_date!))} to {dateToStr(new Date(lease.lease_availability_end_date!))}
+            </div>
+            <div>Price: ${lease.price_per_month.toFixed(2)} USD</div>
+        </div>}
+
         {!lease.external_occupant && lease.occupant_id != null && <div className="body__">
             <div className="paragraph-text">
                 Active from December 10th, 2020 through March 1st, 2021.
@@ -497,5 +508,8 @@ const LeaseInfo = ({property_id, lease, id}: LeaseInfoProps) => {
         </div>}
     </div>)
 }
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const dateToStr = (date: Date): string => `${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
 
 export default PropertyDetailsView

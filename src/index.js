@@ -49,6 +49,7 @@ import LandlordOnboarding from './views/LandlordOnboarding'
 import PushNotificationsPrompt from './views/PushNotificationsPrompt'
 import StudentStatus from './views/StudentStatus'
 import NewLeaseView from './views/NewLeaseView'
+import PriorityFeatureCreationVew from './views/PriorityFeatureCreationVew'
 
 import Testing from './views/Testing'
 
@@ -120,6 +121,7 @@ const Routes = () => {
             <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/:id" component={({match}) => (<PropertyDetails property_id={match.params.id} />)} />
             <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/:id/new" component={({match}) => (<PropertyInitialDetails property_id={match.params.id} />)} />
             <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/lease/new/:id" component={({match}) => (<NewLeaseView property_id={match.params.id} />)} />
+            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/lease/priority/:id" component={({match}) => (<PriorityFeatureCreationVew property_id={match.params.id} /> )} />
           
             {/* Landlord and Student */}
             <AuthRoute accessLevel={AccessLevels.STUDENT | AccessLevels.LANDLORD} exact path="/property/:id" component={({match}) => (<PropertyView property_id={match.params.id} />)} />

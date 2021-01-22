@@ -3,6 +3,7 @@ import React, {useState, useEffect, useRef, createRef, useLayoutEffect} from 're
 import {Form, FormSelect , FormCheckbox, FormTextarea, FormInput, FormGroup} from 'shards-react'
 import {HiOutlineCloudUpload, HiX} from 'react-icons/hi'
 import DatePicker from '../toolbox/form/DatePicker'
+import Error from '../toolbox/form/Error'
 
 interface RadioInputConfig {
     type: 'radio'
@@ -75,6 +76,7 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
     // Generate state variables for each form input in the config
     const [formInputRefs, setFormInputRefs] = useState<{[key: string]: any}>({})
     const [formInputStates, setFormInputStates] = useState<{[key: string]: any}>({})
+    const [formErrors, setFormErrors] = useState<{[key: string]: string}>({})
     const formId = Math.floor(Math.random() * 200000).toFixed(0)
 
     // config effector
@@ -103,32 +105,32 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
 
     }, []);
 
-    useEffect(() => {
-        console.log(`Form Input Refs Changed.`, formInputRefs)
-        // Setup callbacks for each input's refs.
-        let keys = Object.keys(formInputRefs)
-        for (let i = 0; i < keys.length; ++i) {
+    // useEffect(() => {
+    //     console.log(`Form Input Refs Changed.`, formInputRefs)
+    //     // Setup callbacks for each input's refs.
+    //     let keys = Object.keys(formInputRefs)
+    //     for (let i = 0; i < keys.length; ++i) {
 
-            // skip setting onchange event for radio ref
-            if (config[keys[i]].type == 'radio' 
-            || config[keys[i]].type == 'checkbox'
-            || config[keys[i]].type == 'textarea'
-            || config[keys[i]].type == 'date-range'
-            || config[keys[i]].type == 'fileupload') continue;
+    //         // skip setting onchange event for radio ref
+    //         if (config[keys[i]].type == 'radio' 
+    //         || config[keys[i]].type == 'checkbox'
+    //         || config[keys[i]].type == 'textarea'
+    //         || config[keys[i]].type == 'date-range'
+    //         || config[keys[i]].type == 'fileupload') continue;
 
-            let ref_ = formInputRefs[keys[i]].current;
-            if (!ref_) console.log(`Ref for key ${keys[i]} is not set.`)
-            else {
-                let id = ref_.getAttribute('id')
-                id = id.substring(1, id.indexOf('_'));
+    //         let ref_ = formInputRefs[keys[i]].current;
+    //         if (!ref_) console.log(`Ref for key ${keys[i]} is not set.`)
+    //         else {
+    //             let id = ref_.getAttribute('id')
+    //             id = id.substring(1, id.indexOf('_'));
 
-                // attach an onchange function to the ref
-                ref_.addEventListener('change', (e: any) => {
-                    setFormInputStates(getInputStates());
-                });
-            }
-        }
-    }, [formInputRefs])
+    //             // attach an onchange function to the ref
+    //             ref_.addEventListener('change', (e: any) => {
+    //                 setFormInputStates(getInputStates());
+    //             });
+    //         }
+    //     }
+    // }, [formInputRefs])
 
     const getInputStates = (): {[key: string]: any} => {
         let keys = Object.keys(config);
@@ -186,6 +188,15 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
             formInputRefs[field_key].current = new_files_arr;
             newState[field_key] = new_files_arr;
 
+            let newErrorState = {...formErrors};
+            if (accepted_files.length != files.length) {
+                newErrorState[field_key] = `Some of the files uploaded are not of the required filetype or exceed the minimum file size (${ (input_config.max_filesize / 1000).toFixed(2) }Kb)`;
+            }
+            else if (Object.prototype.hasOwnProperty.call(newErrorState, field_key)) {
+                delete newErrorState[field_key];
+            }
+            setFormErrors(newErrorState);
+
             setFormInputStates(newState);
         })
 
@@ -203,7 +214,7 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
         if (input.validator != undefined) {
             if (!Object.prototype.hasOwnProperty.call(formInputStates, field_key)) {
                 validity = false;
-                console.error(`No state data found for key => ${field_key}`);
+                // console.error(`No state data found for key => ${field_key}`);
             }
             else if (formInputStates[field_key] != null) 
                 validity = input.validator(formInputStates[field_key])
@@ -230,14 +241,20 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
             case 'fileupload':
                 return (<FormGroup>
                     <label htmlFor={`#${field_key}_${formId}`}>{input.text}</label>
+                    {Object.prototype.hasOwnProperty.call(formErrors, field_key) && 
+                    <Error 
+                        message={formErrors[field_key]}
+                        type='error'
+                    />}
                     <div 
                         className="form-ctrl-file-upload-container" 
                         onClick={() => {
-                            if (formInputStates[field_key] == null) handleFileUpload(field_key, input)
+                            if (formInputStates[field_key] == null 
+                                || formInputStates[field_key].length == 0) handleFileUpload(field_key, input)
                         }}>
                             
                             {/* Shown when no files are uploaded */}
-                            {formInputStates[field_key] == null &&
+                            {(formInputStates[field_key] == null || formInputStates[field_key].length == 0) &&
                             <div className="no-upload">
                                 <div className="icon_"><HiOutlineCloudUpload /></div>
                                 <div className="text_">Click here to upload a file</div>
@@ -252,7 +269,8 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
                             </div>}
 
                             {/* Shown when there's at least 1 file TODO */}
-                            {formInputStates[field_key] != null && <div className="file-holder_">
+                            {formInputStates[field_key] != null && formInputStates[field_key].length > 0 
+                            && <div className="file-holder_">
                                 <div className="upload-count">
                                     <div>{formInputStates[field_key].length} {formInputStates[field_key].length == 1 ? 'document' : 'documents'} uploaded</div>
                                     <div className="upload-button" onClick={() => handleFileUpload(field_key, input)}>Upload</div>
@@ -289,14 +307,23 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
             case 'select':
                 return (<FormGroup>
                     <label htmlFor={`#${field_key}_${formId}`}>{input.text}</label>
-                    <FormSelect 
+                    {/* <FormSelect 
                         id={`#${field_key}_${formId}`}
                         innerRef={formInputRefs[field_key]}
                         >
                         {input.options.map((option: string, i: number) =>
                             <option key={i} value={option}>{option}</option>
                         )}
-                    </FormSelect>
+                    </FormSelect> */}
+                    <CustomSelect 
+                        options={input.options}
+                        onChange={(e: any) => {
+                            let newState = {...formInputStates};
+                            formInputRefs[field_key].current = e.target.value;
+                            newState[field_key] = e.target.value;
+                            setFormInputStates(newState);
+                        }}
+                    />
                 </FormGroup>)
             case 'textarea':
                 return (<FormGroup>
@@ -312,15 +339,21 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
                 </FormGroup>);
             case 'input':
                 const validProp: {[key: string]: boolean} = {};
-                if (validity != null) {validProp['valid'] = validity; validProp['invalid'] = !validity;}
+                if (validity != null) {validProp['valid'] = validity;}
                 return (<FormGroup>
                     {input.label.placeholder != true && 
                     <label htmlFor={`#${field_key}_${formId}`}>{input.label.text}</label>}
-                    <FormInput id={`#${field_key}_${formId}`}
+                    <Input
                         type={input.inputType}
                         {...validProp}
-                        innerRef={formInputRefs[field_key]}
-                        placeholder={input.label.placeholder == true ? input.label.text : undefined} />
+                        placeholder={input.label.placeholder == true ? input.label.text : undefined}
+                        onChange={(e: any) => {
+                            let newState = {...formInputStates};
+                            formInputRefs[field_key].current = e.target.value;
+                            newState[field_key] = e.target.value;
+                            setFormInputStates(newState);
+                        }}
+                    />
                 </FormGroup>)
             case 'radio':
                 return(<FormGroup>
@@ -421,6 +454,57 @@ export const $or = (fnA: (value: string) => boolean, fnB: (value: string) => boo
 const RadioBubble = ({text, selected, onClick}: {text: string, selected: boolean, onClick: Function}) => {
 
     return (<div className={`form-control-radio ${selected ? `active` : ``}`} onClick={() => onClick()}>{text}</div>)
+}
+
+// custom input
+interface InputProps {
+    placeholder?: string
+    onChange?: Function
+    type: string
+    valid?: boolean
+}
+const Input = ({ placeholder, valid, onChange, type }: InputProps) => {
+
+    const getInputProps = (): {[key: string]: any} => {
+        let props: {[key: string]: any} = {};
+        if (placeholder != undefined)   props['placeholder'] = placeholder;
+        if (onChange != undefined)      props['onChange'] = onChange;
+        props[type] = type;
+        return props;
+    }
+
+    const getValidClass = (): string => {
+        if (valid != undefined) return `${valid ? `valid` : `invalid`}`;
+        return ``;
+    }
+
+    return (<input className={`minimal-input ${getValidClass()}`} {...getInputProps()} />)
+}
+
+interface SelectProps {
+    options: string[]
+    onChange: (arg: any) => any
+}
+const CustomSelect = ({options, onChange}: SelectProps) => {
+
+    const getOptions = () => {
+        let options_: any[] = [];
+
+        options_.push(
+            <option key={-1} disabled selected value={undefined}> -- select an option -- </option>
+        );
+        for (let i = 0; i < options.length; ++i) {
+            options_.push(<option value={options[i]} key={i}>
+                {options[i]}
+            </option>);
+        }
+
+        return options_;
+    }
+
+    return (<select onChange={onChange} className="minimal-select">
+        {getOptions()}
+    </select>)
 }
 
 // Filetype Specifiers

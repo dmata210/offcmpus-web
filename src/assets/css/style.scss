@@ -4811,3 +4811,19 @@ a.subtle-link {
     }
   }
 }
+
+.minimal-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1px solid $navy;
+
+  &.valid {
+    border: 1px solid green;
+  }
+
+  &.invalid {
+    border: 1px solid red;
+  }
+}

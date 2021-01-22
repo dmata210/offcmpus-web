@@ -8,13 +8,19 @@ import {
   useGetLeasesAndOccupantsLazyQuery,
   useGetOwnershipForPropertyLazyQuery,
   useGetPropertyOwnedByLandlordLazyQuery,
+  useAddNewLeaseDocumentMutation,
+  useGetLeaseDocumentsForLandlordLazyQuery,
+  useActivateLeaseMutation,
   Ownership,
   Property,
-  Lease
+  Lease,
+  LeaseDocument
 } from '../API/queries/types/graphqlFragmentTypes'
 import {useFormControl, Filetype, noSpace, numbersOnly, $and, alphaNumeric} from '../components/hooks/useFormControl'
 import Button from '../components/toolbox/form/Button'
 import {ReduxState} from '../redux/reducers/all_reducers'
+import {uploadObjects} from '../API/S3API'
+import Error from '../components/toolbox/form/Error'
 
 /*
  * View for landlords to create new leases for their properties.
@@ -28,11 +34,17 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
   const [GetProperty, {data: propertyResponse}] = useGetPropertyOwnedByLandlordLazyQuery();
   const [GetOwnership, {data: getOwnershipResponse}] = useGetOwnershipForPropertyLazyQuery();
   const [GetLeases, {data: getLeasesResponse}] = useGetLeasesAndOccupantsLazyQuery();
+  const [GetLeaseDocuments, {data: getLeaseDocumentsResponse}] = useGetLeaseDocumentsForLandlordLazyQuery();
+
+  // graph-ql react mutation hooks
+  const [AddLeaseDocument, {data: leaseDcoumentResponse}] = useAddNewLeaseDocumentMutation();
+  const [ActivateLease, {data: activateLeaseResponse}] = useActivateLeaseMutation();
 
   // document state
   const [property, setProperty] = useState<Property | undefined>(undefined)
   const [ownership, setOwnership] = useState<Ownership | undefined>(undefined)
   const [leases, setLeases] = useState<Lease[] | undefined>(undefined)
+  const [leaseDocuments, setLeaseDocuments] = useState<LeaseDocument[] | undefined>(undefined)
   const [targetLeaseId, setTargetLeaseId] = useState<string | undefined>(undefined)
 
   useEffect(() => {
@@ -57,6 +69,13 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
       GetProperty({
         variables: {
           property_id,
+          landlord_id: user.type == 'landlord' ? user.user._id : 'null'
+        }
+      })
+
+      // Get the lease documents for this account
+      GetLeaseDocuments({
+        variables: {
           landlord_id: user.type == 'landlord' ? user.user._id : 'null'
         }
       })
@@ -135,16 +154,27 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
       }
 
       else {
+
         setLeases(getLeasesResponse.getLeasesAndOccupants.data.leases);
       }
     }
 
   }, [getLeasesResponse])
 
+  useEffect(() => {
+
+    if (getLeaseDocumentsResponse && getLeaseDocumentsResponse.getLeaseDocumentsForLandlord
+      && getLeaseDocumentsResponse.getLeaseDocumentsForLandlord.success
+      && getLeaseDocumentsResponse.getLeaseDocumentsForLandlord.data) {
+        
+        setLeaseDocuments(getLeaseDocumentsResponse.getLeaseDocumentsForLandlord.data.lease_documents);
+      }
+  }, [getLeaseDocumentsResponse])
 
   /**
    * Form Control Setup
   */
+  const [formError, setFormError] = useState<string | null>(null)
   const [leaseFormCtrl, leaseFormView] = useFormControl({
     formTitle: "New Lease",
     config: {
@@ -172,24 +202,24 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
     }
   });
 
-  const [savedLeaseDropdown, savedLeaseDropdownView] = useFormControl({
+  const [savedLeaseSelectCtrl, savedLeaseSelectorView] = useFormControl({
     config: {
       savedLeaseOptions: {
         type: 'select',
         text: 'Select which previous lease document you would like to use',
-        options: ["Lease #1", "Lease #2", "Lease #3", "Lease #4"]
+        options: leaseDocuments == undefined ? [] : leaseDocuments.map((doc: LeaseDocument) => doc.lease_name)
       }
     }
   })
 
-  const [newLeaseUpload, newLeaseUploadView] = useFormControl({
+  const [newLeaseUploadCtrl, newLeaseUploadView] = useFormControl({
     config: {
       newLeaseUpload: {
         type: 'fileupload',
         fileInputType: 'multiple',
         text: "Upload the lease document from your computer",
         allowed_filetypes: [Filetype.application.pdf, Filetype.application.doc, Filetype.application.docx],
-        max_filesize: 10000
+        max_filesize: 50000
       },
 
       leaseDocumentName: {
@@ -202,6 +232,159 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
       }
     }
   })
+
+  const handleLeaseCreation = () => {
+    // Ensure that the form fields are valid, first
+
+    // Lease Price Validation
+      // check if the lease we are targeting is not already active
+    let target_lease_obj = getLeasesResponse!.getLeasesAndOccupants!.data!.leases
+    .filter((lease: Lease) => lease._id == targetLeaseId)
+    if (target_lease_obj.length != 1
+    || target_lease_obj[0].active == true) {
+      setFormError("A lease for this room already exists. Cannot create a new lease for this room.");
+    }
+    
+    if (!Object.prototype.hasOwnProperty.call(leaseFormCtrl, 'leasePrice')
+    || leaseFormCtrl.leasePrice == null
+    || leaseFormCtrl.leasePrice.length == 0
+    || !numbersOnly(leaseFormCtrl.leasePrice)) {
+      setFormError("You must provide a monthly lease value.");
+      return;
+    }
+
+    // Lease Date Validation
+    if (!Object.prototype.hasOwnProperty.call(leaseFormCtrl, 'dateAvailable')
+    || leaseFormCtrl.dateAvailable == null
+    || leaseFormCtrl.dateAvailable.length != 2
+    || leaseFormCtrl.dateAvailable[0] == null
+    || leaseFormCtrl.dateAvailable[1] == null
+    || new Date().getTime() > leaseFormCtrl.dateAvailable[0].getTime() ) {
+      setFormError("Invalid lease date provided.");
+      return;
+    }
+
+    // If they uploaded a new lease, make sure there are documents
+    // uploaded and a lease name is provided
+    if(!Object.prototype.hasOwnProperty.call(leaseFormCtrl, 'newOrOldLease')
+    || leaseFormCtrl.newOrOldLease == null) {
+      setFormError ("You must select whether you are uploading a new lease or using a saved lease.");
+      return;
+    }
+
+    if (leaseFormCtrl.newOrOldLease == "New Lease") {
+
+      if (!Object.prototype.hasOwnProperty.call(newLeaseUploadCtrl, 'newLeaseUpload')
+        || newLeaseUploadCtrl.newLeaseUpload == null
+        || newLeaseUploadCtrl.newLeaseUpload.length == 0) {
+          setFormError("At least one lease document must be uploaded.");
+          return;
+      }
+
+      if (!Object.prototype.hasOwnProperty.call(newLeaseUploadCtrl, 'leaseDocumentName')
+      || newLeaseUploadCtrl.leaseDocumentName == null
+      || newLeaseUploadCtrl.leaseDocumentName.length == 0) {
+        setFormError("A name for the lease must be provided");
+        return;
+      }
+
+      if (leaseDocuments 
+        && leaseDocuments.filter( (leaseDoc: LeaseDocument) => leaseDoc.lease_name == newLeaseUploadCtrl.leaseDocumentName ).length != 0) {
+          setFormError("A lease with that name already exists");
+          return;
+        }
+    }
+
+    // If they are using a previous lease, make sure a lease value
+    // is selected
+    else if (leaseFormCtrl.newOrOldLease == "Saved Lease") {
+      if (!Object.prototype.hasOwnProperty.call(savedLeaseSelectCtrl, 'savedLeaseOptions')
+      || savedLeaseSelectCtrl.savedLeaseOptions == null) {
+        setFormError("You must select a saved lease from the dropdown");
+        return;
+      }
+    }
+
+    // if all of the fields are valid, proceed to the creation of the lease
+    proceedLeaseCreation ();
+
+    setFormError(null);
+  }
+
+  const proceedLeaseCreation = () => {
+    if (!user || !user.user) {
+      return;
+    }
+
+    if (leaseFormCtrl.newOrOldLease == "New Lease") {
+      // upload the files
+      uploadObjects({
+        restricted: true,
+        files: newLeaseUploadCtrl.newLeaseUpload,
+        landlords_access: [user.user._id],
+        elevated_privileges_access: ['ownership_reviewer']
+      })
+      .then((response: any) => {
+        console.log("Response: ", response)
+
+        AddLeaseDocument({
+          variables: {
+            landlord_id: user && user.user ? user.user._id : '',
+            lease_name: newLeaseUploadCtrl.leaseDocumentName,
+            document_keys: response.data.files_uploaded.map((file_: any) => file_.key),
+            document_mimes: newLeaseUploadCtrl.newLeaseUpload.map((file: any) => file.type)
+          }
+        });
+      })
+      .catch(err => {
+        console.log(`An error occurred uploading documents...`)
+        console.log(err);
+      })
+    }
+    else if (leaseFormCtrl.newOrOldLease == "Saved Lease") {
+      ActivateLease({
+        variables: {
+          lease_id: targetLeaseId as string,
+          lease_document_id: leaseDocuments!.filter((leaseDoc: LeaseDocument) => leaseDoc.lease_name == savedLeaseSelectCtrl.savedLeaseOptions)[0]._id,
+          price_per_month: parseInt(leaseFormCtrl.leasePrice),
+          lease_start_date: leaseFormCtrl.dateAvailable[0].toISOString(),
+          lease_end_date: leaseFormCtrl.dateAvailable[1].toISOString()
+        }
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (leaseDcoumentResponse && leaseDcoumentResponse.addNewLeaseDocument) {
+      if (leaseDcoumentResponse.addNewLeaseDocument.error != undefined) {
+        setFormError(leaseDcoumentResponse.addNewLeaseDocument.error);
+      }
+      else if (leaseDcoumentResponse.addNewLeaseDocument.data) {
+        // activate the lease
+        ActivateLease({
+          variables: {
+            lease_id: targetLeaseId as string,
+            lease_document_id: leaseDcoumentResponse.addNewLeaseDocument.data._id,
+            price_per_month: parseInt(leaseFormCtrl.leasePrice),
+            lease_start_date: leaseFormCtrl.dateAvailable[0].toISOString(),
+            lease_end_date: leaseFormCtrl.dateAvailable[1].toISOString()
+          }
+        })
+      }
+    }
+  }, [leaseDcoumentResponse])
+
+  useEffect(() => {
+    if (activateLeaseResponse && activateLeaseResponse.activateLease) {
+      if (activateLeaseResponse.activateLease.success && activateLeaseResponse.activateLease.data) {
+        history.push(`/landlord/property/lease/priority/${property_id}?lease=${targetLeaseId}`);
+      }
+        
+      else {
+        history.push(`/landlord/property/${property_id}`);
+      }
+      }
+  }, [activateLeaseResponse])
 
   return (<div style={{
     width: `400px`, height: `900px`, borderBottom: `1px solid red`, margin: `0 auto`, paddingTop: `30px`
@@ -217,14 +400,21 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
      </div>
      }
 
+     <div style={{marginTop: `20px`}} />
+     {/* Error area */}
+     {formError != null && <Error 
+        message={formError}
+        type='error'
+     />}
+
      {/* Lease Form Control Area */}
-     <div style={{marginTop: `30px`}}>
+     <div>
         {leaseFormView}
       </div>
 
       {/* Old Lease Dropdown */}
       {Object.prototype.hasOwnProperty.call(leaseFormCtrl, 'newOrOldLease') && 
-        leaseFormCtrl.newOrOldLease == "Saved Lease"  && savedLeaseDropdownView}
+        leaseFormCtrl.newOrOldLease == "Saved Lease"  && savedLeaseSelectorView}
 
       {/* New Lease Dropdown */}
       {Object.prototype.hasOwnProperty.call(leaseFormCtrl, 'newOrOldLease') && 
@@ -241,6 +431,7 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
           textColor="white"
           bold={true}
           transformDisabled={true}
+          onClick={handleLeaseCreation}
         />
       </div>
     
