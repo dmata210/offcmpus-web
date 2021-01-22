@@ -68,15 +68,33 @@ const PropertyFeedEntry = () => {
                     </div>
 
                 </div>
-                <div className="feed-list">
-                    <div className="feed-list-entry">
-                        <div className="check"><HiCheck /></div>
-                        <div className="value">Utilities Included</div>
-                    </div>
+                <div>
 
-                    <div className="feed-list-entry">
-                        <div className="check"><HiCheck /></div>
-                        <div className="value">Internet Included</div>
+                    <div style={{marginLeft: `10px`}}>
+                    
+                        {/* Price Area */}
+                        <div style={{display: `flex`, alignItems: 'flex-end'}}>
+                            <div style={{
+                                fontSize: `1.5rem`,
+                                fontWeight: 600,
+                                fontFamily: 'khumbh-sans'
+                            }}>$500</div>
+                            <div style={{transform: `translateY(-5px)`}}>/month</div>
+                        </div>
+
+                        {/* Perks Area */}
+                        <div className="feed-list">
+                            <div className="feed-list-entry">
+                                <div className="check"><HiCheck /></div>
+                                <div className="value">Utilities Included</div>
+                            </div>
+
+                            <div className="feed-list-entry">
+                                <div className="check"><HiCheck /></div>
+                                <div className="value">Internet Included</div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
