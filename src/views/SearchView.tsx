@@ -14,16 +14,23 @@ import {useHistory} from 'react-router'
 import {shouldPromptToEnableNotifications} from './PushNotificationsPrompt'
 import {ReduxState} from '../redux/reducers/all_reducers'
 import {useSelector} from 'react-redux'
+import {useSearchForPropertiesLazyQuery, Property, PropertyDirections} from '../API/queries/types/graphqlFragmentTypes'
 
-import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'
+import {MapContainer, TileLayer, Marker, Polyline, Popup} from 'react-leaflet'
 
 const SearchView = () => {
 
-    const user = useSelector((state: ReduxState) => state.user)
+    const [SearchForProps, {data: searchResponse}] = useSearchForPropertiesLazyQuery();
+
+    const user = useSelector((state: ReduxState) => state.user);
+    const institute = useSelector((state: ReduxState) => state.institution);
+
     const containerRef = useRef<HTMLDivElement>(null)
     const leftContainerRef = useRef<HTMLDivElement>(null)
     const [leftFilterWidth, setLeftFilterWidth] = useState<number>(400)
     const [contentStart, setContentStart] = useState<number>(0)
+    
+    const [properties, setProperties] = useState<Property[]>([])
 
     const history = useHistory();
     const cookie = new Cookies ();
@@ -37,10 +44,28 @@ const SearchView = () => {
         updateFilterWidth ()
         window.addEventListener(`resize`, updateFilterWidth)
 
+        // execute search queries
+        SearchForProps({
+            variables: {
+                price_start: 0,
+                price_end: 0,
+                rooms: 0,
+                distance: 0
+            }
+        })
+
         return () => {
             window.removeEventListener(`resize`, updateFilterWidth)
         }
     }, [])
+
+    useEffect(() => {
+
+        if (searchResponse && searchResponse.searchForProperties && searchResponse.searchForProperties.data) {
+            setProperties(searchResponse.searchForProperties.data.properties);
+        }
+
+    }, [searchResponse]);
 
     useEffect(() => {
 
@@ -56,6 +81,30 @@ const SearchView = () => {
         // filter width should be x% of the page width
         let w_ = document.documentElement.getBoundingClientRect().width;
         setLeftFilterWidth(w_ * 0.32)
+    }
+
+    const getInstituteLocation = () => {
+        if (institute && institute.location) {
+            // [institute.location.latitude, institute.location.longitude]
+            return {
+                lat: institute.location.latitude,
+                lng: institute.location.longitude
+            }
+         }
+         return {lat: 0, lng: 0};
+    }
+
+    const generateCoordsPolyLine = (dir: any[]): any [] => {
+        let coords: any [] = [];
+
+        for (let i = 0; i < dir.length - 1; ++i) {
+            coords.push([
+                [dir[i][1], dir[i][0]], [dir[i+1][1], dir[i+1][0]]
+            ]);
+        }
+
+        console.log(`coords`, coords);
+        return coords;
     }
 
     return (<ViewWrapper
@@ -162,14 +211,37 @@ const SearchView = () => {
 
                 <div className="map-box" style={{}}>
                     {/* React Leaflet Resource: https://blog.logrocket.com/how-to-use-react-leaflet/ */}
-                    <MapContainer center={[42.727680, -73.691063]} zoom={17} scrollWheelZoom={false}>
+                    <MapContainer center={getInstituteLocation()} zoom={17} scrollWheelZoom={false}>
                     <TileLayer
                         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    <Marker position={[42.727680, -73.691063]}>
+                    <Marker position={getInstituteLocation()}>
                         <Popup>Troy Placeholder</Popup>
                     </Marker>
+
+                    {/* Put the coordinates information */}
+                    {properties.map((property: Property, i: number) => {
+                        if (!property.directions) return (<div key={i} />)
+                        let directions_ = property.directions.filter((dir: PropertyDirections) => 
+                            institute && institute._id && dir.institution_id == institute._id);
+                        
+                        if (directions_.length == 0) return (<div key={i} />)
+                        let dir: any[] = [];
+                        if (directions_[0].cycling_regular_directions != undefined && directions_[0].cycling_regular_directions.length > 0) 
+                            dir = directions_[0].cycling_regular_directions[0].coordinates;
+                        
+                        else if (directions_[0].driving_car_directions != undefined && directions_[0].driving_car_directions.length > 0) 
+                            dir = directions_[0].driving_car_directions[0].coordinates;
+
+                        else if (directions_[0].foot_walking_directions != undefined && directions_[0].foot_walking_directions.length > 0) 
+                            dir = directions_[0].foot_walking_directions[0].coordinates;
+
+                        return (<Polyline key={i}
+                            pathOptions={{ color: 'purple' }}
+                            positions={ generateCoordsPolyLine(dir) }
+                        />)
+                    })}
                     </MapContainer>
                 </div>
             </div>
@@ -183,8 +255,8 @@ const SearchView = () => {
 
             {/* Right Side */}
             <div className="right-side_">
-                {Array.from(new Array(10), (_: any, i: number) => 
-                    <SearchResult key={i} delay={i < 8 ? i * 100 : 0} />
+                {properties.map((property: Property, i: number) => 
+                    <SearchResult property={property} key={i} delay={i < 8 ? i * 100 : 0} />
                 )}
             </div>
 
@@ -192,62 +264,104 @@ const SearchView = () => {
     </ViewWrapper>)
 }
 
-const SearchResult = ({delay}: {delay: number}) => {
-    
-    const isLargeScreen = useMediaQuery({
-        query: '(min-width: 1200px)'
-    })
-    
-    const showResultSpring = useSpring(0)
-    const rotateXTransform = useTransform(showResultSpring, [0, 1], [10, 0])
-    const translateYTransform = useTransform(showResultSpring, [0, 1], [-15, 0])
+const SearchResult = ({delay, property}: {delay: number, property: Property}) => {
 
-    useEffect(() => {
-        let t_ = setTimeout(() => {
-            showResultSpring.set(1)
-        }, delay)
 
-        return () => {
-            clearTimeout(t_);
+    const getPropertyPriceRange = () :string => {
+        if (!property.leases) return `unknown`;
+
+        if (property.leases.length == 1) return `$${property.leases[0].price_per_month}`;
+        let min_ = Number.MAX_VALUE;
+        let max_ = Number.MIN_VALUE;
+
+        // find the min and max
+        for (let i = 0; i < property.leases.length; ++i) {
+            min_ = Math.min(min_, property.leases[i].price_per_month);
+            max_ = Math.max(max_, property.leases[i].price_per_month);
         }
-    }, [])
 
-    return (<motion.div 
-        style={{
-            opacity: showResultSpring,
-            rotateX: rotateXTransform,
-            translateY: translateYTransform,
-            perspective: `6.5cm`
-        }}
-        className="search-result-2">
-        
-        <div className="image-area_">
-            <div className="image-holder" />
-        </div>
-        <div className="info-area_">
-            <div className="property-location">Sample Property Location 101</div>
-            <div className="property-meta">TROY NY, 12180</div>
+        return `$${min_}-$${max_}`;
+    }
 
-            <div className="action-area">
-                <Button 
-                    bold={true}
-                    text="View"
-                    textColor="white"
-                    background="#3B4353"
-                />
+    return (<div className="search-result-3">
+
+        {/* Price Area */}
+        <div className="price-holder">
+            <div className="price-info">
+                <div className="price_">{getPropertyPriceRange()} </div>
+                <div className="month_">/month</div>
             </div>
+
+            {/* # of rooms avaliable */}
+            {property.leases && <div className="lease-count">{property.leases.length} lease(s) available</div>}
         </div>
 
-        {isLargeScreen && <div className="amenities-area">
-            <div className="header_">Amenities</div>
-            {Array.from(new Array(3), (_: any, i: number) => 
-                <div className="entry_" key={i}>
-                    <div className="check_"><HiCheck /></div>
-                    <div className="">Entry Goes Here</div>
-                </div>
-            )}
-        </div>}
+        {/* Image Side */}
+        <div className="image-area">
+            <div style={{
+                backgroundColor: `#E1E6EA`,
+                width: `100%`,
+                height: `100%`,
+                borderRadius: `5px`
+            }} />
 
-    </motion.div>)
+            <div className="picture-count">+8 Pictures</div>
+        </div>
+
+        {/* Property Info Area */}
+        <div className="property-info-area">
+
+            {/* Top Side */}
+            <div className="property-info-top">
+                
+                {/* Property Location Info */}
+                <div className="prop-info">
+                    <div className="addr-line">{property.address_line.toLowerCase()}</div>
+                    {property.address_line_2 && property.address_line_2 != ""
+                    && <div className="addr-line">{property.address_line_2.toLowerCase()}</div>}
+                    <div className="addr-line-2">
+                        {property.city.toLowerCase()} {property.state}, {property.zip}
+                    </div>
+
+                    {/* Show the amenities */}
+                    <div style={{marginTop: `5px`}}>
+                        {function () {
+                            let amentities: string[] = [];
+                            if (property.details && property.details.furnished) amentities.push("Furnished");
+                            if (property.details && property.details.has_heater) amentities.push("Heating");
+                            if (property.details && property.details.has_ac) amentities.push("AC");
+                            if (property.details && property.details.has_washer) amentities.push("Washer");
+
+                            return amentities.map((amenity: string, i: number) => 
+                                <div key={i} className="info-tag">{amenity}</div>)
+                        }()}
+                    </div>
+
+                    {/* Rating Placeholder */}
+                    <div>RATINGS GO HERE</div>
+                </div>
+
+                {/* Landlord Info */}
+                <div className="landlord-info">
+
+                    <div style={{
+                        fontWeight: 600,
+                        fontFamily: "khumbh-sans"
+                    }}>Landlord</div>
+                    <div className="info-line">Sample Landlord</div>
+                    <div>RATINGS GO HERE</div>
+
+                </div>
+
+            </div>
+
+            {/* Bottom Side */}
+            <div className="property-info-bottom">
+                Y
+            </div>
+
+        </div>
+
+    </div>);
 }
 export default SearchView

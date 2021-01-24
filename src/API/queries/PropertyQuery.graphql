@@ -53,6 +53,23 @@ query VerifyAddress(
   }
 }
 
+query SearchForProperties(
+  $price_start: Float!,
+  $price_end: Float!,
+  $rooms: Int!,
+  $distance: Float!
+) {
+
+  searchForProperties (
+    price_start: $price_start,
+    price_end: $price_end,
+    rooms: $rooms,
+    distance: $distance
+  ) {
+    ...PropertyListWithLeaseAPIResponse
+  }
+}
+
 mutation AddImagesToProperty(
   $property_id: String!,
   $s3_keys: [String!]!
@@ -107,28 +124,7 @@ fragment PropertyAPIResponseFields on PropertyAPIResponse {
   success
   error
   data {
-    _id
-    landlord
-    address_line
-    address_line_2
-    city
-    state
-    zip
-    
-    details {
-      description
-      rooms
-      bathrooms
-      sq_ft
-      furnished
-      has_washer
-      has_heater
-      has_ac
-      property_images {
-        s3_key
-        date_uploaded
-      }
-    }
+    ...PropertyFields
   }
 }
 
@@ -137,28 +133,17 @@ fragment PropertyListAPIResponseFields on PropertyListAPIResponse {
   error
   data {
     properties {
-      _id
-      landlord
-      address_line
-      address_line_2
-      city
-      state
-      zip
+      ...PropertyFields
+    }
+  }
+}
 
-      details {
-        description
-        rooms
-        bathrooms
-        sq_ft
-        furnished
-        has_washer
-        has_heater
-        has_ac
-        property_images {
-          s3_key
-          date_uploaded
-        }
-      }
+fragment PropertyListWithLeaseAPIResponse on PropertyListAPIResponse {
+  success
+  error
+  data {
+    properties {
+      ...PropertyWithLeaseFields
     }
   }
 }
@@ -172,5 +157,66 @@ fragment AddressVerificationAPIResponseFields on AddressVerificationAPIResponse 
     city
     state
     zip
+  }
+}
+
+fragment PropertyFields on Property {
+  _id
+  landlord
+  address_line
+  address_line_2
+  city
+  state
+  zip
+  
+  # details about a property
+  details {
+    description
+    rooms
+    bathrooms
+    sq_ft
+    furnished
+    has_washer
+    has_heater
+    has_ac
+    property_images {
+      s3_key
+      date_uploaded
+    }
+  }
+
+  # direction information from a property to nearby institutions
+  directions {
+    institution_id
+    
+    foot_walking_directions {
+      distance
+      coordinates
+    }
+    
+    driving_car_directions {
+      distance
+      coordinates
+    }
+
+    cycling_regular_directions {
+      distance
+      coordinates
+    }
+  }
+}
+
+
+fragment PropertyWithLeaseFields on Property {
+  ...PropertyFields
+  leases {
+    _id
+    active
+    ownership_id
+    price_per_month
+    external_occupant
+    lease_availability_end_date
+    lease_availability_start_date
+    lease_document_id
   }
 }

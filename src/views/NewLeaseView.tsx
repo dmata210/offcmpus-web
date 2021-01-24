@@ -38,7 +38,9 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
   const [GetProperty, {data: propertyResponse}] = useGetPropertyOwnedByLandlordLazyQuery();
   const [GetOwnership, {data: getOwnershipResponse}] = useGetOwnershipForPropertyLazyQuery();
   const [GetLeases, {data: getLeasesResponse}] = useGetLeasesAndOccupantsLazyQuery();
-  const [GetLeaseDocuments, {data: getLeaseDocumentsResponse}] = useGetLeaseDocumentsForLandlordLazyQuery();
+  const [GetLeaseDocuments, {data: getLeaseDocumentsResponse}] = useGetLeaseDocumentsForLandlordLazyQuery({
+    fetchPolicy: 'no-cache'
+  });
 
   // graph-ql react mutation hooks
   const [AddLeaseDocument, {data: leaseDcoumentResponse}] = useAddNewLeaseDocumentMutation();
@@ -391,7 +393,7 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
   }, [activateLeaseResponse])
 
   return (<div style={{
-    width: `400px`, height: `900px`, borderBottom: `1px solid red`, margin: `0 auto`, paddingTop: `30px`
+    width: `400px`, height: `900px`, margin: `0 auto`, paddingTop: `30px`
   }}>
 
     <div style={{marginBottom: `20px`}}>

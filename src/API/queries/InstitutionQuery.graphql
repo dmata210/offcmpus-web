@@ -22,6 +22,8 @@ fragment InstitutionAPIResponseFields on InstitutionAPIResponse {
       city
       state
       zip
+      longitude
+      latitude
     }
   }
 }
@@ -39,6 +41,8 @@ fragment InstitutionListAPIResponseFields on InstitutionListAPIResponse {
         city
         state
         zip
+        longitude
+        latitude
       }
     }
   }
