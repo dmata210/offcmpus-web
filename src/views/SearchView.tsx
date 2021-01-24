@@ -14,15 +14,17 @@ import {useHistory} from 'react-router'
 import {shouldPromptToEnableNotifications} from './PushNotificationsPrompt'
 import {ReduxState} from '../redux/reducers/all_reducers'
 import {useSelector} from 'react-redux'
-import {useSearchForPropertiesLazyQuery, Property} from '../API/queries/types/graphqlFragmentTypes'
+import {useSearchForPropertiesLazyQuery, Property, PropertyDirections} from '../API/queries/types/graphqlFragmentTypes'
 
-import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'
+import {MapContainer, TileLayer, Marker, Polyline, Popup} from 'react-leaflet'
 
 const SearchView = () => {
 
     const [SearchForProps, {data: searchResponse}] = useSearchForPropertiesLazyQuery();
 
-    const user = useSelector((state: ReduxState) => state.user)
+    const user = useSelector((state: ReduxState) => state.user);
+    const institute = useSelector((state: ReduxState) => state.institution);
+
     const containerRef = useRef<HTMLDivElement>(null)
     const leftContainerRef = useRef<HTMLDivElement>(null)
     const [leftFilterWidth, setLeftFilterWidth] = useState<number>(400)
@@ -79,6 +81,30 @@ const SearchView = () => {
         // filter width should be x% of the page width
         let w_ = document.documentElement.getBoundingClientRect().width;
         setLeftFilterWidth(w_ * 0.32)
+    }
+
+    const getInstituteLocation = () => {
+        if (institute && institute.location) {
+            // [institute.location.latitude, institute.location.longitude]
+            return {
+                lat: institute.location.latitude,
+                lng: institute.location.longitude
+            }
+         }
+         return {lat: 0, lng: 0};
+    }
+
+    const generateCoordsPolyLine = (dir: any[]): any [] => {
+        let coords: any [] = [];
+
+        for (let i = 0; i < dir.length - 1; ++i) {
+            coords.push([
+                [dir[i][1], dir[i][0]], [dir[i+1][1], dir[i+1][0]]
+            ]);
+        }
+
+        console.log(`coords`, coords);
+        return coords;
     }
 
     return (<ViewWrapper
@@ -185,14 +211,37 @@ const SearchView = () => {
 
                 <div className="map-box" style={{}}>
                     {/* React Leaflet Resource: https://blog.logrocket.com/how-to-use-react-leaflet/ */}
-                    <MapContainer center={[42.727680, -73.691063]} zoom={17} scrollWheelZoom={false}>
+                    <MapContainer center={getInstituteLocation()} zoom={17} scrollWheelZoom={false}>
                     <TileLayer
                         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    <Marker position={[42.727680, -73.691063]}>
+                    <Marker position={getInstituteLocation()}>
                         <Popup>Troy Placeholder</Popup>
                     </Marker>
+
+                    {/* Put the coordinates information */}
+                    {properties.map((property: Property, i: number) => {
+                        if (!property.directions) return (<div key={i} />)
+                        let directions_ = property.directions.filter((dir: PropertyDirections) => 
+                            institute && institute._id && dir.institution_id == institute._id);
+                        
+                        if (directions_.length == 0) return (<div key={i} />)
+                        let dir: any[] = [];
+                        if (directions_[0].cycling_regular_directions != undefined && directions_[0].cycling_regular_directions.length > 0) 
+                            dir = directions_[0].cycling_regular_directions[0].coordinates;
+                        
+                        else if (directions_[0].driving_car_directions != undefined && directions_[0].driving_car_directions.length > 0) 
+                            dir = directions_[0].driving_car_directions[0].coordinates;
+
+                        else if (directions_[0].foot_walking_directions != undefined && directions_[0].foot_walking_directions.length > 0) 
+                            dir = directions_[0].foot_walking_directions[0].coordinates;
+
+                        return (<Polyline key={i}
+                            pathOptions={{ color: 'purple' }}
+                            positions={ generateCoordsPolyLine(dir) }
+                        />)
+                    })}
                     </MapContainer>
                 </div>
             </div>
