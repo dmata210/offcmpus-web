@@ -38,7 +38,9 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
   const [GetProperty, {data: propertyResponse}] = useGetPropertyOwnedByLandlordLazyQuery();
   const [GetOwnership, {data: getOwnershipResponse}] = useGetOwnershipForPropertyLazyQuery();
   const [GetLeases, {data: getLeasesResponse}] = useGetLeasesAndOccupantsLazyQuery();
-  const [GetLeaseDocuments, {data: getLeaseDocumentsResponse}] = useGetLeaseDocumentsForLandlordLazyQuery();
+  const [GetLeaseDocuments, {data: getLeaseDocumentsResponse}] = useGetLeaseDocumentsForLandlordLazyQuery({
+    fetchPolicy: 'no-cache'
+  });
 
   // graph-ql react mutation hooks
   const [AddLeaseDocument, {data: leaseDcoumentResponse}] = useAddNewLeaseDocumentMutation();
