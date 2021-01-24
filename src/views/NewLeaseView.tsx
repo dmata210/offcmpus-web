@@ -391,7 +391,7 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
   }, [activateLeaseResponse])
 
   return (<div style={{
-    width: `400px`, height: `900px`, borderBottom: `1px solid red`, margin: `0 auto`, paddingTop: `30px`
+    width: `400px`, height: `900px`, margin: `0 auto`, paddingTop: `30px`
   }}>
 
     <div style={{marginBottom: `20px`}}>

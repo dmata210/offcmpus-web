@@ -63,7 +63,7 @@ const StudentFeed = () => {
                     let entries: any[] = [];
 
                     for (let i = 0; i < 5; ++i) {
-                        entries.push(<PropertyFeedEntry 
+                        entries.push(<PropertyFeedEntry key={i} 
                             showPropertyInfo={showPropertyInfo}
                         />);
                     }
