@@ -14,16 +14,21 @@ import {useHistory} from 'react-router'
 import {shouldPromptToEnableNotifications} from './PushNotificationsPrompt'
 import {ReduxState} from '../redux/reducers/all_reducers'
 import {useSelector} from 'react-redux'
+import {useSearchForPropertiesLazyQuery, Property} from '../API/queries/types/graphqlFragmentTypes'
 
 import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet'
 
 const SearchView = () => {
+
+    const [SearchForProps, {data: searchResponse}] = useSearchForPropertiesLazyQuery();
 
     const user = useSelector((state: ReduxState) => state.user)
     const containerRef = useRef<HTMLDivElement>(null)
     const leftContainerRef = useRef<HTMLDivElement>(null)
     const [leftFilterWidth, setLeftFilterWidth] = useState<number>(400)
     const [contentStart, setContentStart] = useState<number>(0)
+    
+    const [properties, setProperties] = useState<Property[]>([])
 
     const history = useHistory();
     const cookie = new Cookies ();
@@ -37,10 +42,28 @@ const SearchView = () => {
         updateFilterWidth ()
         window.addEventListener(`resize`, updateFilterWidth)
 
+        // execute search queries
+        SearchForProps({
+            variables: {
+                price_start: 0,
+                price_end: 0,
+                rooms: 0,
+                distance: 0
+            }
+        })
+
         return () => {
             window.removeEventListener(`resize`, updateFilterWidth)
         }
     }, [])
+
+    useEffect(() => {
+
+        if (searchResponse && searchResponse.searchForProperties && searchResponse.searchForProperties.data) {
+            setProperties(searchResponse.searchForProperties.data.properties);
+        }
+
+    }, [searchResponse]);
 
     useEffect(() => {
 
@@ -183,7 +206,7 @@ const SearchView = () => {
 
             {/* Right Side */}
             <div className="right-side_">
-                {Array.from(new Array(10), (_: any, i: number) => 
+                {properties.map((_: any, i: number) => 
                     <SearchResult key={i} delay={i < 8 ? i * 100 : 0} />
                 )}
             </div>
