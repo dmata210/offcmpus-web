@@ -5038,16 +5038,15 @@ a.subtle-link {
   font-family: khumbh-sans;
   display: inline-block;
   font-size: 0.7rem;
-  background-color: #ebb3b6;
+  background-color: #edccce;
   padding: 3px 8px 1px 8px;
   border-radius: 10px;
-  font-weight: 600;
   margin-right: 8px;
   color: $navy;
   cursor: pointer;
   transition: background-color 0.25s;
 
   &:hover {
-    background-color: #eba3a7;
+    background-color: #ebb7ba;
   }
 }
