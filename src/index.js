@@ -51,6 +51,7 @@ import StudentStatus from './views/StudentStatus'
 import NewLeaseView from './views/NewLeaseView'
 import PriorityFeatureCreationVew from './views/PriorityFeatureCreationVew'
 import StudentFeed from './views/StudentFeed'
+import StudentPropertyInfoView from './views/StudentPropertyInfoView'
 
 import Testing from './views/Testing'
 
@@ -108,6 +109,7 @@ const Routes = () => {
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/collection" component={CollectionView} />
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/s/status" component={StudentStatus} />
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/feed" component={StudentFeed} />
+            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/info/property/:id" component={({match}) => (<StudentPropertyInfoView property_id={match.params.id} />)} />
 
               {/* Mod Console (Ownership Reviewer) */}
               <AuthRoute accessLevel={AccessLevels.OWNERSHIP_REVIEWER} exact path="/ownership/review" component={OwnershipReview} />

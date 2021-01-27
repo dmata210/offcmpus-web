@@ -103,7 +103,6 @@ const SearchView = () => {
             ]);
         }
 
-        console.log(`coords`, coords);
         return coords;
     }
 
@@ -357,7 +356,22 @@ const SearchResult = ({delay, property}: {delay: number, property: Property}) =>
 
             {/* Bottom Side */}
             <div className="property-info-bottom">
-                Y
+                
+                {/* More Info on Property */}
+                <div style={{
+                    position: 'absolute',
+                    right: `15px`,
+                    bottom: `10px`
+                }}>
+                    <Button 
+                        text="View Property"
+                        background="#E0777D"
+                        bold={true}
+                        textColor="white"
+                        transformDisabled={true}
+                        link_to={`/info/property/${property._id}`}
+                    /> 
+                </div>
             </div>
 
         </div>
