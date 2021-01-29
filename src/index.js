@@ -17,6 +17,7 @@ import './assets/css/layout.scss'
 import './assets/css/fonts.scss'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'shards-ui/dist/css/shards.min.css'
+import 'antd/dist/antd.css';
 
 // router paths
 import SearchView_ from './views/SearchView'
