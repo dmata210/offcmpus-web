@@ -8,7 +8,8 @@ import { useGetPropertySummaryLazyQuery,
     useCanAddReviewLazyQuery,
     useAddReviewForLeaseMutation,
     LeaseHistory,
-    PropertySummary } from '../API/queries/types/graphqlFragmentTypes'
+    PropertySummary, 
+    PropertyDetails} from '../API/queries/types/graphqlFragmentTypes'
 
 import { ReduxState } from '../redux/reducers/all_reducers';
 import Button from '../components/toolbox/form/Button';
@@ -500,10 +501,33 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                         </div>
 
                         <div className="property-tags_">
-                            <div className="tag_">Furnished</div>
-                            <div className="tag_">Furnished</div>
-                            <div className="tag_">Furnished</div>
-                            <div className="tag_">Furnished</div>
+                            {
+                                summary && summary.property && summary.property.details
+                                && function () {
+                                    let tags: any[] = [];
+                                    let details: PropertyDetails = summary.property.details;
+
+                                    let i = 0;
+                                    if (details.furnished) {
+                                        tags.push(<div className="tag_" key={i}>Furnished</div>);
+                                        ++i;
+                                    }
+                                    if (details.has_washer) {
+                                        tags.push(<div className="tag_" key={i}>Washer</div>);
+                                        ++i;
+                                    }
+                                    if (details.has_heater) {
+                                        tags.push(<div className="tag_" key={i}>Heating</div>);
+                                        ++i;
+                                    }
+                                    if (details.has_ac) {
+                                        tags.push(<div className="tag_" key={i}>AC</div>);
+                                        ++i;
+                                    }
+
+                                    return tags;
+                                }()
+                            }
                         </div>
 
                         <div className="meta-area">
