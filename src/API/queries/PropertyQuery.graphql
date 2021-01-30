@@ -14,6 +14,69 @@ query GetProperty(
   }
 }
 
+query GetPropertySummary (
+  $property_id: String!
+) {
+  getPropertySummary (property_id: $property_id) {
+    success
+    error
+    data {
+      property {
+        _id
+        address_line
+        address_line_2
+        city
+        state
+        zip
+        details {
+          description
+          rooms
+          bathrooms
+          sq_ft
+          furnished
+          has_washer
+          has_heater
+          has_ac
+          property_images {
+            s3_key
+            date_uploaded
+          }
+        }
+      }
+      leases {
+        _id
+        price_per_month
+        lease_availability_start_date
+        lease_availability_end_date
+        lease_history {
+          student_id
+          start_date
+          end_date
+          review_of_property {
+            rating
+            review
+            response
+          }
+          review_of_landlord {
+            rating
+            review
+            response
+          }
+          property_images {
+            s3_key
+            date_uploaded
+          }
+        }
+      }
+      landlord {
+        _id
+        first_name
+        last_name
+      }
+    }
+  }
+}
+
 query GetPropertyOwnedByLandlord(
   $property_id: String!,
   $landlord_id: String!
@@ -218,5 +281,15 @@ fragment PropertyWithLeaseFields on Property {
     lease_availability_end_date
     lease_availability_start_date
     lease_document_id
+    lease_history {
+      price
+      student_id
+      start_date
+      end_date
+      property_images {
+        s3_key
+        date_uploaded
+      }
+    }
   }
 }

@@ -4,6 +4,41 @@ query GetLeasesAndOccupants ($ownership_id: String!) {
     }
 }
 
+query CanAddReview (
+    $student_id: String!,
+    $property_id: String!
+) {
+    canAddReview(student_id: $student_id, property_id: $property_id) {
+        success
+        error
+        data {
+            value
+        }
+    }
+}
+
+mutation AddReviewForLease (
+    $lease_id: String!,
+    $student_id: String!,
+    $property_review: String!,
+    $property_rating: Float!,
+    $landlord_review: String!,
+    $landlord_rating: Float!,
+    $property_images: [String!]!
+) {
+    addReviewForLease (
+        lease_id: $lease_id,
+        student_id: $student_id,
+        property_review: $property_review,
+        property_rating: $property_rating,
+        landlord_review: $landlord_review,
+        landlord_rating: $landlord_rating,
+        property_images: $property_images
+    ) {
+        ...LeaseAPIResponseFields
+    }
+}
+
 mutation ActivateLease (
     $lease_id: String!,
     $lease_document_id: String!,
@@ -67,6 +102,26 @@ fragment LeaseFields on Lease {
     lease_document_id
     lease_availability_start_date
     lease_availability_end_date
+    lease_history {
+        price
+        student_id
+        start_date
+        end_date
+        review_of_property {
+            rating
+            review
+            response
+        }
+        review_of_landlord {
+            rating
+            review
+            response
+        }
+        property_images {
+            s3_key
+            date_uploaded
+        }
+    }
 }
 
 fragment LeaseOccupant on Student {

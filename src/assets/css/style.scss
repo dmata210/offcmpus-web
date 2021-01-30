@@ -5252,6 +5252,25 @@ a.subtle-link {
   padding: 10px 15px;
   border-radius: 5px;
 
+  .review_ {
+
+    .review_images {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+
+      .review-image-holder {
+        cursor: pointer;
+        width: 100px;
+        height: 100px;
+        border: 1px solid $navyLight;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-right: 18px;
+      }
+    }
+  }
+
   .response_ {
     margin-left: 5%;
     margin-top: 20px;
