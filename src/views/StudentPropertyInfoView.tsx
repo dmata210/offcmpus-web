@@ -244,7 +244,8 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
         
         if (summary) {
             for (let i = 0; i < summary.leases.length; ++i) {
-                for (let j = 0; j < summary.leases[i].lease_history; ++j) {
+                if (!summary.leases[i].lease_history) continue;
+                for (let j = 0; j < summary.leases[i].lease_history.length; ++j) {
                     if (summary.leases[i].lease_history[j].review_of_property) {
                         ++count;
                         scale += summary.leases[i].lease_history[j].review_of_property.rating;
@@ -252,7 +253,6 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                 }
             }
         }
-
         return count == 0 ? 0 : scale / count;
     }
 
@@ -262,7 +262,8 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
         
         if (summary) {
             for (let i = 0; i < summary.leases.length; ++i) {
-                for (let j = 0; j < summary.leases[i].lease_history; ++j) {
+                if (!summary.leases[i].lease_history) continue;
+                for (let j = 0; j < summary.leases[i].lease_history.length; ++j) {
                     if (summary.leases[i].lease_history[j].review_of_landlord) {
                         ++count;
                         scale += summary.leases[i].lease_history[j].review_of_landlord.rating;
@@ -270,7 +271,6 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                 }
             }
         }
-
         return count == 0 ? 0 : scale / count;
     }
     
@@ -401,7 +401,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                 </div>
             }
 
-            <ConfirmLine
+            {reviewPopupPage != 2 && <ConfirmLine
                 withCancel={true}
                 onCancel={() => closePopup()}
                 onConfirm={() => {
@@ -459,7 +459,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                     }
                 }}
                 confirmButtonText={reviewPopupPage == 0 ? `Next: Landlord Review` : `Save Review`}
-            />
+            />}
 
         </Popup>
 
@@ -529,14 +529,14 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                             <div className="ratings_">
                                 <div className="header">Property Score</div>
                                 <div>
-                                    <Rate disabled defaultValue={getAveragePropertyReviewScale() * 6} />
+                                    <Rate disabled value={getAveragePropertyReviewScale() * 5} />
                                 </div>
 
                             </div>
                             <div className="ratings_">
                                 <div className="header">Landlord Score</div>
                                 <div>
-                                    <Rate disabled defaultValue={getAverageLandlordReviewScale() * 6} />
+                                    <Rate disabled value={getAverageLandlordReviewScale() * 5} />
                                 </div>
                             </div>
 
@@ -614,8 +614,64 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                 {function () {
                     let reviews: any[] = [];
 
-                    for (let i = 0; i < 5; ++i) {
-                        reviews.push(<ReviewResponse key={i} />)
+                    if (summary) {
+                        for (let i = 0; i < summary.leases.length; ++i) {
+                            if (summary.leases[i].lease_history == undefined) continue;
+
+                            for (let j = 0; j < summary.leases[i].lease_history.length; ++j) {
+
+                                if (reviewView == 'landlord') {
+                                    if (summary.leases[i].lease_history[j].review_of_landlord == undefined) continue;
+
+                                    reviews.push({
+                                        date: new Date( summary.leases[i].lease_history[j].end_date ),
+                                        dom: <ReviewResponse 
+                                            key={i} 
+                                            lease_history={summary.leases[i].lease_history[j]}
+                                            reviewFor={reviewView}
+                                        />
+                                    })
+                                }
+
+                                else if (reviewView == 'property') {
+                                    if (summary.leases[i].lease_history[j].review_of_property == undefined) continue;
+
+                                    reviews.push({
+                                        date: new Date( summary.leases[i].lease_history[j].end_date ),
+                                        dom: <ReviewResponse 
+                                            key={i} 
+                                            lease_history={summary.leases[i].lease_history[j]}
+                                            reviewFor={reviewView}
+                                        />
+                                    })
+                                }
+
+                            }
+                        } // out of for loop
+                    }
+
+                    // sort the reviews.
+                    if (reviews.length > 0) {
+                        reviews.sort((a: any, b: any): number => {
+                            if (reviewView == 'property') {
+                                if (reviewOrder.property == 'most-recent') return a.date > b.date ? 1 : -1;
+                                else return a.date < b.date ? 1 : -1;
+                            }
+                            if (reviewView == 'landlord') {
+                                if (reviewOrder.landlord == 'most-recent') return a.date > b.date ? 1 : -1;
+                                else return a.date < b.date ? 1 : -1;
+                            }
+    
+                            // no sort mode selected...
+                            return 0;
+                        });
+                        return reviews.map((data: any) => data.dom);
+                    }
+                    // put Empty placeholder
+                    else {
+                        reviews.push(<div key={-1}>
+                            <Empty description="No reviews for this property yet" />
+                        </div>);
                     }
 
                     return reviews;
@@ -628,37 +684,45 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
 }
 
 
-const ReviewResponse = () => {
+const ReviewResponse = ({lease_history, reviewFor}: {lease_history: LeaseHistory, reviewFor: 'landlord' | 'property'}) => {
 
     return (<div className="review-response-container">
 
         <div className='review-box'>
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: `5px`}}>
-                <div style={{fontWeight: 600}}>Leased 2018</div>
+                <div style={{fontWeight: 600}}>Leased {new Date(lease_history.end_date).getFullYear()}</div>
                 <div>
-                    <Rate disabled defaultValue={Math.random() * 6} />
+                    <Rate disabled value={
+                        reviewFor == 'property'?
+                        lease_history.review_of_property!.rating * 5
+                        : lease_history.review_of_landlord!.rating * 5
+                    } />
                 </div>
             </div>
             <div className="review_">
-                The property is pretty good. Everything was in really good shape. I can recommend this property to others
-                to lease it out. Only a few downsides. This and that. That and this. Yatta yatta. Kapeiche Kablowie.
+                {reviewFor == 'property' ? lease_history.review_of_property!.review : lease_history.review_of_landlord!.review}
 
-                {Math.floor( Math.random() * 100 ) % 2 == 0 && <div className="review_images">
-                    <div className="review-image-holder"><img /></div>
-                    <div className="review-image-holder"><img /></div>
-                    <div className="review-image-holder"><img /></div>
-                    <div className="review-image-holder"><img /></div>
-                    <div className="review-image-holder"><img /></div>
+                {reviewFor == 'property' &&
+                <div className="review_images">
+                    {lease_history.property_images.map((img_info: any, i: number) => 
+                        <div key={i} className="review-image-holder"><img /></div>)}
                 </div>}
             </div>
 
-            <div className="response_">
+            {lease_history.review_of_property!.response != undefined &&
+                <div className="response_">
                 <div style={{fontWeight: 600}}>Response from Landlord</div>
-            <div className="review_">
-                The property is pretty good. Everything was in really good shape. I can recommend this property to others
-                to lease it out. Only a few downsides. This and that. That and this. Yatta yatta. Kapeiche Kablowie.
-            </div>
-            </div>
+                    {reviewFor == 'property'
+                        ?
+                        <div className="review_">
+                            { lease_history.review_of_property!.response }
+                        </div>
+                    : <div className="review_">
+                        { lease_history.review_of_landlord!.response }
+                    </div>
+                    }
+                </div>
+            }
         </div>
 
     </div>)
