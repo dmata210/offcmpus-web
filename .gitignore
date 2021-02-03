@@ -30,5 +30,5 @@ yarn-error.log*
 
 status_reports/*
 
-src/API/queries/types/*
+#src/API/queries/types/*
 profiles/*
