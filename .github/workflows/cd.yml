@@ -44,5 +44,5 @@ jobs:
 
       - name: Copy files to prod
         run: |
-          aws s3 cp . s3://offcmpus.io
+          aws s3 sync . s3://offcmpus.io
         working-directory: build
