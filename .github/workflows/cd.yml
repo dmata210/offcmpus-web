@@ -26,9 +26,14 @@ jobs:
         run: npm install
 
       - name: Build production
-        run: npm run build
+        run: CI=false npm run build
         env:
           NODE_ENV: production
+# temporary hack until consolidated secrets management...
+          REACT_APP_JIRA_FEEDBACK_URI: ${{ secrets.JIRA_FEEDBACK_URI }}
+          REACT_APP_STRIPE_STARTER_TIER_PRICE_ID: ${{ secrets.STRIPE_STARTER_TIER_PRICE_ID }}
+          REACT_APP_STRIPE_PRO_TIER_PRICE_ID: ${{ secrets.STRIPE_PRO_TIER_PRICE_ID }}
+          REACT_APP_STRIPE_TEST_API_TOKEN: ${{ secrets.STRIPE_TEST_API_TOKEN }}
 
       - name: Check dist
         run: ls
