@@ -8,6 +8,7 @@ import { useGetPropertySummaryLazyQuery,
     useCanAddReviewLazyQuery,
     useAddReviewForLeaseMutation,
     LeaseHistory,
+    Lease,
     PropertySummary, 
     PropertyDetails} from '../API/queries/types/graphqlFragmentTypes'
 
@@ -20,6 +21,11 @@ import {uploadObjects} from '../API/S3API';
 const { Option } = Select;
 const { Dragger } = Upload;
 
+const dateAbbr = (date: Date): string => {
+    let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+}
+
 const desc = ['terrible', 'bad', 'normal', 'good', 'wonderful'];
 const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
 
@@ -30,6 +36,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
     const [userLease, setUserLease] = useState<any>(null);
     const [userLeaseHistory, setUserLeaseHistory] = useState<LeaseHistory | null>(null);
     const [reviewPopupPage, setReviewPopupPage] = useState<number>(0);
+    const [leaseInfoPopup, setLeaseInfoPopup] = useState<boolean>(false);
 
     const closePopup = () => {
         setReviewPopupPage(0);
@@ -464,6 +471,55 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
 
         </Popup>
 
+        <Popup
+            width={600}
+            height={700}
+            show={summary != null && summary.leases.length > 0 && leaseInfoPopup}
+        >
+            <PopupHeader
+                withClose={true}
+                onClose={() => setLeaseInfoPopup(false)}
+            >
+                {summary ? summary.leases.length: 0} Room(s) Available
+            </PopupHeader>
+
+            <div style={{
+                padding: "10px 20px"
+            }}>
+                {/* List the leases that a student can rent out */}
+                {summary && summary.leases 
+                && summary.leases.map((lease: Lease, i: number) => 
+                    <div key={i} className="lease-popup-info">
+                        <div style={{width: "60%"}}>
+                            <div style={{fontWeight: 600}}>Room {i + 1}</div>
+                            <div className="kvp_">
+                                <div className="key_">Price</div>
+                                <div className="value_">${lease.price_per_month}/month</div>
+                            </div>
+                            <div className="kvp_">                    
+                                <div className="key_">Available From</div>
+                                <div className="value_">{dateAbbr(new Date(lease.lease_availability_start_date ? lease.lease_availability_start_date : ''))}</div>
+                            </div>
+                            <div className="kvp_">
+                                <div className="key_">Lease Ends</div>
+                                <div className="value_">{dateAbbr(new Date(lease.lease_availability_end_date ? lease.lease_availability_end_date : ''))}</div>
+                            </div>
+                        </div>
+                        <div style={{width: `160px`}}>
+                            <Button 
+                                text="I'm Interested"
+                                textColor="white"
+                                bold={true}
+                                transformDisabled={true}
+                                background="#E0777D"
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+
+        </Popup>
+
         <div className="section-header-2" style={{height: `30px`, marginBottom: `16px`}}>
             <div className="title-area">Property Info</div>
         </div>
@@ -533,7 +589,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                         <div className="meta-area">
                             
                             <div className="meta-section">
-                                {summary && summary.leases.length} Rooms
+                                {summary && summary.leases.length} Rooms available to lease
                             </div>
 
                             <div className="meta-section">
@@ -594,6 +650,23 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
             </div>
 
         </div>
+
+        {/* Interest Area */}
+        {summary && summary.leases.length > 0 && <div className="property-interest-area">
+            <div>
+                <div style={{fontWeight: 600}}>There are {summary.leases.length} rooms available to lease.</div>
+            </div>
+            <div style={{width: `200px`}}>
+                <Button 
+                    text="View Available Leases"
+                    textColor="white"
+                    background="#E0777D"
+                    bold={true}
+                    transformDisabled={true}
+                    onClick={() => setLeaseInfoPopup(true)}
+                />
+            </div>
+        </div>}
 
         {/* Reviews Area */}
         <div style={{

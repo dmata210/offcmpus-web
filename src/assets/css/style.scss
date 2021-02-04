@@ -5336,3 +5336,36 @@ a.subtle-link {
     }
   }
 }
+
+.property-interest-area {
+
+  display: flex;
+  background-color: white;
+  justify-content: space-between;
+  width: 90%;
+  margin: 0 auto;
+  padding: 12px 15px;
+  align-items: center;
+  border-radius: 5px;
+}
+
+.lease-popup-info {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  .kvp_ {
+    display: flex;
+    margin-bottom: 3px;
+    align-items: flex-end;
+    .key_ {
+      color: $navyLightText;
+      font-weight: 600;
+      font-family: khumbh-sans;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      margin-right: 6px;
+    }
+  }
+}

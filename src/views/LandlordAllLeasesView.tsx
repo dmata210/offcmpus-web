@@ -141,7 +141,9 @@ const PropertyAndLeases = ({
     //====== FUNCTIONS =======
     const getAddress = (): string => {
         let addr = `${property.address_line}, ${ property.address_line_2 ? `${property.address_line_2}, ` : `` }`;
-        addr += `${property.city} ${property.state}, ${property.zip}`;
+        addr += `${property.city} `;
+        addr = addr.toLowerCase();
+        addr += `${property.state}, ${property.zip}`;
         return addr;
     }
 
@@ -224,7 +226,10 @@ const PropertyAndLeases = ({
     return (<div className="property-and-leases-modal">
 
         <div className="addr">
-            <div style={{marginRight: `8px`}}>{getAddress()}</div>
+            <div style={{
+                marginRight: `8px`,
+                textTransform: 'capitalize'
+            }}>{getAddress()}</div>
             <Link to={`/landlord/property/${property._id}`}>Go to property</Link>   
         </div>
         
