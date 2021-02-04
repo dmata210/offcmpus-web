@@ -4633,6 +4633,7 @@ a {
   transition: opacity 0.25s;
   cursor: pointer;
   z-index: 3;
+  line-height: 20px;
 
   &:hover {
     opacity: 1;
@@ -5282,6 +5283,56 @@ a.subtle-link {
 
     &:hover {
       border: 1px solid $navyLightText;
+    }
+  }
+}
+
+.property-and-leases-modal {
+
+  margin-bottom: 20px;
+  .addr {
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+  }
+
+  .init-details {
+    height: 100px;
+    background-color: $navyLight;
+    border-radius: 5px;
+    box-sizing: border-box;
+    position: relative;
+    text-align: center;
+
+    .content {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      left: 50%;
+    }
+  }
+}
+
+.lease-info-container {
+  display: flex;
+  flex-wrap: wrap;
+
+  .lease-info-view {
+    background-color: $navyLight;
+    margin-right: 14px;
+    margin-bottom: 14px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    width: 200px;
+    padding-top: 10px;
+
+    .occupant-info {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 0 10px 8px 10px;
+    }
+
+    .market-info {
+      padding: 8px 10px 8px 10px;
     }
   }
 }

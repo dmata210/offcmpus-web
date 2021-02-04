@@ -15,9 +15,9 @@ import Button from '../components/toolbox/form/Button'
 import CommentBubble from '../components/toolbox/misc/CommentBubble'
 import Centered from '../components/toolbox/layout/Centered'
 import SuggestedInput from '../components/toolbox/form/SuggestionInput'
-// @ts-ignore
-import { Breadcrumb, BreadcrumbItem } from "shards-react";
+
 import {Link} from 'react-router-dom'
+import { Breadcrumb } from 'antd';
 
 
 interface IPropertyInfo {
@@ -205,11 +205,16 @@ const LandlordNewProperty = () => {
     <div>
 
       
-      <Breadcrumb>
+      {/* <Breadcrumb>
         <BreadcrumbItem>
           <Link to="/landlord/dashboard">Dashboard</Link>
         </BreadcrumbItem>
         <BreadcrumbItem active>Add Property</BreadcrumbItem>
+      </Breadcrumb> */}
+
+      <Breadcrumb>
+        <Breadcrumb.Item href="/landlord/dashboard">Dashboard</Breadcrumb.Item>
+        <Breadcrumb.Item>Add Property</Breadcrumb.Item>
       </Breadcrumb>
 
 
@@ -287,6 +292,8 @@ const LandlordNewProperty = () => {
           }}
           text="Cancel"
           background="#E4E4E4"
+          transformDisabled={true}
+          bold={true}
         />
       </div>
 
@@ -299,6 +306,8 @@ const LandlordNewProperty = () => {
           iconLocation="right"
           textColor="white"
           background="#3B4353"
+          transformDisabled={true}
+          bold={true}
         />
       </div>
 
