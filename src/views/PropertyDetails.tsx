@@ -461,6 +461,12 @@ const LeaseInfo = ({property_id, lease, id}: LeaseInfoProps) => {
                 <Button bold={true} link_to={getLeaseCreationLink()} textColor="white" background="#E0777D" text="Create Lease" transformDisabled={true} />    
             </div>}
 
+            {!lease.external_occupant && lease.occupant_id == null && lease.active && <div className="right__">
+                <Button bold={true} 
+                    link_to={`/landlord/lease/${property_id}/${lease._id}`} 
+                    textColor="white" background="#3B4353" text="View Lease Info" transformDisabled={true} />    
+            </div>}
+
             {/* External Lease -> Lease is not managed through offcmpus */}
             {lease.external_occupant == true && <div className="right__">
                 <div style={{display: `flex`}}>

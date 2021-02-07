@@ -67,6 +67,10 @@ query GetPropertySummary (
             date_uploaded
           }
         }
+        student_interests {
+          student_id
+          date
+        }
       }
       landlord {
         _id
@@ -246,6 +250,10 @@ fragment PropertyListWithLeasesAPIResponseFields on PropertyListAPIResponse {
           }
 
         }
+        student_interests {
+          student_id
+          date
+        }
 
       }
     }
@@ -341,6 +349,10 @@ fragment PropertyWithLeaseFields on Property {
         s3_key
         date_uploaded
       }
+    }
+    student_interests {
+      student_id
+      date
     }
   }
 }

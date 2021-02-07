@@ -11,10 +11,10 @@ import {HiCheck} from 'react-icons/hi'
 import {motion, useSpring, useTransform} from 'framer-motion'
 import Cookies from 'universal-cookie'
 import {useHistory} from 'react-router'
-import {shouldPromptToEnableNotifications} from './PushNotificationsPrompt'
 import {ReduxState} from '../redux/reducers/all_reducers'
 import {useSelector} from 'react-redux'
 import {useSearchForPropertiesLazyQuery, Property, PropertyDirections} from '../API/queries/types/graphqlFragmentTypes'
+import { Empty } from 'antd';
 
 import {MapContainer, TileLayer, Marker, Polyline, Popup} from 'react-leaflet'
 
@@ -36,7 +36,7 @@ const SearchView = () => {
     const cookie = new Cookies ();
 
     const resultsCount = useNumberCounter({
-        value: 50,
+        value: properties.length,
         duration: 1000
     })
 
@@ -66,16 +66,6 @@ const SearchView = () => {
         }
 
     }, [searchResponse]);
-
-    useEffect(() => {
-
-        if (user && user.user) {
-            shouldPromptToEnableNotifications(user)
-            .then((shouldPrompt: boolean) => {
-                if (shouldPrompt) history.push('/notifications/enable')
-            })
-        }
-    }, [user])
 
     const updateFilterWidth = () => {
         // filter width should be x% of the page width
@@ -253,11 +243,25 @@ const SearchView = () => {
         }}>
 
             {/* Right Side */}
+            {properties.length > 0 &&
             <div className="right-side_">
                 {properties.map((property: Property, i: number) => 
                     <SearchResult property={property} key={i} delay={i < 8 ? i * 100 : 0} />
                 )}
-            </div>
+            </div>}
+
+            {properties.length == 0 &&
+            <div style={{
+                textAlign: `center`,
+                margin: `0 auto`,
+                paddingTop: `150px`
+            }}>
+                <Empty
+                    description={
+                    <span>No properties could be found</span>
+                    }
+                />
+            </div>}
 
         </div>
     </ViewWrapper>)

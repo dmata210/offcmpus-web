@@ -17,6 +17,127 @@ query CanAddReview (
     }
 }
 
+query GetLeaseSummary($lease_id: String!) {
+
+    getLeaseSummary (lease_id: $lease_id) {
+        success
+        error
+        data {
+            room_no
+            property {
+                _id
+                landlord
+                address_line
+                address_line_2
+                city
+                state
+                zip
+            }
+            lease {
+                _id
+                active
+                ownership_id
+                price_per_month
+                occupant_id
+                external_occupant
+                priority {
+                    level
+                    start_date
+                    end_date
+                }
+                lease_document_id
+                lease_availability_start_date
+                lease_availability_end_date
+                lease_history {
+                    price
+                    student_id
+                    start_date
+                    end_date
+                    review_of_property {
+                        rating
+                        review
+                        response
+                    }
+                    review_of_landlord {
+                        rating
+                        review
+                        response
+                    }
+                    property_images {
+                        s3_key
+                        date_uploaded
+                    }
+                }
+                student_interests {
+                    student_id
+                    date
+                    accepted
+                }
+            }
+            institutions {
+                _id
+                name
+                s3_thumb_key
+                location {
+                    address
+                    city
+                    state
+                    zip
+                    longitude
+                    latitude
+                }
+            }
+            students {
+                _id
+                first_name
+                last_name
+                email
+                phone_number
+                auth_info {
+                    institution_id
+                }
+            }
+            lease_doc {
+                _id
+                lease_name
+                documents {
+                    mime_type
+                    s3_key
+                }
+                landlord_id
+            }
+
+        }
+    }
+    
+}
+
+mutation AcceptOrDeclineStudentInterest (
+    $action: String!,
+    $student_id: String!,
+    $lease_id: String!
+) {
+    acceptOrDeclineStudentInterest (
+        action: $action,
+        student_id: $student_id,
+        lease_id: $lease_id
+    ) {
+        ...LeaseAPIResponseFields
+    }
+}
+
+mutation expressInterest (
+    $student_id: String!,
+    $lease_id: String!
+) {
+    expressInterest (
+        student_id: $student_id,
+        lease_id: $lease_id
+    ) {
+        ...LeaseAPIResponseFields
+    }
+}
+
 mutation AddReviewForLease (
     $lease_id: String!,
     $student_id: String!,
@@ -121,6 +242,11 @@ fragment LeaseFields on Lease {
             s3_key
             date_uploaded
         }
+    }
+    student_interests {
+        student_id
+        date  
+        accepted
     }
 }
 

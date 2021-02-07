@@ -2801,6 +2801,22 @@ body {
     transition: background 0.15s;
     position: relative;
 
+    .bubble-count {
+      position: absolute;
+      background-color: red;
+      width: 20px;
+      height: 20px;
+      transform: translate(25%, -25%);
+      border-radius: 30px;
+      right: 0;
+      top: 0;
+      color: white;
+      font-size: 0.7rem;
+      line-height: 20px;
+      text-align: center;
+      font-weight: 600;
+    }
+
     &:hover {
       background-color: #F6F7F9;
     }
@@ -5118,7 +5134,7 @@ a.subtle-link {
             font-weight: 600;
             font-family: khumbh-sans;
             font-size: 1.2rem;
-            margin-right: 8px;
+            margin-right: 2px;
           }
         }
 
@@ -5368,4 +5384,94 @@ a.subtle-link {
       margin-right: 6px;
     }
   }
+}
+
+.lease-contents {
+  display: flex;
+  margin-top: 20px;
+
+  .container_ {
+    margin-bottom: 20px;
+    .title {
+      font-family: khumbh-sans;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: $navy;
+    }
+
+    .body {
+      background-color: white;
+      border-radius: 5px;
+      box-sizing: border-box;
+      padding: 10px 15px;
+
+      &.flex {
+        display: flex;
+
+        &.space-between {
+          justify-content: space-between;
+        }
+
+        &.align-center {
+          align-items: center;
+        }
+      }
+    }
+  }
+
+  .interests-area {
+    width: 350px;
+    min-width: 350px;
+  }
+
+  .graph-area {
+    flex-grow: 1;
+    margin-right: 20px;
+  }
+}
+
+.student-interest {
+  display: flex;
+  margin-top: 10px;
+  align-items: center;
+
+  .college-logo {
+    border: 1px solid $navyLightText;
+    width: 30px;
+    height: 30px;
+    border-radius: 3px;
+    margin-right: 10px;
+    overflow: hidden;
+  }
+
+  .actions-area {
+    margin-left: 10px;
+  }
+
+  .student-name {
+    flex-grow: 1;
+  }
+}
+
+.lease-graph-controls {
+  display: flex;
+  align-items: center;
+
+  .ctrl {
+    margin-right: 10px;
+  }
+}
+
+.date-container {
+  margin-left: 10px;
+  &:first-child {
+    margin-left: 0px;
+  }
+
+  background-color: $navyVeryLight;
+  box-sizing: border-box;
+  padding: 3px 12px;
+  border: 1px solid $navyLight;
+  border-radius: 3px;
 }

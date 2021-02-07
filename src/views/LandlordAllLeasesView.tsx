@@ -5,7 +5,8 @@ import {useNumberCounter} from '../components/hooks/useNumberCounter';
 import {
     useGetPropertiesForLandlordLazyQuery,
     Property,
-    Lease
+    Lease,
+    StudentInterest
 } from '../API/queries/types/graphqlFragmentTypes';
 import {useSelector} from 'react-redux';
 import {Link} from 'react-router-dom';
@@ -13,7 +14,8 @@ import urlencode from 'urlencode';
 
 import {ReduxState} from '../redux/reducers/all_reducers'
 import Button from '../components/toolbox/form/Button';
-import MoreDetails from '../components/toolbox/misc/MoreDetails2'
+import MoreDetails from '../components/toolbox/misc/MoreDetails2';
+import { Empty } from 'antd';
 
 /**
  * The view shows all the leases that the landlord has (active or inactive), 
@@ -90,7 +92,6 @@ const LandlordAllLeasesView = () => {
         })
         return count_;
     }
-
     
     //====== MISC HOOKS =======
     const leasesCounter = useNumberCounter({
@@ -101,7 +102,9 @@ const LandlordAllLeasesView = () => {
     //====== RENDER =======
     return (<ViewWrapper>
         
-        <div>
+        <div style={{
+            marginBottom: `150px`
+        }}>
             <div className="section-header-2" style={{
                 display: 'flex',
                 alignItems: 'center'
@@ -111,7 +114,7 @@ const LandlordAllLeasesView = () => {
             </div>
 
             {/* Show the leases grouped by property */}
-            <div style={{
+            {properties.length > 0 && <div style={{
                 marginTop: `15px`
             }}>
                 {properties.map((property: Property, i: number) => 
@@ -121,7 +124,34 @@ const LandlordAllLeasesView = () => {
                         leases={Object.prototype.hasOwnProperty.call(leases, property._id) ? leases[property._id] : []}
                     />
                 )}
-            </div>
+            </div>}
+
+            {properties.length == 0 && 
+            <div style={{
+                marginTop: `100px`
+            }}>
+                <Empty
+                    description={
+                    <span>
+                        No leases. Add a property to create a lease.
+                    </span>
+                    }
+                >
+                    <div style={{
+                        width: `200px`,
+                        margin: `0 auto`
+                    }}>
+                        <Button 
+                            text="Add Property"
+                            textColor="white"
+                            background="#E0777D"
+                            bold={true}
+                            transformDisabled={true}
+                            link_to={`/landlord/new-property`}
+                        />
+                    </div>
+                </Empty>    
+            </div>}
 
         </div>
 
@@ -145,6 +175,15 @@ const PropertyAndLeases = ({
         addr = addr.toLowerCase();
         addr += `${property.state}, ${property.zip}`;
         return addr;
+    }
+
+    /**
+     * Get the StudentInterest documents that do not have
+     * an accepted value yet (undecided).
+     */
+    const getUndecidedInterested = (lease: Lease): StudentInterest[] => {
+        return lease.student_interests.filter((interest: StudentInterest) => 
+            interest.accepted == undefined);
     }
 
     const isOnMarket = (lease: Lease):boolean => lease.active && !lease.external_occupant;
@@ -185,32 +224,83 @@ const PropertyAndLeases = ({
                         {dateAbbr(new Date(lease.lease_availability_start_date ? lease.lease_availability_start_date : ''))} - {dateAbbr(new Date(lease.lease_availability_end_date ? lease.lease_availability_end_date : ''))}
                     </div>
 
+                    {getUndecidedInterested(lease).length == 0 &&
                     <div style={{
-                        marginTop: `8px`,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
+                        marginTop: `8px`
                     }}>
-                        <div style={{width: `85%`}}>
-                            <Button 
-                                text="Assign Lease"
-                                textColor="white"
-                                bold={true}
-                                transformDisabled={true}
-                                background="#3B4353"
-                            />
+                        
+                        <div style={{
+                            fontWeight: 600,
+                            fontStyle: `italic`
+                        }}>
+                            No student interests, yet.
                         </div>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <div style={{width: `85%`}}>
+                                <Button 
+                                    text="Go To Lease"
+                                    textColor="white"
+                                    bold={true}
+                                    transformDisabled={true}
+                                    background="#3B4353"
+                                    link_to={`/landlord/lease/${property._id}/${lease._id}`}
+                                />
+                            </div>
+                            <div>
+                                <MoreDetails 
+                                    width={200}
+                                    details={`
+                                        Assign a lease to a student who has expressed interest in this
+                                        property. They will be sent the lease document and be able to
+                                        digitally sign the lease with you.
+                                    `}
+                                />
+                            </div>
+                        </div>
+
+                    </div>}
+                    {getUndecidedInterested(lease).length > 0 &&
+                    <div style={{
+                        marginTop: `8px`
+                    }}>
+                        
                         <div>
-                            <MoreDetails 
-                                width={200}
-                                details={`
-                                    Assign a lease to a student who has expressed interest in this
-                                    property. They will be sent the lease document and be able to
-                                    digitally sign the lease with you.
-                                `}
-                            />
+                            <span style={{
+                                fontWeight: 600
+                            }}>{getUndecidedInterested(lease).length}</span> student(s) interested
                         </div>
-                    </div>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <div style={{width: `85%`}}>
+                                <Button 
+                                    text="Go To Lease"
+                                    textColor="white"
+                                    bold={true}
+                                    transformDisabled={true}
+                                    background="#3B4353"
+                                    link_to={`/landlord/lease/${property._id}/${lease._id}`}
+                                />
+                            </div>
+                            <div>
+                                <MoreDetails 
+                                    width={200}
+                                    details={`
+                                        Assign a lease to a student who has expressed interest in this
+                                        property. They will be sent the lease document and be able to
+                                        digitally sign the lease with you.
+                                    `}
+                                />
+                            </div>
+                        </div>
+
+                    </div>}
 
                 </div>}
 

@@ -54,6 +54,8 @@ import PriorityFeatureCreationVew from './views/PriorityFeatureCreationVew'
 import StudentFeed from './views/StudentFeed'
 import StudentPropertyInfoView from './views/StudentPropertyInfoView'
 import LandlordAllLeasesView from './views/LandlordAllLeasesView'
+import LandlordLeaseInfoView from './views/LandlordLeaseInfoView'
+import StudentNotificationsView from './views/StudentNotificationsView'
 
 import Testing from './views/Testing'
 
@@ -112,6 +114,7 @@ const Routes = () => {
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/s/status" component={StudentStatus} />
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/feed" component={StudentFeed} />
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/info/property/:id" component={({match}) => (<StudentPropertyInfoView property_id={match.params.id} />)} />
+            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/notifications" component={StudentNotificationsView} />
 
               {/* Mod Console (Ownership Reviewer) */}
               <AuthRoute accessLevel={AccessLevels.OWNERSHIP_REVIEWER} exact path="/ownership/review" component={OwnershipReview} />
@@ -129,6 +132,7 @@ const Routes = () => {
             <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/lease/new/:id" component={({match}) => (<NewLeaseView property_id={match.params.id} />)} />
             <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/lease/priority/:id" component={({match}) => (<PriorityFeatureCreationVew property_id={match.params.id} /> )} />
             <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/leases" component={LandlordAllLeasesView} />
+            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/lease/:property_id/:lease_id" component={({match}) => (<LandlordLeaseInfoView property_id={match.params.property_id} lease_id={match.params.lease_id} />)} />
 
             {/* Landlord and Student */}
             <AuthRoute accessLevel={AccessLevels.STUDENT | AccessLevels.LANDLORD} exact path="/property/:id" component={({match}) => (<PropertyView property_id={match.params.id} />)} />

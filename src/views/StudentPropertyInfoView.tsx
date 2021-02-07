@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import ViewWrapper from '../components/ViewWrapper';
 import Tabs from '../components/toolbox/misc/Tabs';
-import { Select, Rate, Empty, Upload, Input, Result, Spin, Button as AntButton } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
+import { Select, Rate, Empty, 
+    Upload, Input, Result, Spin, 
+    Tag, Button as AntButton } from 'antd';
+import { InboxOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 import { useGetPropertySummaryLazyQuery, 
     useCanAddReviewLazyQuery,
     useAddReviewForLeaseMutation,
+    useExpressInterestMutation,
     LeaseHistory,
     Lease,
     PropertySummary, 
@@ -17,6 +20,7 @@ import Button from '../components/toolbox/form/Button';
 import Popup, {PopupHeader, ConfirmLine} from '../components/toolbox/misc/Popup';
 import { UploadFile } from 'antd/lib/upload/interface';
 import {uploadObjects} from '../API/S3API';
+import MoreDetails from '../components/toolbox/misc/MoreDetails2';
 
 const { Option } = Select;
 const { Dragger } = Upload;
@@ -54,6 +58,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
         review: "", rating: 0
     }})
 
+    const [ExpressInterest, {data: interestResponse}] = useExpressInterestMutation();
     const [AddReview, {data: addReviewResponse, loading: addReviewLoading}] = useAddReviewForLeaseMutation();
     // query whether the current user can write a review
     const [CanAddReview, {data: canAddReviewResponse}] = useCanAddReviewLazyQuery();
@@ -77,6 +82,17 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
             }
         }
     }, [summaryDataResponse]);
+
+    /**
+     * Determine whether this student has already expressed interest for this property
+     */
+    const alreadyInterested = (lease: Lease): boolean => {
+        if (!user || !user.user) return false;
+        for (let i = 0; i < lease.student_interests.length; ++i) {
+            if (lease.student_interests[i].student_id == user.user._id) return true;
+        }
+        return false;
+    }
 
     useEffect(() => {
 
@@ -505,15 +521,45 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                                 <div className="value_">{dateAbbr(new Date(lease.lease_availability_end_date ? lease.lease_availability_end_date : ''))}</div>
                             </div>
                         </div>
-                        <div style={{width: `160px`}}>
+                        {alreadyInterested(lease) &&
+                            <div style={{
+                                display: `flex`,
+                                alignItems: `center`
+                            }}>
+                                    <div>
+                                    <Tag icon={<CheckCircleOutlined />} color="success">
+                                        Already interested
+                                    </Tag>
+                                    </div>
+                                    <div>
+                                        <MoreDetails 
+                                            width={200}
+                                            details={summary == null ? `` : 
+                                            `The landlord, ${summary.landlord.first_name} ${summary.landlord.last_name}, has recieved
+                                            notificaton of your interest. You will be notificed if they choose to give you the lease.`}
+                                        />
+                                    </div>
+                            </div>}
+                        {!alreadyInterested(lease) &&
+                            <div style={{width: `160px`}}>
                             <Button 
                                 text="I'm Interested"
                                 textColor="white"
                                 bold={true}
                                 transformDisabled={true}
                                 background="#E0777D"
+                                onClick={() => {
+
+                                    ExpressInterest({
+                                        variables: {
+                                            student_id: user && user.user ? user.user._id : "",
+                                            lease_id: lease._id
+                                        }
+                                    })
+
+                                }}
                             />
-                        </div>
+                        </div>}
                     </div>
                 )}
             </div>
