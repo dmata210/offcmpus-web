@@ -10,6 +10,33 @@ query GetStudentNotifications ($student_id: String!) {
     error
     data {
       notifications {
+        _id
+        date_created
+        date_seen
+        subject
+        body
+        action {
+          action_text
+          action_url
+        }
+      }
+    }
+  }
+}
+
+mutation MarkAsSeen(
+  $student_id: String!,
+  $notification_id: String!
+) {
+  markStudentNotificationAsSeen(
+    student_id: $student_id,
+    notification_id: $notification_id
+  ) {
+    success
+    error
+    data {
+      notifications {
+        _id
         date_created
         date_seen
         subject

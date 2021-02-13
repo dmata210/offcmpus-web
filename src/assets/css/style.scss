@@ -5475,3 +5475,41 @@ a.subtle-link {
   border: 1px solid $navyLight;
   border-radius: 3px;
 }
+
+.student-notification {
+  margin-bottom: 15px;
+  padding: 0 10px;
+
+  &.new {
+    border-left: 4px solid $pink;
+    .notif-head {
+      .subject::before {
+        content: "New";
+        background-color: $pink;
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 100;
+        padding: 2px 5px;
+        padding-top: 4px;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .notif-head {
+    display: flex;
+    font-family: khumbh-sans;
+    justify-content: space-between;
+
+    .subject {
+      font-weight: 600;
+    }
+  }
+
+  .notif-body {
+    .action-area {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}

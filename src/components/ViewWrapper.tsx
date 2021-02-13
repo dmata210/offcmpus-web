@@ -564,7 +564,10 @@ const ViewWrapper = ({children,
           {Object.keys(pageLinks).map((page_: any, index: number) => 
           (<Link className="subtle-link" to={pageLinks[page_].target} key={index}>
             <div className={`menu-link ${window.location.pathname.toLowerCase() === pageLinks[page_].target.toLowerCase() ? 'active' : ''}`}>
-              {page_ == "notifications" && <div className="bubble-count">{studentNotifs.length}</div>}
+              {page_ == "notifications" 
+                // Only show the notifications bubble if there is at least 1 NEW notification (notification that has not been marked as seen)
+                && studentNotifs.filter((notif: StudentNotification) => notif.date_seen == undefined).length > 0
+                && <div className="bubble-count">{studentNotifs.filter((notif: StudentNotification) => notif.date_seen == undefined).length}</div>}
               <div className={`icon ${menuCollapsed ? 'collapsed' : ''}`}>{pageLinks[page_].icon}</div>
               <motion.div className="text" style={{opacity: menuCollapseInitSpring}}>{pageLinks[page_].name}</motion.div>
           </div>
