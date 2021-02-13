@@ -426,7 +426,7 @@ interface CardProps {
     header: string
     right_side?: any
 }
-const Card = ({children, header, right_side}: CardProps) => {
+export const Card = ({children, header, right_side}: CardProps) => {
 
     return <div className="content-card">
 

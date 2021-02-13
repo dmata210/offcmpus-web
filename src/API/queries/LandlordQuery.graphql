@@ -1,3 +1,9 @@
+query GetLandlord($landlord_id: String!) {
+  getLandlord(_id: $landlord_id) {
+    ...LandlordAPIResponseFields
+  }
+}
+
 mutation CreateLandlord(
   $first_name: String!,
   $last_name: String!,

@@ -12,9 +12,16 @@ import {motion, useSpring, useTransform} from 'framer-motion'
 import Cookies from 'universal-cookie'
 import {useHistory} from 'react-router'
 import {ReduxState} from '../redux/reducers/all_reducers'
-import {useSelector} from 'react-redux'
-import {useSearchForPropertiesLazyQuery, Property, PropertyDirections} from '../API/queries/types/graphqlFragmentTypes'
+import {useSelector, useDispatch} from 'react-redux'
+import {
+    useSearchForPropertiesLazyQuery, 
+    useAddCollectionMutation,
+    useRemoveCollectionMutation,
+    Property, 
+    PropertyDirections
+} from '../API/queries/types/graphqlFragmentTypes'
 import { Empty } from 'antd';
+import {fetchUser} from '../redux/actions/user'
 
 import {MapContainer, TileLayer, Marker, Polyline, Popup} from 'react-leaflet'
 
@@ -246,7 +253,8 @@ const SearchView = () => {
             {properties.length > 0 &&
             <div className="right-side_">
                 {properties.map((property: Property, i: number) => 
-                    <SearchResult property={property} key={i} delay={i < 8 ? i * 100 : 0} />
+                    <SearchResult user={user}
+                    property={property} key={i} delay={i < 8 ? i * 100 : 0} />
                 )}
             </div>}
 
@@ -267,8 +275,31 @@ const SearchView = () => {
     </ViewWrapper>)
 }
 
-const SearchResult = ({delay, property}: {delay: number, property: Property}) => {
+const SearchResult = ({delay, property, user}: {delay: number, property: Property, user: any}) => {
 
+    const dispatch = useDispatch();
+
+    const propertySaved = (): boolean => {
+        if (!user || !user.user) return false;
+        if (user.user.saved_collection.includes(property._id)) return true;
+        return false;
+    }
+
+    const [AddCollection, {data: addCollectionResponse}] = useAddCollectionMutation();
+    const [RemoveCollection, {data: removeCollectionResponse}] = useRemoveCollectionMutation();
+
+    useEffect(() => {
+        if (
+            (addCollectionResponse && addCollectionResponse.addPropertyToStudentCollection
+            && addCollectionResponse.addPropertyToStudentCollection.data
+            && addCollectionResponse.addPropertyToStudentCollection.success)
+        ||
+            (removeCollectionResponse && removeCollectionResponse.removePropertyFromStudentCollection
+            && removeCollectionResponse.removePropertyFromStudentCollection.data
+            && removeCollectionResponse.removePropertyFromStudentCollection.success)) {
+                dispatch(fetchUser(user, {update: true}));   
+            }
+      }, [addCollectionResponse, removeCollectionResponse])
 
     const getPropertyPriceRange = () :string => {
         if (!property.leases) return `unknown`;
@@ -365,16 +396,49 @@ const SearchResult = ({delay, property}: {delay: number, property: Property}) =>
                 <div style={{
                     position: 'absolute',
                     right: `15px`,
-                    bottom: `10px`
+                    bottom: `10px`,
+                    display: `flex`
                 }}>
-                    <Button 
-                        text="View Property"
-                        background="#E0777D"
-                        bold={true}
-                        textColor="white"
-                        transformDisabled={true}
-                        link_to={`/info/property/${property._id}`}
-                    /> 
+                    <div style={{marginRight: `5px`}}>
+                        <Button 
+                            text={propertySaved() ? `Remove` : `Save`}
+                            background="#848CFF"
+                            bold={true}
+                            textColor="white"
+                            transformDisabled={true}
+                            onClick={() => {
+                                // Do save stuff ...
+                                if (user && user.user) {
+                                    if (propertySaved()) {
+                                        RemoveCollection({
+                                            variables: {
+                                                student_id: user.user._id,
+                                                property_id: property._id
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        AddCollection({
+                                            variables: {
+                                                student_id: user.user._id,
+                                                property_id: property._id
+                                            }
+                                        });
+                                    }
+                                }
+                            }}
+                        /> 
+                    </div>
+                    <div>
+                        <Button 
+                            text="View Property"
+                            background="#E0777D"
+                            bold={true}
+                            textColor="white"
+                            transformDisabled={true}
+                            link_to={`/info/property/${property._id}`}
+                        /> 
+                    </div>
                 </div>
             </div>
 

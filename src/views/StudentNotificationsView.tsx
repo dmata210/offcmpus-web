@@ -13,6 +13,7 @@ import {
     useMarkAsSeenMutation,
     StudentNotification,
 } from '../API/queries/types/graphqlFragmentTypes'
+import {getDateAbbr} from '../components/helpers/meta'
 
 // TODO add authentication verificaation on getStudentNotifications query so only
 // authenticated users can acquire this information
@@ -127,7 +128,7 @@ const NotifComponent = ({notif, student_id}: {notif: StudentNotification, studen
             >
             <div className="notif-head">
                 <div className="subject">{notif.subject}</div>
-                <div className="date-area">{geteDate(notif.date_created)}</div>
+                <div className="date-area">{getDateAbbr(notif.date_created)}</div>
             </div>
             <div className="notif-body">
                 <div className="body_">{notif.body}</div>
@@ -148,10 +149,3 @@ const NotifComponent = ({notif, student_id}: {notif: StudentNotification, studen
 }
 
 export default StudentNotificationsView;
-
-const geteDate = (iso: string): string => {
-    let months: string[] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    let date: Date = new Date(iso);
-   
-    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} : ${date.getHours()}:${date.getMinutes()}`;
-}

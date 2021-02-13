@@ -4,6 +4,27 @@ query GetLeasesAndOccupants ($ownership_id: String!) {
     }
 }
 
+query GetRoomNo(
+    $lease_id: String!,
+    $ownership_id: String!
+) {
+    getRoomNo(lease_id: $lease_id, ownership_id: $ownership_id) {
+        ...NumberAPIResponseFields
+    }
+}
+
+query CheckEligibleForLeaseAgreement(
+    $lease_id: String!,
+    $student_id: String!
+) {
+    checkEligibleForLeaseAgreement(
+        lease_id: $lease_id,
+        student_id: $student_id
+    ) {
+        ...LeaseAPIResponseFields
+    }
+}
+
 query CanAddReview (
     $student_id: String!,
     $property_id: String!
@@ -278,5 +299,13 @@ fragment LeaseOccupant on Student {
       search_end
       price_start
       price_end
+    }
+}
+
+fragment NumberAPIResponseFields on NumberAPIResponse {
+    success
+    error
+    data {
+        value
     }
 }
