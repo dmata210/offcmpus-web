@@ -5,16 +5,19 @@ import { Select, Rate, Empty,
     Upload, Input, Result, Spin, 
     Tag, Button as AntButton } from 'antd';
 import { InboxOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useGetPropertySummaryLazyQuery, 
     useCanAddReviewLazyQuery,
     useAddReviewForLeaseMutation,
     useExpressInterestMutation,
+    useAddCollectionMutation,
+    useRemoveCollectionMutation,
     LeaseHistory,
     Lease,
     PropertySummary, 
     PropertyDetails} from '../API/queries/types/graphqlFragmentTypes'
 
+import {fetchUser} from '../redux/actions/user'
 import { ReduxState } from '../redux/reducers/all_reducers';
 import Button from '../components/toolbox/form/Button';
 import Popup, {PopupHeader, ConfirmLine} from '../components/toolbox/misc/Popup';
@@ -33,6 +36,7 @@ const dateAbbr = (date: Date): string => {
 const desc = ['terrible', 'bad', 'normal', 'good', 'wonderful'];
 const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
 
+    const dispatch = useDispatch();
     const user = useSelector((state: ReduxState) => state.user);
     const [reviewView, setReviewView] = useState<'landlord' | 'property'>('property');
     const [summary, setPropertySummary] = useState<any | null>(null);
@@ -62,9 +66,27 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
     const [AddReview, {data: addReviewResponse, loading: addReviewLoading}] = useAddReviewForLeaseMutation();
     // query whether the current user can write a review
     const [CanAddReview, {data: canAddReviewResponse}] = useCanAddReviewLazyQuery();
+    const [AddToCollection, {data: addCollectionResponse}] = useAddCollectionMutation();
+    const [RemoveFromCollection, {data: removeCollectionResponse}] = useRemoveCollectionMutation();
 
     // get the summary for this property
     const [GetPropertySummary, {data: summaryDataResponse}] = useGetPropertySummaryLazyQuery();
+
+    useEffect(() => {
+        if (
+        (removeCollectionResponse && removeCollectionResponse.removePropertyFromStudentCollection
+        && removeCollectionResponse.removePropertyFromStudentCollection.data
+        && removeCollectionResponse.removePropertyFromStudentCollection.success)
+        ||
+        (addCollectionResponse && addCollectionResponse.addPropertyToStudentCollection
+        && addCollectionResponse.addPropertyToStudentCollection.data
+        && addCollectionResponse.addPropertyToStudentCollection.success)
+        ) {
+            // update student state information
+            dispatch(fetchUser(user, {update: true}));
+        }
+    }, [addCollectionResponse, removeCollectionResponse]);
+
     useEffect(() => {
         if (summaryDataResponse && summaryDataResponse.getPropertySummary) {
             
@@ -315,6 +337,13 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
         }
 
         return price_range;
+    }
+
+    const propertySaved = (): boolean => {
+        if (!user || !user.user) return false;
+        if (user.type == 'landlord') return false;
+        if ((user.user as any).saved_collection!.includes(property_id)) return true;
+        return false;
     }
 
     return (<ViewWrapper>
@@ -602,34 +631,69 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                             <div className="price_">{getPriceRange()}</div> <div>/month</div>
                         </div>
 
-                        <div className="property-tags_">
-                            {
-                                summary && summary.property && summary.property.details
-                                && function () {
-                                    let tags: any[] = [];
-                                    let details: PropertyDetails = summary.property.details;
+                        <div style={{
+                            display: `flex`, 
+                            justifyContent: `space-between`,
+                            alignItems: `center`
+                        }}>
+                            <div className="property-tags_">
+                                {
+                                    summary && summary.property && summary.property.details
+                                    && function () {
+                                        let tags: any[] = [];
+                                        let details: PropertyDetails = summary.property.details;
 
-                                    let i = 0;
-                                    if (details.furnished) {
-                                        tags.push(<div className="tag_" key={i}>Furnished</div>);
-                                        ++i;
-                                    }
-                                    if (details.has_washer) {
-                                        tags.push(<div className="tag_" key={i}>Washer</div>);
-                                        ++i;
-                                    }
-                                    if (details.has_heater) {
-                                        tags.push(<div className="tag_" key={i}>Heating</div>);
-                                        ++i;
-                                    }
-                                    if (details.has_ac) {
-                                        tags.push(<div className="tag_" key={i}>AC</div>);
-                                        ++i;
-                                    }
+                                        let i = 0;
+                                        if (details.furnished) {
+                                            tags.push(<div className="tag_" key={i}>Furnished</div>);
+                                            ++i;
+                                        }
+                                        if (details.has_washer) {
+                                            tags.push(<div className="tag_" key={i}>Washer</div>);
+                                            ++i;
+                                        }
+                                        if (details.has_heater) {
+                                            tags.push(<div className="tag_" key={i}>Heating</div>);
+                                            ++i;
+                                        }
+                                        if (details.has_ac) {
+                                            tags.push(<div className="tag_" key={i}>AC</div>);
+                                            ++i;
+                                        }
 
-                                    return tags;
-                                }()
-                            }
+                                        return tags;
+                                    }()
+                                }
+                            </div>
+                            <div style={{marginRight: `10px`}}>
+                                <Button 
+                                    text={propertySaved() ? `Remove From Collection` : `Save To Collection`}
+                                    background="#848CFF"
+                                    textColor="white"
+                                    bold={true}
+                                    transformDisabled={true}
+                                    onClick={() => {
+                                        if (user && user.user) {
+                                            if (propertySaved()) {
+                                                RemoveFromCollection({
+                                                    variables: {
+                                                        property_id,
+                                                        student_id: user.user._id
+                                                    }
+                                                });
+                                            }
+                                            else {
+                                                AddToCollection({
+                                                    variables: {
+                                                        property_id,
+                                                        student_id: user.user._id
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }}
+                                />
+                            </div>
                         </div>
 
                         <div className="meta-area">
