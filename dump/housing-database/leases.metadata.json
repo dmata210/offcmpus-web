@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"housing-database.leases"}],"uuid":"ca9222583d084ea4becad912bcbcbd64"}

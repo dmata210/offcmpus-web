@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"housing-database.landlords"}],"uuid":"7b6bb5cc82d7448d817b11a3668e1d6b"}

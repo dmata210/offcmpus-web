@@ -9,16 +9,18 @@ export const getPropertyAddress = (prop: Property) => {
     return addr;
 }
 
-export const getDateAbbr = (iso: string): string => {
+export const getDateAbbr = (iso: string, {withTime = true}: {withTime: boolean}): string => {
     let months: string[] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     let date: Date = new Date(iso);
    
-    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} : ${date.getHours()}:${date.getMinutes()}`;
+    if (withTime) return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} : ${date.getHours()}:${date.getMinutes()}`;
+    else return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
 
-export const getDate = (iso: string): string => {
+export const getDate = (iso: string, {withTime = true}: {withTime: boolean}): string => {
     let months: string[] = ["January", "February", "March", "April", "May", "June", "July", "August", "Septemer", "Octoboer", "November", "December"];
     let date: Date = new Date(iso);
    
-    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} : ${date.getHours()}:${date.getMinutes()}`;
+    if (withTime) return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} : ${date.getHours()}:${date.getMinutes()}`;
+    else return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }

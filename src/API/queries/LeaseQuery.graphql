@@ -38,6 +38,32 @@ query CanAddReview (
     }
 }
 
+query GetAcceptedLeases (
+    $student_id: String!
+) {
+    getAcceptedLeases (student_id: $student_id) {
+        success,
+        error,
+        data {
+            histories {
+                room_no
+                lease_history {
+                    ...LeaseHistoryFields
+                }
+                landlord {
+                    ...LandlordFields
+                }
+                lease {
+                    ...LeaseFields
+                }
+                property {
+                    ...PropertyFields
+                }
+            }
+        }
+    }
+}
+
 query GetLeaseSummary($lease_id: String!) {
 
     getLeaseSummary (lease_id: $lease_id) {
@@ -94,6 +120,10 @@ query GetLeaseSummary($lease_id: String!) {
                     date
                     accepted
                 }
+                students_that_declined {
+                    date
+                    student_id
+                }
             }
             institutions {
                 _id
@@ -131,6 +161,24 @@ query GetLeaseSummary($lease_id: String!) {
         }
     }
     
+}
+
+mutation DeclineLeaseAgreement(
+    $student_id: String!,
+    $lease_id: String!
+) {
+    declineLeaseAgreement(student_id: $student_id, lease_id: $lease_id) {
+        ...LeaseAPIResponseFields
+    }
+}
+
+mutation AcceptLeaseAgreement(
+    $student_id: String!,
+    $lease_id: String!
+) {
+    acceptLeaseAgreement(student_id: $student_id, lease_id: $lease_id) {
+        ...LeaseAPIResponseFields
+    }
 }
 
 mutation AcceptOrDeclineStudentInterest (
@@ -269,6 +317,10 @@ fragment LeaseFields on Lease {
         date  
         accepted
     }
+    students_that_declined {
+        date
+        student_id
+    }
 }
 
 fragment LeaseOccupant on Student {
@@ -307,5 +359,26 @@ fragment NumberAPIResponseFields on NumberAPIResponse {
     error
     data {
         value
+    }
+}
+
+fragment LeaseHistoryFields on LeaseHistory {
+    price
+    student_id
+    start_date
+    end_date
+    review_of_property {
+        rating
+        review
+        response
+    }
+    review_of_landlord {
+        rating
+        review
+        response
+    }
+    property_images {
+        s3_key
+        date_uploaded
     }
 }

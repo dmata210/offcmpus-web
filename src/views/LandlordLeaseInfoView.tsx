@@ -517,13 +517,6 @@ const StudentInterestInfo = ({
             {(status == undefined || status == null)
             && <Dropdown overlay={getOverlayMenu()} placement="bottomLeft" arrow>
                 <AntButton>Actions</AntButton>
-                {/* <Button 
-                    text="Actions"
-                    textColor="white"
-                    background="#E0777D"
-                    bold={true}
-                    transformDisabled={true}
-                /> */}
             </Dropdown>}
             {status != undefined && status != null && status == true
             && <div>

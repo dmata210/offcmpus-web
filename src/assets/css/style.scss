@@ -5513,3 +5513,40 @@ a.subtle-link {
     }
   }
 }
+
+.accepted-lease-summary-entry {
+  background-color: $navyLight;
+  padding: 8px 10px;
+  border-radius: 5px;
+
+  .prop-name {
+    font-weight: 600;
+  }
+
+  .date-section {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 5px;
+
+    .date_ {
+      background-color: $navyLightText;
+      border-radius: 3px;
+      border-radius: 4px;
+      padding: 2px 5px;
+
+      .title {
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.active-lease-summary-entry {
+  background-color: $navyLight;
+  padding: 8px 10px;
+  border-radius: 5px;
+  
+  .prop-name {
+    font-weight: 600;
+  }
+}

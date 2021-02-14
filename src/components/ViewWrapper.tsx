@@ -9,7 +9,7 @@ import AuthAPI from '../API/AuthAPI'
 import {dateToMonthAndYear} from './toolbox/form/RangeSlider'
 import {pushRedirect} from './hooks/usePushRedirect'
 import Popup, {PopupHeader, ConfirmLine} from '../components/toolbox/misc/Popup'
-import { HiOutlineNewspaper, HiCheckCircle, HiTerminal, HiOutlinePencil,
+import { HiOutlineNewspaper, HiDocument, HiCheckCircle, HiTerminal, HiOutlinePencil,
   HiLogout, HiClipboard, HiOutlineChatAlt, HiOutlineAdjustments,
   HiOutlineChevronLeft, HiOutlineChevronRight, HiCog } from 'react-icons/hi';
 import {RiLayoutMasonryLine} from 'react-icons/ri';
@@ -63,7 +63,9 @@ const ViewWrapper = ({children,
   const contentEndRef = useRef<HTMLDivElement>(null)
 
   const [SubmitFeedback, {data: submissionData}] = useSubmitFeedbackMutation();
-  const [GetNotifications, {data: notificationsResponse}] = useGetStudentNotificationsLazyQuery();
+  const [GetNotifications, {data: notificationsResponse}] = useGetStudentNotificationsLazyQuery({
+    fetchPolicy: 'no-cache'
+  });
   const user = useSelector((state: ReduxState) => state.user)
   // const [viewWidth, setViewWidth] = useState<number>(1400)
   const [feedbackSubmitted, setFeedbackSubmitted] = useState<boolean>(false)
@@ -148,6 +150,11 @@ const ViewWrapper = ({children,
             target: '/search',
             icon: <BiSearch />,
             name: 'Search'
+          },
+          accepted_leases: {
+            target: '/student/accepted_leases',
+            icon: <HiDocument />,
+            name: "Accepted Leases"
           },
           notifications: {
             target: `/student/notifications`,

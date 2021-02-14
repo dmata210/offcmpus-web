@@ -14,6 +14,7 @@ import { useGetPropertySummaryLazyQuery,
     useRemoveCollectionMutation,
     LeaseHistory,
     Lease,
+    LeaseAndAvailability,
     PropertySummary, 
     PropertyDetails} from '../API/queries/types/graphqlFragmentTypes'
 
@@ -131,21 +132,21 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                     
                     let leases = summaryDataResponse.getPropertySummary.data.leases;
                     for (let i = 0; i < leases.length; ++i) {
-                        if (leases[i].lease_history) {
+                        if (leases[i].lease.lease_history) {
 
-                            for (let j = 0; j < leases[i].lease_history.length; ++j) {
+                            for (let j = 0; j < leases[i].lease.lease_history.length; ++j) {
 
-                                if (leases[i].lease_history[j].student_id == user.user._id) {
+                                if (leases[i].lease.lease_history[j].student_id == user.user._id) {
                                     lease_ = leases[i];
-                                    if (lease_history == null) lease_history = leases[i].lease_history[j] as LeaseHistory;
+                                    if (lease_history == null) lease_history = leases[i].lease.lease_history[j] as LeaseHistory;
                                     else {
 
                                         // get the most recent lease history
                                         let prev: Date = new Date((lease_history as any).end_date);
-                                        let current: Date = new Date(leases[i].lease_history[j].end_date);
+                                        let current: Date = new Date(leases[i].lease.lease_history[j].end_date);
 
                                         if (current > prev) {
-                                            lease_history = leases[i].lease_history[j] as LeaseHistory;
+                                            lease_history = leases[i].lease.lease_history[j] as LeaseHistory;
                                         }
 
                                     }
@@ -176,7 +177,10 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
     }, [user]);
 
     useEffect(() => {
-        GetPropertySummary({ variables: { property_id } })
+        GetPropertySummary({ variables: { 
+            property_id,
+            student_id: user && user.user ? user.user._id : ''
+        } })
     }, []);
 
     // review order structure
@@ -249,9 +253,9 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
         */
         if (summary) {
             for (let i = 0; i < summary.leases.length; ++i) {
-                for (let j =0; j < summary.leases[i].lease_history.length; ++j) {
-                    if (summary.leases[i].lease_history[j].review_of_property) ++count_;
-                    if (summary.leases[i].lease_history[j].review_of_landlord) ++count_;
+                for (let j =0; j < summary.leases[i].lease.lease_history.length; ++j) {
+                    if (summary.leases[i].lease.lease_history[j].review_of_property) ++count_;
+                    if (summary.leases[i].lease.lease_history[j].review_of_landlord) ++count_;
                 }
             }
         }
@@ -290,11 +294,11 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
         
         if (summary) {
             for (let i = 0; i < summary.leases.length; ++i) {
-                if (!summary.leases[i].lease_history) continue;
-                for (let j = 0; j < summary.leases[i].lease_history.length; ++j) {
-                    if (summary.leases[i].lease_history[j].review_of_property) {
+                if (!summary.leases[i].lease.lease_history) continue;
+                for (let j = 0; j < summary.leases[i].lease.lease_history.length; ++j) {
+                    if (summary.leases[i].lease.lease_history[j].review_of_property) {
                         ++count;
-                        scale += summary.leases[i].lease_history[j].review_of_property.rating;
+                        scale += summary.leases[i].lease.lease_history[j].review_of_property.rating;
                     }
                 }
             }
@@ -308,11 +312,11 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
         
         if (summary) {
             for (let i = 0; i < summary.leases.length; ++i) {
-                if (!summary.leases[i].lease_history) continue;
-                for (let j = 0; j < summary.leases[i].lease_history.length; ++j) {
-                    if (summary.leases[i].lease_history[j].review_of_landlord) {
+                if (!summary.leases[i].lease.lease_history) continue;
+                for (let j = 0; j < summary.leases[i].lease.lease_history.length; ++j) {
+                    if (summary.leases[i].lease.lease_history[j].review_of_landlord) {
                         ++count;
-                        scale += summary.leases[i].lease_history[j].review_of_landlord.rating;
+                        scale += summary.leases[i].lease.lease_history[j].review_of_landlord.rating;
                     }
                 }
             }
@@ -324,13 +328,13 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
         let price_range = "";
 
         if (summary) {
-            if (summary.leases.length == 1) price_range = `$${summary.leases[0].price_per_month}`;
+            if (summary.leases.length == 1) price_range = `$${summary.leases[0].lease.price_per_month}`;
             else if (summary.leases.length > 1) {
                 let min_ = Number.MAX_VALUE;
                 let max_ = Number.MIN_VALUE;
                 for (let i = 0; i < summary.leases.length; ++i) {
-                    min_ = Math.min(min_, summary.leases[i].price_per_month);
-                    max_ = Math.max(min_, summary.leases[i].price_per_month);
+                    min_ = Math.min(min_, summary.leases[i].lease.price_per_month);
+                    max_ = Math.max(min_, summary.leases[i].lease.price_per_month);
                 }
                 price_range = `$${min_}-${max_}`;
             }
@@ -533,8 +537,10 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
             }}>
                 {/* List the leases that a student can rent out */}
                 {summary && summary.leases 
-                && summary.leases.map((lease: Lease, i: number) => 
-                    <div key={i} className="lease-popup-info">
+                && summary.leases.map((lease_av: LeaseAndAvailability, i: number) => 
+                    {
+                        let lease: Lease = lease_av.lease;
+                        return (<div key={i} className="lease-popup-info">
                         <div style={{width: "60%"}}>
                             <div style={{fontWeight: 600}}>Room {i + 1}</div>
                             <div className="kvp_">
@@ -571,7 +577,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                             </div>}
                         {!alreadyInterested(lease) &&
                             <div style={{width: `160px`}}>
-                            <Button 
+                            {lease_av.able_to_lease && <Button 
                                 text="I'm Interested"
                                 textColor="white"
                                 bold={true}
@@ -587,9 +593,17 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                                     })
 
                                 }}
-                            />
+                            />}
+                            {!lease_av.able_to_lease && <Button 
+                                text="Unable to Lease"
+                                textColor="white"
+                                bold={true}
+                                disabled={true}
+                                transformDisabled={true}
+                            />}
                         </div>}
-                    </div>
+                    </div>);
+                    }
                 )}
             </div>
 
@@ -699,7 +713,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                         <div className="meta-area">
                             
                             <div className="meta-section">
-                                {summary && summary.leases.length} Rooms available to lease
+                                {summary && summary.leases.map((l: LeaseAndAvailability) => l.able_to_lease).length} Rooms available to lease
                             </div>
 
                             <div className="meta-section">
@@ -823,31 +837,31 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
 
                     if (summary) {
                         for (let i = 0; i < summary.leases.length; ++i) {
-                            if (summary.leases[i].lease_history == undefined) continue;
+                            if (summary.leases[i].lease.lease_history == undefined) continue;
 
-                            for (let j = 0; j < summary.leases[i].lease_history.length; ++j) {
+                            for (let j = 0; j < summary.leases[i].lease.lease_history.length; ++j) {
 
                                 if (reviewView == 'landlord') {
-                                    if (summary.leases[i].lease_history[j].review_of_landlord == undefined) continue;
+                                    if (summary.leases[i].lease.lease_history[j].review_of_landlord == undefined) continue;
 
                                     reviews.push({
-                                        date: new Date( summary.leases[i].lease_history[j].end_date ),
+                                        date: new Date( summary.leases[i].lease.lease_history[j].end_date ),
                                         dom: <ReviewResponse 
                                             key={i} 
-                                            lease_history={summary.leases[i].lease_history[j]}
+                                            lease_history={summary.leases[i].lease.lease_history[j]}
                                             reviewFor={reviewView}
                                         />
                                     })
                                 }
 
                                 else if (reviewView == 'property') {
-                                    if (summary.leases[i].lease_history[j].review_of_property == undefined) continue;
+                                    if (summary.leases[i].lease.lease_history[j].review_of_property == undefined) continue;
 
                                     reviews.push({
-                                        date: new Date( summary.leases[i].lease_history[j].end_date ),
+                                        date: new Date( summary.leases[i].lease.lease_history[j].end_date ),
                                         dom: <ReviewResponse 
                                             key={i} 
-                                            lease_history={summary.leases[i].lease_history[j]}
+                                            lease_history={summary.leases[i].lease.lease_history[j]}
                                             reviewFor={reviewView}
                                         />
                                     })

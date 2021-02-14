@@ -11,6 +11,8 @@ import {
     useGetOwnershipLazyQuery,
     useGetLandlordLazyQuery,
     useGetRoomNoLazyQuery,
+    useAcceptLeaseAgreementMutation,
+    useDeclineLeaseAgreementMutation,
     Lease,
     Property,
     Ownership,
@@ -18,7 +20,7 @@ import {
 } from '../API/queries/types/graphqlFragmentTypes'
 import {Card} from './PropertyDetails'
 import KVPair from '../components/toolbox/misc/kvpair'
-import {getPropertyAddress} from '../components/helpers/meta'
+import {getPropertyAddress,getDate} from '../components/helpers/meta'
 import Button from '../components/toolbox/form/Button'
 
 /**
@@ -37,6 +39,8 @@ const StudentLeaseAgreementView = ({lease_id}: {lease_id: string}) => {
     const [GetOwnership, {data: ownershipResponse}] = useGetOwnershipLazyQuery();
     const [GetLandlord, {data: landlordResponse}] = useGetLandlordLazyQuery();
     const [GetRoomNo, {data: roomNoResponse}] = useGetRoomNoLazyQuery();
+    const [AcceptAgreement, {data: acceptResponse}] = useAcceptLeaseAgreementMutation();
+    const [DeclineAgreement, {data: declineResponse}] = useDeclineLeaseAgreementMutation();
 
     //====================== STATE ======================
     const user = useSelector((state: ReduxState) => state.user);
@@ -166,6 +170,11 @@ const StudentLeaseAgreementView = ({lease_id}: {lease_id: string}) => {
         return `none`;
     }
 
+    const getPrice = (): string => {
+        if (lease == null) return ``;
+        return `$${lease.price_per_month} /month`;
+    }
+
     return (<ViewWrapper>
         <div>
             
@@ -183,8 +192,11 @@ const StudentLeaseAgreementView = ({lease_id}: {lease_id: string}) => {
                 children={<div>
                     <KVPair key_="Property" value={getPropertyAddr()} />
                     <KVPair key_="Room #" value={roomNo == null ? `` : `${roomNo}`} />
+                    <KVPair key_="Price" value={getPrice()} />
                     <KVPair key_="Landlord" value={getLandlordName()} />
                     <KVPair key_="Landlord Phone Number" value={getLandlordPhoneNumber()} />
+                    <KVPair key_="Lease Start Date" value={getDate(lease != null && lease.lease_availability_start_date ? lease.lease_availability_start_date : '', {withTime: true})} />
+                    <KVPair key_="Lease End Date" value={getDate(lease != null && lease.lease_availability_end_date ? lease.lease_availability_end_date : '', {withTime: true})} />
                 </div>}
             />
 
@@ -222,6 +234,16 @@ const StudentLeaseAgreementView = ({lease_id}: {lease_id: string}) => {
                                     background="#E0777D"
                                     bold={true}
                                     transformDisabled={true}
+                                    onClick={() => {
+                                        if (lease != null && user && user.user) {
+                                            DeclineAgreement({
+                                                variables: {
+                                                    student_id: user.user._id,
+                                                    lease_id: lease._id
+                                                }
+                                            })
+                                        }
+                                    }}
                                 />
                             </div>
                             <div>
@@ -231,6 +253,16 @@ const StudentLeaseAgreementView = ({lease_id}: {lease_id: string}) => {
                                     background="#6AD68B"
                                     bold={true}
                                     transformDisabled={true}
+                                    onClick={() => {
+                                        if (lease != null && user && user.user) {
+                                            AcceptAgreement({
+                                                variables: {
+                                                    student_id: user.user._id,
+                                                    lease_id: lease._id
+                                                }
+                                            })
+                                        }
+                                    }}
                                 />
                             </div>
                         </div>

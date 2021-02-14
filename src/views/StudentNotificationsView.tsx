@@ -21,7 +21,9 @@ import {getDateAbbr} from '../components/helpers/meta'
 const StudentNotificationsView = () => {
 
     //======== GRAPHQL ========
-    const [GetNotifications, {data: getNotificationsResponse}] = useGetStudentNotificationsLazyQuery();
+    const [GetNotifications, {data: getNotificationsResponse}] = useGetStudentNotificationsLazyQuery({
+        fetchPolicy: 'no-cache'
+    });
 
     //======== STATE ========
     const user = useSelector((state: ReduxState) => state.user);
@@ -76,7 +78,11 @@ const StudentNotificationsView = () => {
             {notifications.length == 0 && <div style={{marginTop: `40px`}}>
                 <Empty description={<span>No notifications</span>} />
             </div>}
-            {notifications.length > 0 && notifications.map((notif: StudentNotification, i: number) => 
+            {notifications.length > 0 && notifications.sort((a: StudentNotification, b: StudentNotification) => {
+                let a_d: Date = new Date(a.date_created);
+                let b_d: Date = new Date(b.date_created);
+                return a_d < b_d ? 1 : -1;
+            }).map((notif: StudentNotification, i: number) => 
                 <NotifComponent notif={notif} student_id={user && user.user ? user.user._id : ''} key={i} />)}
 
         </div>
@@ -128,7 +134,7 @@ const NotifComponent = ({notif, student_id}: {notif: StudentNotification, studen
             >
             <div className="notif-head">
                 <div className="subject">{notif.subject}</div>
-                <div className="date-area">{getDateAbbr(notif.date_created)}</div>
+                <div className="date-area">{getDateAbbr(notif.date_created, {withTime: true})}</div>
             </div>
             <div className="notif-body">
                 <div className="body_">{notif.body}</div>

@@ -21,9 +21,10 @@ query getPropertyForOwnership($ownership_id: String!) {
 }
 
 query GetPropertySummary (
-  $property_id: String!
+  $property_id: String!,
+  $student_id: String!
 ) {
-  getPropertySummary (property_id: $property_id) {
+  getPropertySummary (property_id: $property_id, student_id: $student_id) {
     success
     error
     data {
@@ -50,32 +51,39 @@ query GetPropertySummary (
         }
       }
       leases {
-        _id
-        price_per_month
-        lease_availability_start_date
-        lease_availability_end_date
-        lease_history {
-          student_id
-          start_date
-          end_date
-          review_of_property {
-            rating
-            review
-            response
+        able_to_lease
+        lease {
+          _id
+          price_per_month
+          lease_availability_start_date
+          lease_availability_end_date
+          lease_history {
+            student_id
+            start_date
+            end_date
+            review_of_property {
+              rating
+              review
+              response
+            }
+            review_of_landlord {
+              rating
+              review
+              response
+            }
+            property_images {
+              s3_key
+              date_uploaded
+            }
           }
-          review_of_landlord {
-            rating
-            review
-            response
+          student_interests {
+            student_id
+            date
           }
-          property_images {
-            s3_key
-            date_uploaded
+          students_that_declined {
+              date
+              student_id
           }
-        }
-        student_interests {
-          student_id
-          date
         }
       }
       landlord {
@@ -260,6 +268,7 @@ fragment PropertyListWithLeasesAPIResponseFields on PropertyListAPIResponse {
           student_id
           date
         }
+        
 
       }
     }
