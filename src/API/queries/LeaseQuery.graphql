@@ -38,6 +38,24 @@ query CanAddReview (
     }
 }
 
+query GetAcceptedLeaseInfo (
+    $student_id: String!,
+    $lease_id: String!,
+    $history_id: String!
+) {
+    getAcceptedLeaseInfo(
+        student_id: $student_id,
+        lease_id: $lease_id,
+        history_id: $history_id
+    ) {
+        success
+        error
+        data {
+            ...LeaseHistorySummaryFields
+        }
+    }
+}
+
 query GetAcceptedLeases (
     $student_id: String!
 ) {
@@ -46,19 +64,7 @@ query GetAcceptedLeases (
         error,
         data {
             histories {
-                room_no
-                lease_history {
-                    ...LeaseHistoryFields
-                }
-                landlord {
-                    ...LandlordFields
-                }
-                lease {
-                    ...LeaseFields
-                }
-                property {
-                    ...PropertyFields
-                }
+                ...LeaseHistorySummaryFields
             }
         }
     }
@@ -380,5 +386,22 @@ fragment LeaseHistoryFields on LeaseHistory {
     property_images {
         s3_key
         date_uploaded
+    }
+}
+
+fragment LeaseHistorySummaryFields on LeaseHistorySummary {
+    room_no
+    lease_history_id
+    lease_history {
+        ...LeaseHistoryFields
+    }
+    landlord {
+        ...LandlordFields
+    }
+    lease {
+        ...LeaseFields
+    }
+    property {
+        ...PropertyFields
     }
 }

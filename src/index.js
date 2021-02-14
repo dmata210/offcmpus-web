@@ -58,6 +58,7 @@ import LandlordLeaseInfoView from './views/LandlordLeaseInfoView'
 import StudentNotificationsView from './views/StudentNotificationsView'
 import StudentLeaseAgreementView from './views/StudentLeaseAgreement'
 import StudentAcceptedLeasesView from './views/StudentAcceptedLeasesView'
+import StudentAcceptedLeaseInfoView from './views/StudentAcceptedLeaseInfoView'
 
 import Testing from './views/Testing'
 
@@ -119,6 +120,7 @@ const Routes = () => {
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/notifications" component={StudentNotificationsView} />
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/lease/:id" component={({match}) => (<StudentLeaseAgreementView lease_id={match.params.id} />)} />
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/accepted_leases" component={StudentAcceptedLeasesView} />
+            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/lease/info/:lease_id/:history_id" component={({match}) => <StudentAcceptedLeaseInfoView lease_id={match.params.lease_id} history_id={match.params.history_id} />} />
 
               {/* Mod Console (Ownership Reviewer) */}
               <AuthRoute accessLevel={AccessLevels.OWNERSHIP_REVIEWER} exact path="/ownership/review" component={OwnershipReview} />

@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react'
 import {useSelector} from 'react-redux'
 import {Empty} from 'antd'
 
+import Button from '../components/toolbox/form/Button'
 import KVPair from '../components/toolbox/misc/kvpair'
 import {useNumberCounter} from '../components/hooks/useNumberCounter'
 import ViewWrapper from '../components/ViewWrapper'
@@ -19,7 +20,9 @@ import {getPropertyAddress, getDateAbbr} from '../components/helpers/meta'
 const StudentAcceptedLeases = () => {
 
     //============== GRAPHQL ==============
-    const [GetAcceptedLeases, {data: acceptedLeasesResponse}] = useGetAcceptedLeasesLazyQuery();
+    const [GetAcceptedLeases, {data: acceptedLeasesResponse}] = useGetAcceptedLeasesLazyQuery({
+        fetchPolicy: 'no-cache'
+    });
 
     //============== STATE ==============
     const user = useSelector((state: ReduxState) => state.user);
@@ -127,6 +130,17 @@ const ActiveLeaseSummaryEntry = ({summary}: {summary: LeaseHistorySummary}) => {
             <div>Get Contact</div>
         </div>
 
+        <div style={{marginTop: `5px`}}>
+            <Button 
+                text="View Lease"
+                background="#E0777D"
+                textColor="white"
+                bold={true}
+                transformDisabled={true}
+                link_to={`/student/lease/info/${summary.lease._id}/${summary.lease_history_id}`}
+            />
+        </div>
+
     </div>)
 }
 
@@ -152,6 +166,17 @@ const LeaseSummaryEntry = ({summary}: {summary: LeaseHistorySummary}) => {
                 <div className="title">End Date</div>
                 <div className="date-area">{getDateAbbr(summary.lease_history.end_date, {withTime: false})}</div>
             </div>
+        </div>
+
+        <div style={{marginTop: `5px`}}>
+            <Button 
+                text="View Lease"
+                background="#E0777D"
+                textColor="white"
+                bold={true}
+                transformDisabled={true}
+                link_to={`/student/lease/info/${summary.lease._id}/${summary.lease_history_id}`}
+            />
         </div>
     </div>)
 }

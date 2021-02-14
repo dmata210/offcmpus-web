@@ -65,6 +65,25 @@ const StudentLeaseAgreementView = ({lease_id}: {lease_id: string}) => {
     }, [user]);
 
     useEffect(() => {
+
+        // redirect to accept leases view once they have accepted the agreement
+        if (acceptResponse && acceptResponse.acceptLeaseAgreement 
+        && acceptResponse.acceptLeaseAgreement.data
+        && acceptResponse.acceptLeaseAgreement.success) {
+            history.push('/student/accepted_leases');
+        }
+    }, [acceptResponse]);
+
+    useEffect(() => {
+        
+        // redirect to the notifications when the student declines
+        if (declineResponse && declineResponse.declineLeaseAgreement
+        && declineResponse.declineLeaseAgreement.success) {
+            history.push('/student/notifications');
+        }
+    }, [declineResponse]);
+
+    useEffect(() => {
         if (eligibilityResponse && eligibilityResponse.checkEligibleForLeaseAgreement) {
 
             // if they are not eligeble, redirect to the notifications page
