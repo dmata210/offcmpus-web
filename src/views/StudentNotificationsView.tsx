@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import {useSelector} from 'react-redux'
 import {useHistory} from 'react-router'
 import { Empty } from 'antd';
+import {Helmet} from "react-helmet";
 
 import {useNumberCounter} from '../components/hooks/useNumberCounter'
 import ViewWrapper from '../components/ViewWrapper'
@@ -63,6 +64,11 @@ const StudentNotificationsView = () => {
             width: `400px`,
             margin: `0 auto`
         }}>
+
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>offcmpus | Notifications</title>
+            </Helmet>
 
             {/* Title */}
             <div className="section-header-2" style={{

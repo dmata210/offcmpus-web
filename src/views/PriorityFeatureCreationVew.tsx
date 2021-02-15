@@ -5,6 +5,7 @@ import Button from '../components/toolbox/form/Button'
 import RectMouseManget from '../components/toolbox/misc/RectMouseMagnet'
 import API from '../API/API'
 import {loadStripe, Stripe} from '@stripe/stripe-js';
+import {Helmet} from "react-helmet";
 
 const PriorityFeatureCreationVew = () => {
 
@@ -58,6 +59,12 @@ const PriorityFeatureCreationVew = () => {
         marginTop: `50px`,
         paddingBottom: `50px`
     }}>
+
+        
+        <Helmet>
+            <meta charSet="utf-8" />
+            <title>offcmpus | Finder's Premium</title>
+        </Helmet>
 
         {/* Logo */}
         <div style={{marginBottom: `20px`}}>

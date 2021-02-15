@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import {useSelector} from 'react-redux'
 import {Empty} from 'antd'
+import {Helmet} from "react-helmet";
 
 import Button from '../components/toolbox/form/Button'
 import KVPair from '../components/toolbox/misc/kvpair'
@@ -78,6 +79,11 @@ const StudentAcceptedLeases = () => {
 
     return (<ViewWrapper>
         <div>
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>offcmpus | Accepted Leases</title>
+            </Helmet>
+
             <div className="section-header-2" style={{
                 height: `30px`, 
                 marginBottom: `16px`,

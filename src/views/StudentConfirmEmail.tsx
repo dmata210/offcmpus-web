@@ -2,6 +2,7 @@ import React, {useEffect} from 'react'
 import {useHistory} from 'react-router'
 import queryString from 'query-string'
 import {useConfirmStudentEmailMutation} from '../API/queries/types/graphqlFragmentTypes'
+import {Helmet} from "react-helmet";
 
 const StudentConfirmEmail = ({confirm_key}: {confirm_key: string}) => {
 
@@ -36,7 +37,14 @@ const StudentConfirmEmail = ({confirm_key}: {confirm_key: string}) => {
 
     }, [confirmEmailResponse])
 
-    return (<div>[Student] Confirm Email</div>)
+    return (<div>
+
+            <Helmet>
+            <meta charSet="utf-8" />
+            <title>offcmpus | Landlord Email Confirmation</title>
+            </Helmet>
+
+        Student] Confirm Email</div>)
 }
 
 export default StudentConfirmEmail

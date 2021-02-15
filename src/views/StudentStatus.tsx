@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import {useHistory} from 'react-router'
 import {useSelector, useDispatch} from 'react-redux'
+import {Helmet} from "react-helmet";
 
 import {resolveRedirect} from '../components/hooks/usePushRedirect'
 import Centered from '../components/toolbox/layout/Centered'
@@ -117,6 +118,13 @@ const StudentStatus = () => {
 
     return (<Centered width="400" height="600">
         <div>
+
+            
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>offcmpus | Search Status</title>
+            </Helmet>
+
             <div className="title-1" style={{marginBottom: '20px'}}>Lease Search Status</div>
 
             {/* Question Radio Input */}

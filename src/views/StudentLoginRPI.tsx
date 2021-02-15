@@ -5,6 +5,7 @@ import Logo from '../components/Logo'
 import urlencode from 'urlencode'
 import {backendPath} from '../config'
 import queryString from 'query-string'
+import {Helmet} from "react-helmet";
 
 const StudentLoginViewRPI = () => {
 
@@ -54,8 +55,13 @@ const StudentLoginViewRPI = () => {
     
     //===================== RENDER =====================
     return (<Centered width={400} height={400}>
+        
 
         <div>
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>offcmpus | Student Login</title>
+            </Helmet>
 
             <div style={{width: `150px`, margin: `0 auto`, marginBottom: `30px`,}}>
                 <Logo withBeta={true} withText={true} />

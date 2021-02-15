@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import {Helmet} from "react-helmet";
 
 import Logo from '../components/Logo'
 import Button from '../components/toolbox/form/Button'
@@ -102,6 +103,12 @@ const LandlordOnboarding = () => {
     const pgTranslateX = useTransform(entrySpring, [0, 1], [-5, 0])
 
     return (<div className="onboarding-container">
+
+
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>Welcome to Offcmpus</title>
+            </Helmet>
 
         <div
             style={{

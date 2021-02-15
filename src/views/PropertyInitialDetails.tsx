@@ -5,6 +5,7 @@ import Counter, {positiveOnly, maxVal} from '../components/toolbox/form/Counter'
 import {useUpdatePropertyDetailsMutation} from '../API/queries/types/graphqlFragmentTypes'
 import {motion, useSpring, useTransform} from 'framer-motion'
 import {useHistory} from 'react-router'
+import {Helmet} from "react-helmet";
 
 interface QuestionResponse {
     hasHeater: boolean | null
@@ -277,6 +278,11 @@ const PropertyInitialDetails = ({property_id}: {property_id: string}) => {
 
     return (<Centered width={400} height={600}>
         <React.Fragment>
+            
+        <Helmet>
+            <meta charSet="utf-8" />
+            <title>offcmpus | Property Details</title>
+        </Helmet>
 
         {!submitting && property != null && <div 
             className="initial-details-container"

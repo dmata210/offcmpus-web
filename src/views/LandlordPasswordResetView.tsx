@@ -3,6 +3,7 @@ import queryString from 'query-string'
 import {useHistory} from 'react-router-dom'
 import {HiCheck, HiX} from 'react-icons/hi'
 import { Alert } from 'antd';
+import {Helmet} from "react-helmet";
 
 import Centered from '../components/toolbox/layout/Centered'
 import Input from '../components/toolbox/form/Input'
@@ -96,6 +97,11 @@ const LandlordPasswordResetView = ({reset_key}: {reset_key: string}) => {
     return (<Centered width={400} height={400}>
 
         <div>
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>offcmpus | Password Reset</title>
+            </Helmet>
+
             <div style={{fontWeight: 600, fontSize: `1.2rem`}}>Reset Your Password</div>
             {error && 
             <div style={{padding: `10px 0`}}>
