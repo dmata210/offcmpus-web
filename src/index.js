@@ -59,6 +59,7 @@ import StudentNotificationsView from './views/StudentNotificationsView'
 import StudentLeaseAgreementView from './views/StudentLeaseAgreement'
 import StudentAcceptedLeasesView from './views/StudentAcceptedLeasesView'
 import StudentAcceptedLeaseInfoView from './views/StudentAcceptedLeaseInfoView'
+import StudentLoginViewRPI from './views/StudentLoginRPI'
 
 import Testing from './views/Testing'
 
@@ -106,7 +107,7 @@ const Routes = () => {
           <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/" component={LandingView} />
           <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/auth-cas" component={StudentCASAuth} />
           <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/login" component={LandlordLoginView} />
-          <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/login" component={StudentLoginView} />
+          <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/login" component={StudentLoginViewRPI} />
           <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/register" component={LandlordRegisterView} />
           
           {/* Restricted Paths */}
