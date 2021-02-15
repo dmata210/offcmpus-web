@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import {useHistory} from 'react-router'
 import {Link} from 'react-router-dom'
+import {Helmet} from "react-helmet";
 
 import LandlordAPI from '../API/LandlordAPI'
 import Centered from '../components/toolbox/layout/Centered'
@@ -118,6 +119,11 @@ const LandlordLogin = () => {
 
   return (<Centered width={isMobile ? 300 : 400} height={500}>
     <div>
+      
+      <Helmet>
+          <meta charSet="utf-8" />
+          <title>offcmpus | Landlord Login</title>
+      </Helmet>
 
       {/* Error Area */}
 

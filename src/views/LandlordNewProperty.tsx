@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import {useMediaQuery} from 'react-responsive'
 import {useSelector} from 'react-redux'
 import {useHistory} from 'react-router'
+import {Helmet} from "react-helmet";
 
 import {
   useVerifyAddressLazyQuery,
@@ -203,6 +204,12 @@ const LandlordNewProperty = () => {
   const isMobile = useMediaQuery({ query: '(max-width: 500px)' })
   return (<Centered width={isMobile ? 300 : 400} height={500}>
     <div>
+
+      
+    <Helmet>
+        <meta charSet="utf-8" />
+        <title>offcmpus | New Property</title>
+    </Helmet>
 
       
       {/* <Breadcrumb>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import {Helmet} from "react-helmet";
 import ViewWrapper from '../components/ViewWrapper';
 import Tabs from '../components/toolbox/misc/Tabs';
 import { Select, Rate, Empty, 
@@ -351,6 +352,11 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
     }
 
     return (<ViewWrapper>
+
+        <Helmet>
+            <meta charSet="utf-8" />
+            <title>offcmpus | Property Info</title>
+        </Helmet>
 
         {/* Add Review Popup */}
         <Popup show={canAddReviewResponse != undefined && canAddReviewResponse.canAddReview 

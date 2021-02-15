@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import ViewWrapper from '../components/ViewWrapper'
 import {useHistory} from 'react-router'
 import {useSelector} from 'react-redux'
+import {Helmet} from "react-helmet";
 import {ReduxState} from '../redux/reducers/all_reducers'
 import {PropertyDetails, Property, 
     PropertyImageInfo,
@@ -250,6 +251,12 @@ const PropertyDetailsView = (
             landlord_id={user && user.user ? user.user._id : null}
         />}
     >
+
+        
+        <Helmet>
+            <meta charSet="utf-8" />
+            <title>offcmpus | Property Details</title>
+        </Helmet>
         <React.Fragment>
             {/* Photos Update Popup */}
             <ImageUploadPopup

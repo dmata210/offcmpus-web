@@ -3,6 +3,7 @@ import {HiCheck} from 'react-icons/hi'
 import {useSelector} from 'react-redux'
 import {useHistory} from 'react-router'
 import {shouldPromptToEnableNotifications} from './PushNotificationsPrompt'
+import {Helmet} from "react-helmet";
 
 import ViewWrapper from '../components/ViewWrapper'
 import Button from '../components/toolbox/form/Button'
@@ -33,6 +34,11 @@ const StudentFeed = () => {
     }, [user]);
 
     return (<ViewWrapper>
+
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>offcmpus | Student Feed</title>
+            </Helmet>
 
         {/* Property Info Popup */}
         <Popup

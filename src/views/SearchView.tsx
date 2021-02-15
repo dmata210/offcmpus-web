@@ -13,6 +13,7 @@ import Cookies from 'universal-cookie'
 import {useHistory} from 'react-router'
 import {ReduxState} from '../redux/reducers/all_reducers'
 import {useSelector, useDispatch} from 'react-redux'
+import {Helmet} from "react-helmet";
 import {
     useSearchForPropertiesLazyQuery, 
     useAddCollectionMutation,
@@ -111,6 +112,12 @@ const SearchView = () => {
             setContentStart(val)
         }}
         left_attachment={<div className="filter-map-attachment">
+
+            
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>offcmpus | Search</title>
+            </Helmet>
 
             {/* Left Side */}
             <div className="section-header-2" style={{height: `30px`, marginBottom: `16px`}}>

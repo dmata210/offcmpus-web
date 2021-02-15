@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react'
 import {useSelector} from 'react-redux'
 import {useHistory} from 'react-router'
 import { Alert } from 'antd';
+import {Helmet} from "react-helmet";
 
 import ViewWrapper from '../components/ViewWrapper'
 import {ReduxState} from '../redux/reducers/all_reducers'
@@ -196,6 +197,12 @@ const StudentLeaseAgreementView = ({lease_id}: {lease_id: string}) => {
 
     return (<ViewWrapper>
         <div>
+
+            
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>offcmpus | Lease Agreement</title>
+            </Helmet>
             
             {/* Title */}
             <div className="section-header-2" style={{

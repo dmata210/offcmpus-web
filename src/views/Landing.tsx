@@ -3,6 +3,7 @@ import {useHistory} from 'react-router-dom'
 import {motion, useSpring, useTransform} from 'framer-motion'
 import queryString from 'query-string'
 import { useMediaQuery } from 'react-responsive'
+import {Helmet} from "react-helmet";
 
 import LeftAndRight from '../components/toolbox/layout/LeftAndRight'
 import Logo from '../components/Logo'
@@ -72,6 +73,11 @@ const LandingPage = () => {
     
     {isSmallScreen && <MobileLanding initialLandlord={showLandlord} />}
     {!isSmallScreen && <div>
+
+      <Helmet>
+          <meta charSet="utf-8" />
+          <title>offcmpus | A New Way for Students to Lease</title>
+      </Helmet>
 
       <Centered horizontalBuffer={400} height="100%">
         <React.Fragment>

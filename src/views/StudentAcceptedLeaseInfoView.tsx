@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {useSelector} from 'react-redux'
+import {Helmet} from "react-helmet";
 
 import ViewWrapper from '../components/ViewWrapper'
 import {ReduxState} from '../redux/reducers/all_reducers'
@@ -54,6 +55,10 @@ const StudentAcceptedLeaseInfoView = (
 
 
     return (<ViewWrapper>
+        <Helmet>
+            <meta charSet="utf-8" />
+            <title>offcmpus | Lease Info</title>
+        </Helmet>
 
         <div>
             

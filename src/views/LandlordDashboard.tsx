@@ -18,6 +18,7 @@ import Popup, {PopupHeader} from '../components/toolbox/misc/Popup'
 import {HiCheckCircle} from 'react-icons/hi'
 import Cookies from 'universal-cookie'
 import {shouldPromptToEnableNotifications} from './PushNotificationsPrompt'
+import {Helmet} from "react-helmet";
 
 const LandlordDashboard = () => {
 
@@ -151,6 +152,12 @@ const LandlordDashboard = () => {
   return (<ViewWrapper
     left_attachment_width={200}
     left_attachment={<div className="getting-started-attachment">
+
+      
+      <Helmet>
+          <meta charSet="utf-8" />
+          <title>offcmpus | Landlord Dashboard</title>
+      </Helmet>
 
       {/* Resent Confirm-Email Popup */}
       <Popup show={showResendConfirmation} width={400} height={90}>

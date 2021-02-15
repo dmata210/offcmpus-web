@@ -3,6 +3,7 @@ import {FiAlertTriangle} from 'react-icons/fi'
 import {HiX} from 'react-icons/hi'
 import {useSelector} from 'react-redux'
 import {useHistory, useLocation} from 'react-router'
+import {Helmet} from "react-helmet";
 
 import {useUpdatePhoneNumberMutation} from '../API/queries/types/graphqlFragmentTypes'
 import {ReduxState} from '../redux/reducers/all_reducers'
@@ -127,6 +128,10 @@ const PhoneVerifyView = () => {
 
     return (<Centered width={400} height={500}>
         <div>
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>offcmpus | Phone Verification</title>
+            </Helmet>
             <div className="title-1" style={{marginBottom: '20px'}}>Phone Number Verification</div>
             
             {onTwilioPortion && 

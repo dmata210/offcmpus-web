@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import {useHistory} from 'react-router'
 import {Empty} from 'antd'
+import {Helmet} from "react-helmet";
 
 import {useCollectionLazyQuery, useRemoveCollectionMutation} from '../API/queries/types/graphqlFragmentTypes'
 import {fetchUser} from '../redux/actions/user'
@@ -91,6 +92,12 @@ const CollectionView = () => {
 
   return (<ViewWrapper>
     <div className="collection-holder">
+
+      
+      <Helmet>
+          <meta charSet="utf-8" />
+          <title>offcmpus | Collection</title>
+      </Helmet>
 
       {/* Collection Header */}
       <div className="section-header-2" ref={headerRef}>

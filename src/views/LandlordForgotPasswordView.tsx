@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import { PageHeader, Alert } from 'antd';
 import {useHistory} from 'react-router';
+import {Helmet} from "react-helmet";
 
 import Centered from '../components/toolbox/layout/Centered'
 import Input from '../components/toolbox/form/Input'
@@ -46,6 +47,11 @@ const LandlordForgotPassword = () => {
     return (<Centered width={400} height={500}>
 
         <div>
+
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>offcmpus | Forgot Password</title>
+            </Helmet>
 
             {/* Header */}
             <PageHeader

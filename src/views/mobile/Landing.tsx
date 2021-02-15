@@ -4,6 +4,7 @@ import {motion, useSpring, useTransform} from 'framer-motion'
 import DramaticButton from '../../components/toolbox/form/DramaticButton'
 import RectMouseMagnet from '../../components/toolbox/misc/RectMouseMagnet'
 import UnauthMobileMenu from '../../components/toolbox/misc/UnauthMobileMenu'
+import {Helmet} from "react-helmet";
 
 interface LandingProps {
     initialLandlord: boolean
@@ -59,6 +60,12 @@ const Landing = ({
             }]}
         >
             <div>
+
+                
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>offcmpus | A New Way for Students to Lease</title>
+            </Helmet>
             
             {/* Tab Slider */}
             <div style={{

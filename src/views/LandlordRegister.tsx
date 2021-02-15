@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import {useHistory} from 'react-router'
 import {useMediaQuery} from 'react-responsive'
+import {Helmet} from "react-helmet";
 
 import Centered from '../components/toolbox/layout/Centered'
 import Logo from '../components/Logo'
@@ -152,6 +153,11 @@ const LandlordRegister = () => {
 
   return (<Centered width={isMobile ? 300 : 400} height={600}>
     <div>{!createLandlordLoading && !landlordCreationResponse && <div>
+
+      <Helmet>
+          <meta charSet="utf-8" />
+          <title>offcmpus | Landlord Register</title>
+      </Helmet>
 
       {/* Header */}
       <div style={{display: 'flex'}} className="padded upper">

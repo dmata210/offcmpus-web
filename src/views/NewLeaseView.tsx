@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import queryString from 'query-string' 
 import {useHistory} from 'react-router'
 import {useSelector} from 'react-redux'
+import {Helmet} from "react-helmet"
 import {Link} from 'react-router-dom'
 
 import { Breadcrumb } from 'antd';
@@ -398,6 +399,12 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
     <div style={{marginBottom: `20px`}}>
       <Logo withText={true} />
     </div>
+
+    
+    <Helmet>
+        <meta charSet="utf-8" />
+        <title>offcmpus | New Lease</title>
+    </Helmet>
 
     <Breadcrumb>
       <Breadcrumb.Item>

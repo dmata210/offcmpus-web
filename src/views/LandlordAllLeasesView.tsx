@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react'
+import {Helmet} from "react-helmet";
 
 import ViewWrapper from '../components/ViewWrapper'
 import {useNumberCounter} from '../components/hooks/useNumberCounter';
@@ -101,6 +102,11 @@ const LandlordAllLeasesView = () => {
 
     //====== RENDER =======
     return (<ViewWrapper>
+
+        <Helmet>
+            <meta charSet="utf-8" />
+            <title>offcmpus | All Leases</title>
+        </Helmet>
         
         <div style={{
             marginBottom: `150px`

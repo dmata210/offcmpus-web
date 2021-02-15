@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import {useMediaQuery} from 'react-responsive'
 import {useHistory} from 'react-router'
 import {useSelector} from 'react-redux'
+import {Helmet} from "react-helmet";
 // @ts-ignore
 import { Breadcrumb } from 'antd';
 import {Link} from 'react-router-dom'
@@ -230,7 +231,14 @@ const LandlordOwnershipDocuments = ({ownership_id}:ILandlordOwnershipDocuments) 
   const isMobile = useMediaQuery({ query: '(max-width: 500px)' })
   return (<Centered width={isMobile ? 300 : 600} height={`100%`}>
 
+
     <div style={{paddingTop: '20px'}}>
+
+          
+    <Helmet>
+        <meta charSet="utf-8" />
+        <title>offcmpus | Ownership</title>
+    </Helmet>
 
       <div style={{
         marginBottom: `20px`
