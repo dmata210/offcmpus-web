@@ -38,9 +38,10 @@ const NotFound = () => {
         }}>
           <Button 
             text="Go Home"
-            icon={<FiHome />}
             textColor="white"
             onClick={goHome}
+            transformDisabled={true}
+            bold={true}
           />
         </div>
       </div>

@@ -14,14 +14,18 @@ interface ButtonInterface {
   bold?: boolean
   large?: boolean
   disabled?: boolean
+  disabledBackground?: string
   transformDisabled?:boolean
 }
 
-const Button = ({ text, disabled, transformDisabled, icon, bold, width, large, border, link_to, iconLocation, onClick, textColor, background }: ButtonInterface) => {
+const Button = ({ text, disabled, disabledBackground, transformDisabled, icon, bold, width, large, border, link_to, iconLocation, onClick, textColor, background }: ButtonInterface) => {
 
   const buttonRef = useRef<HTMLDivElement>(null)
   const bgColor = (): string => {
-    if (disabled == true) return `#ced5db`;
+    if (disabled == true) {
+      if (disabledBackground) return disabledBackground;
+      return `#ced5db`;
+    }
     // default black
     return background ? background : "#1E2019"
   }

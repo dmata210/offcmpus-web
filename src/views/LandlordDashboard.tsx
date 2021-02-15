@@ -95,6 +95,22 @@ const LandlordDashboard = () => {
     return !Object.prototype.hasOwnProperty.call(user.user, `confirmation_key`) || (user.user as any).confirmation_key == undefined
   }
 
+  // return true if the landlord has at least 1 property
+  const hasAPropery = ():boolean => {
+    return propertyOwnerships.length > 0 || propertyOwnershipsInReview.length > 0;
+  }
+
+  const handleOpenALease = () => {
+    if (propertyOwnerships.length > 0) {
+      history.push(`/landlord/leases`);
+      // history.push(`/landlord/property/${propertyOwnerships[0].property_id}`)
+    }
+  }
+  
+  const hasPhoneNumber = (): boolean => {
+    if (!user || !user.user) return false;
+    return user.user.phone_number != undefined;
+  }
 
   const resendEmail = () => {
     let last_confirm_email_resent = cookies.get('conf_em_last_res')
@@ -187,20 +203,30 @@ const LandlordDashboard = () => {
           <div className="list-item-number">1</div>
           <div className="list-item-value">Confirm Your Email</div>
         </div>
-        <div className="task-item">
+        <div 
+          onClick={() => {if (!hasPhoneNumber()) history.push({
+            pathname: '/verify/phone-number',
+            state: {
+              redirect: '/landlord/dashboard'
+            }
+          });}}
+          className={`task-item ${hasPhoneNumber() ? `strike-through` : ``}`}>
           <div className="list-item-number">2</div>
           <div className="list-item-value">Add Phone Number</div>
         </div>
-        <div className="task-item">
+        <div 
+          onClick={() => {if (!hasAPropery()) history.push('/landlord/new-property') }}
+          className={`task-item ${hasAPropery() ? `strike-through` : ``}`}>
           <div className="list-item-number">3</div>
           <div className="list-item-value">Add a Property</div>
         </div>
-        <div className="task-item">
+        {/* <div className="task-item">
           <div className="list-item-number">4</div>
           <div className="list-item-value">Add Details</div>
-        </div>
-        <div className="task-item">
-          <div className="list-item-number">5</div>
+        </div> */}
+        <div className="task-item"
+          onClick={() => {handleOpenALease()}}>
+          <div className="list-item-number">4</div>
           <div className="list-item-value">Open a Lease</div>
         </div>
 

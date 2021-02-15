@@ -2628,7 +2628,7 @@ body {
             max-height: 40px;
 
             &.icon {
-              line-height: 50px;
+              line-height: 35px;
               font-size: 1.35rem;
             }
           }
@@ -2800,6 +2800,22 @@ body {
     display: flex;
     transition: background 0.15s;
     position: relative;
+
+    .bubble-count {
+      position: absolute;
+      background-color: red;
+      width: 20px;
+      height: 20px;
+      transform: translate(25%, -25%);
+      border-radius: 30px;
+      right: 0;
+      top: 0;
+      color: white;
+      font-size: 0.7rem;
+      line-height: 20px;
+      text-align: center;
+      font-weight: 600;
+    }
 
     &:hover {
       background-color: #F6F7F9;
@@ -4633,6 +4649,7 @@ a {
   transition: opacity 0.25s;
   cursor: pointer;
   z-index: 3;
+  line-height: 20px;
 
   &:hover {
     opacity: 1;
@@ -5028,7 +5045,7 @@ a.subtle-link {
     }
 
     .property-info-bottom {
-      border-top: 1px solid $navyLight;
+
     }
   }
 
@@ -5049,4 +5066,520 @@ a.subtle-link {
   &:hover {
     background-color: #ebb7ba;
   }
+}
+
+.student-property-view-modal {
+
+
+  .property-info {
+    background-color: white;
+    display: flex;
+    border-radius: 5px;
+    box-shadow: 0px 3px 20px rgba(59, 67, 83, 0.1);
+    margin-bottom: 20px;
+
+    .image-area_ {
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+      width: 40%;
+      background-color: $navyLight;
+      height: 500px;
+    }
+
+    .info-area_ {
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
+      width: 60%;
+      overflow-y: scroll;
+      position: relative;
+
+      .img-thumbs {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-top: 1px solid $navyLight;
+        display: flex;
+        overflow-x: scroll;
+        padding: 8px 10px;
+
+        .image-thumb {
+          width: 100px;
+          min-width: 100px;
+          height: 60px;
+          border: 1px solid $navyLightText;
+          border-radius: 5px;
+          cursor: pointer;
+          margin-right: 10px;
+
+          &.active {
+            border: 1px solid $navy;
+          }
+        }
+      }
+      
+      .top_ {
+        position: relative;
+        line-height: 18px;
+        box-sizing: border-box;
+
+        .price-range {
+          position: absolute;
+          right: 25px;
+          top: 20px;
+          display: flex;
+
+          .price_{
+            color: #6AD68B;
+            font-weight: 600;
+            font-family: khumbh-sans;
+            font-size: 1.2rem;
+            margin-right: 2px;
+          }
+        }
+
+        .addr_ {
+          padding: 20px 20px;
+
+          .__ {
+            display: flex;
+            .addr1 {
+              margin-right: 10px;
+              font-weight: 600;
+              font-family: khumbh-sans;
+              font-size: 1.2rem;
+            }
+
+            .addr2 {
+              transform: translateY(-3px);
+            }
+          }
+
+        }
+
+        .owner-info {
+          color: #4f87d0;
+        }
+
+        .meta-area {
+          display: flex;
+          margin-top: 15px;
+          border-top: 1px solid $navyLight;
+          border-bottom: 1px solid $navyLight;
+          
+          .meta-section {
+            flex-grow: 1;
+            text-align: center;
+            border-right: 1px solid $navyLight;
+            padding: 10px 0;
+
+            &:last-child {
+              border-right: none;
+            }
+          }
+        }
+
+        .property-tags_ {
+          display: flex;
+          flex-wrap: wrap;
+          padding: 0px 20px;
+          margin-top: -8px;
+
+          .tag_ {
+            font-weight: 600;
+            font-family: khumbh-sans;
+            display: inline-block;
+            font-size: 0.7rem;
+            background-color: #edccce;
+            padding: 3px 8px 1px 8px;
+            border-radius: 10px;
+            margin-right: 8px;
+            color: $navy;
+            cursor: pointer;
+            transition: background-color 0.25s;
+          
+            &:hover {
+              background-color: #ebb7ba;
+            }
+          }
+        }
+
+        .description {
+          box-sizing: border-box;
+          padding: 15px;
+
+          .header {
+            font-family: khumbh-sans;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
+          }
+        }
+
+        .property-ratings {
+          display: flex;
+          margin-top: 8px;
+          padding: 10px 30px;
+
+          .ratings_ {
+            // border: 1px solid black;
+            width: 50%;
+            height: 60px;
+
+            .header {
+              font-family: khumbh-sans;
+              font-weight: 600;
+              text-transform: uppercase;
+              font-size: 0.75rem;
+              margin-bottom: 8px;
+            }
+          }
+        }
+      }
+
+    }
+  }
+}
+
+.tab-component {
+  display: flex;
+
+  .tab_ {
+    padding: 6px 15px;
+    box-sizing: border-box;
+    font-weight: 600;
+    color: $navy;
+    opacity: 0.8;
+    border-bottom: 2px solid rgba(0, 0, 0, 0);
+    cursor: pointer;
+    transition: border 0.25s, opacity 0.25s;
+
+    &.active {
+      border-bottom: 2px solid $navy;
+      opacity: 1;
+    }
+  }
+}
+
+.review-response-container {
+  background-color: white;
+  margin-top: 20px;
+  box-sizing: border-box;
+  padding: 10px 15px;
+  border-radius: 5px;
+
+  .review_ {
+
+    .review_images {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+
+      .review-image-holder {
+        cursor: pointer;
+        width: 100px;
+        height: 100px;
+        border: 1px solid $navyLight;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-right: 18px;
+      }
+    }
+  }
+
+  .response_ {
+    margin-left: 5%;
+    margin-top: 20px;
+    border: 1px solid $navyLight;
+    box-sizing: border-box;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: border 0.25s;
+
+    &:hover {
+      border: 1px solid $navyLightText;
+    }
+  }
+}
+
+.property-and-leases-modal {
+
+  margin-bottom: 20px;
+  .addr {
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+  }
+
+  .init-details {
+    height: 100px;
+    background-color: $navyLight;
+    border-radius: 5px;
+    box-sizing: border-box;
+    position: relative;
+    text-align: center;
+
+    .content {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      left: 50%;
+    }
+  }
+}
+
+.lease-info-container {
+  display: flex;
+  flex-wrap: wrap;
+
+  .lease-info-view {
+    background-color: $navyLight;
+    margin-right: 14px;
+    margin-bottom: 14px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    width: 200px;
+    padding-top: 10px;
+
+    .occupant-info {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 0 10px 8px 10px;
+    }
+
+    .market-info {
+      padding: 8px 10px 8px 10px;
+    }
+  }
+}
+
+.property-interest-area {
+
+  display: flex;
+  background-color: white;
+  justify-content: space-between;
+  width: 90%;
+  margin: 0 auto;
+  padding: 12px 15px;
+  align-items: center;
+  border-radius: 5px;
+}
+
+.lease-popup-info {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  .kvp_ {
+    display: flex;
+    margin-bottom: 3px;
+    align-items: flex-end;
+    .key_ {
+      color: $navyLightText;
+      font-weight: 600;
+      font-family: khumbh-sans;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      margin-right: 6px;
+    }
+  }
+}
+
+.lease-contents {
+  display: flex;
+  margin-top: 20px;
+
+  .container_ {
+    margin-bottom: 20px;
+    .title {
+      font-family: khumbh-sans;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: $navy;
+    }
+
+    .body {
+      background-color: white;
+      border-radius: 5px;
+      box-sizing: border-box;
+      padding: 10px 15px;
+
+      &.flex {
+        display: flex;
+
+        &.space-between {
+          justify-content: space-between;
+        }
+
+        &.align-center {
+          align-items: center;
+        }
+      }
+    }
+  }
+
+  .interests-area {
+    width: 350px;
+    min-width: 350px;
+  }
+
+  .graph-area {
+    flex-grow: 1;
+    margin-right: 20px;
+  }
+}
+
+.student-interest {
+  display: flex;
+  margin-top: 10px;
+  align-items: center;
+
+  .college-logo {
+    border: 1px solid $navyLightText;
+    width: 30px;
+    height: 30px;
+    border-radius: 3px;
+    margin-right: 10px;
+    overflow: hidden;
+  }
+
+  .actions-area {
+    margin-left: 10px;
+  }
+
+  .student-name {
+    flex-grow: 1;
+  }
+}
+
+.lease-graph-controls {
+  display: flex;
+  align-items: center;
+
+  .ctrl {
+    margin-right: 10px;
+  }
+}
+
+.date-container {
+  margin-left: 10px;
+  &:first-child {
+    margin-left: 0px;
+  }
+
+  background-color: $navyVeryLight;
+  box-sizing: border-box;
+  padding: 3px 12px;
+  border: 1px solid $navyLight;
+  border-radius: 3px;
+}
+
+.student-notification {
+  margin-bottom: 15px;
+  padding: 0 10px;
+
+  &.new {
+    border-left: 4px solid $pink;
+    .notif-head {
+      .subject::before {
+        content: "New";
+        background-color: $pink;
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 100;
+        padding: 2px 5px;
+        padding-top: 4px;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .notif-head {
+    display: flex;
+    font-family: khumbh-sans;
+    justify-content: space-between;
+
+    .subject {
+      font-weight: 600;
+    }
+  }
+
+  .notif-body {
+    .action-area {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}
+
+.accepted-lease-summary-entry {
+  background-color: $navyLight;
+  padding: 8px 10px;
+  border-radius: 5px;
+
+  .prop-name {
+    font-weight: 600;
+  }
+
+  .date-section {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 5px;
+
+    .date_ {
+      background-color: $navyLightText;
+      border-radius: 3px;
+      border-radius: 4px;
+      padding: 2px 5px;
+
+      .title {
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.active-lease-summary-entry {
+  background-color: $navyLight;
+  padding: 8px 10px;
+  border-radius: 5px;
+  
+  .prop-name {
+    font-weight: 600;
+  }
+}
+
+.rp-saved-user-area {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 1px solid $navyLight;
+  padding-bottom: 30px;
+
+  .school-logo {
+    width: 70px;
+    height: 70px;
+    min-width: 50px;
+    border: 1px solid $navyLightText;
+    border-radius: 5px;
+    margin-right: 15px;
+  }
+
+  .info-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+
+    .name-area {
+      font-weight: 600;
+      font-size: 1.15rem;
+    }
+
+    .action-area {
+      width: 100%;
+    }
+  }
+
 }

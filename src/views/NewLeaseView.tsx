@@ -5,8 +5,7 @@ import {useHistory} from 'react-router'
 import {useSelector} from 'react-redux'
 import {Link} from 'react-router-dom'
 
-// @ts-ignore
-import { Breadcrumb, BreadcrumbItem } from "shards-react";
+import { Breadcrumb } from 'antd';
 import {
   useGetLeasesAndOccupantsLazyQuery,
   useGetOwnershipForPropertyLazyQuery,
@@ -401,6 +400,16 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
     </div>
 
     <Breadcrumb>
+      <Breadcrumb.Item>
+       <a href="/landlord/dashboard">Dashboard</a>
+      </Breadcrumb.Item>
+      <Breadcrumb.Item>
+        <a href={`/landlord/property/${property_id}`}>Property Details</a>
+      </Breadcrumb.Item>
+      <Breadcrumb.Item>New Lease</Breadcrumb.Item>
+    </Breadcrumb>
+
+    {/* <Breadcrumb>
         <BreadcrumbItem>
           <Link to="/landlord/dashboard">Dashboard</Link>
         </BreadcrumbItem>
@@ -408,7 +417,7 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
           <Link to={`/landlord/property/${property_id}`}>Property Details</Link>
         </BreadcrumbItem>
       <BreadcrumbItem active>New Lease</BreadcrumbItem>
-    </Breadcrumb>
+    </Breadcrumb> */}
 
      {property != undefined && leases != undefined && ownership != undefined && targetLeaseId != undefined &&
      <div>

@@ -17,6 +17,7 @@ import './assets/css/layout.scss'
 import './assets/css/fonts.scss'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'shards-ui/dist/css/shards.min.css'
+import 'antd/dist/antd.css';
 
 // router paths
 import SearchView_ from './views/SearchView'
@@ -33,7 +34,7 @@ import PropertyView from './views/PropertyView'
 import StudentLoginView from './views/StudentLoginView'
 import StudentRegisterComplete from './views/StudentRegisterCompleteView'
 import LandlordDashboard from './views/LandlordDashboard'
-import CollectionView from './views/Collection'
+import CollectionView from './views/CollectionView'
 import StudentCASAuth from './modules/redirects/StudentCASAuth'
 import LandlordNewProperty from './views/LandlordNewProperty'
 import LandlordOwnershipDocuments from './views/LandlordOwnershipDocuments'
@@ -51,6 +52,14 @@ import StudentStatus from './views/StudentStatus'
 import NewLeaseView from './views/NewLeaseView'
 import PriorityFeatureCreationVew from './views/PriorityFeatureCreationVew'
 import StudentFeed from './views/StudentFeed'
+import StudentPropertyInfoView from './views/StudentPropertyInfoView'
+import LandlordAllLeasesView from './views/LandlordAllLeasesView'
+import LandlordLeaseInfoView from './views/LandlordLeaseInfoView'
+import StudentNotificationsView from './views/StudentNotificationsView'
+import StudentLeaseAgreementView from './views/StudentLeaseAgreement'
+import StudentAcceptedLeasesView from './views/StudentAcceptedLeasesView'
+import StudentAcceptedLeaseInfoView from './views/StudentAcceptedLeaseInfoView'
+import StudentLoginViewRPI from './views/StudentLoginRPI'
 
 import Testing from './views/Testing'
 
@@ -98,7 +107,7 @@ const Routes = () => {
           <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/" component={LandingView} />
           <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/auth-cas" component={StudentCASAuth} />
           <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/login" component={LandlordLoginView} />
-          <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/login" component={StudentLoginView} />
+          <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/login" component={StudentLoginViewRPI} />
           <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/register" component={LandlordRegisterView} />
           
           {/* Restricted Paths */}
@@ -108,6 +117,11 @@ const Routes = () => {
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/collection" component={CollectionView} />
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/s/status" component={StudentStatus} />
             <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/feed" component={StudentFeed} />
+            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/info/property/:id" component={({match}) => (<StudentPropertyInfoView property_id={match.params.id} />)} />
+            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/notifications" component={StudentNotificationsView} />
+            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/lease/:id" component={({match}) => (<StudentLeaseAgreementView lease_id={match.params.id} />)} />
+            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/accepted_leases" component={StudentAcceptedLeasesView} />
+            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/lease/info/:lease_id/:history_id" component={({match}) => <StudentAcceptedLeaseInfoView lease_id={match.params.lease_id} history_id={match.params.history_id} />} />
 
               {/* Mod Console (Ownership Reviewer) */}
               <AuthRoute accessLevel={AccessLevels.OWNERSHIP_REVIEWER} exact path="/ownership/review" component={OwnershipReview} />
@@ -124,7 +138,9 @@ const Routes = () => {
             <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/:id/new" component={({match}) => (<PropertyInitialDetails property_id={match.params.id} />)} />
             <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/lease/new/:id" component={({match}) => (<NewLeaseView property_id={match.params.id} />)} />
             <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/lease/priority/:id" component={({match}) => (<PriorityFeatureCreationVew property_id={match.params.id} /> )} />
-          
+            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/leases" component={LandlordAllLeasesView} />
+            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/lease/:property_id/:lease_id" component={({match}) => (<LandlordLeaseInfoView property_id={match.params.property_id} lease_id={match.params.lease_id} />)} />
+
             {/* Landlord and Student */}
             <AuthRoute accessLevel={AccessLevels.STUDENT | AccessLevels.LANDLORD} exact path="/property/:id" component={({match}) => (<PropertyView property_id={match.params.id} />)} />
             <AuthRoute accessLevel={AccessLevels.STUDENT | AccessLevels.LANDLORD} exact path="/notifications/enable" component={PushNotificationsPrompt} />

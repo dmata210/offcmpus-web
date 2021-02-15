@@ -14,13 +14,96 @@ query GetProperty(
   }
 }
 
+query getPropertyForOwnership($ownership_id: String!) {
+  getPropertyForOwnership(ownership_id: $ownership_id) {
+    ...PropertyAPIResponseFields
+  }
+}
+
+query GetPropertySummary (
+  $property_id: String!,
+  $student_id: String!
+) {
+  getPropertySummary (property_id: $property_id, student_id: $student_id) {
+    success
+    error
+    data {
+      property {
+        _id
+        address_line
+        address_line_2
+        city
+        state
+        zip
+        details {
+          description
+          rooms
+          bathrooms
+          sq_ft
+          furnished
+          has_washer
+          has_heater
+          has_ac
+          property_images {
+            s3_key
+            date_uploaded
+          }
+        }
+      }
+      leases {
+        able_to_lease
+        lease {
+          _id
+          price_per_month
+          lease_availability_start_date
+          lease_availability_end_date
+          lease_history {
+            student_id
+            start_date
+            end_date
+            review_of_property {
+              rating
+              review
+              response
+            }
+            review_of_landlord {
+              rating
+              review
+              response
+            }
+            property_images {
+              s3_key
+              date_uploaded
+            }
+          }
+          student_interests {
+            student_id
+            date
+          }
+          students_that_declined {
+              date
+              student_id
+          }
+        }
+      }
+      landlord {
+        _id
+        first_name
+        last_name
+      }
+    }
+  }
+}
+
 query GetPropertyOwnedByLandlord(
   $property_id: String!,
-  $landlord_id: String!
+  $landlord_id: String!,
+  $with_leases: Boolean
 ) {
   getPropertyOwnedByLandlord(
     property_id: $property_id,
-    landlord_id: $landlord_id
+    landlord_id: $landlord_id,
+    with_leases: $with_leases
   ) {
     ...PropertyAPIResponseFields
   }
@@ -28,10 +111,15 @@ query GetPropertyOwnedByLandlord(
 
 query GetPropertiesForLandlord(
   $landlord_id: String!,
+  $with_leases: Boolean,
   $status: String
 ) {
-  getPropertiesForLandlord(landlord_id:$landlord_id, status: $status) {
-    ...PropertyListAPIResponseFields
+  getPropertiesForLandlord(
+    landlord_id:$landlord_id, 
+    with_leases: $with_leases,
+    status: $status
+  ) {
+    ...PropertyListWithLeasesAPIResponseFields
   }
 }
 
@@ -53,6 +141,23 @@ query VerifyAddress(
   }
 }
 
+# query SearchForProperties(
+#   $price_start: Float!,
+#   $price_end: Float!,
+#   $rooms: Int!,
+#   $distance: Float!
+# ) {
+
+#   searchForProperties (
+#     price_start: $price_start,
+#     price_end: $price_end,
+#     rooms: $rooms,
+#     distance: $distance
+#   ) {
+#     ...PropertyListWithLeaseAPIResponse
+#   }
+# }
+
 query SearchForProperties(
   $price_start: Float!,
   $price_end: Float!,
@@ -66,7 +171,23 @@ query SearchForProperties(
     rooms: $rooms,
     distance: $distance
   ) {
-    ...PropertyListWithLeaseAPIResponse
+    success
+    error
+    data {
+      search_results {
+        property {
+          ...PropertyFields
+        }
+        landlord_first_name
+        landlord_last_name
+        price_range
+        lease_count
+        landlord_rating_avg
+        property_rating_avg
+        landlord_rating_count
+        property_rating_count
+      }
+    }
   }
 }
 
@@ -134,6 +255,55 @@ fragment PropertyListAPIResponseFields on PropertyListAPIResponse {
   data {
     properties {
       ...PropertyFields
+    }
+  }
+}
+
+fragment PropertyListWithLeasesAPIResponseFields on PropertyListAPIResponse {
+  success
+  error
+  data {
+    properties {
+      ...PropertyFields
+      leases {
+
+        _id
+        active
+        ownership_id
+        price_per_month
+        occupant_id
+        external_occupant
+        lease_document_id
+        lease_availability_start_date
+        lease_availability_end_date
+        lease_history {
+          price
+          student_id
+          start_date
+          end_date
+          review_of_property {
+            rating
+            review
+            response
+          }
+          review_of_landlord {
+            rating
+            review
+            response
+          }
+          property_images {
+            s3_key
+            date_uploaded
+          }
+
+        }
+        student_interests {
+          student_id
+          date
+        }
+        
+
+      }
     }
   }
 }
@@ -218,5 +388,19 @@ fragment PropertyWithLeaseFields on Property {
     lease_availability_end_date
     lease_availability_start_date
     lease_document_id
+    lease_history {
+      price
+      student_id
+      start_date
+      end_date
+      property_images {
+        s3_key
+        date_uploaded
+      }
+    }
+    student_interests {
+      student_id
+      date
+    }
   }
 }

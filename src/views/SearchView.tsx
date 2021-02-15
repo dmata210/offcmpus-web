@@ -11,10 +11,18 @@ import {HiCheck} from 'react-icons/hi'
 import {motion, useSpring, useTransform} from 'framer-motion'
 import Cookies from 'universal-cookie'
 import {useHistory} from 'react-router'
-import {shouldPromptToEnableNotifications} from './PushNotificationsPrompt'
 import {ReduxState} from '../redux/reducers/all_reducers'
-import {useSelector} from 'react-redux'
-import {useSearchForPropertiesLazyQuery, Property, PropertyDirections} from '../API/queries/types/graphqlFragmentTypes'
+import {useSelector, useDispatch} from 'react-redux'
+import {
+    useSearchForPropertiesLazyQuery, 
+    useAddCollectionMutation,
+    useRemoveCollectionMutation,
+    Property, 
+    PropertySearchResult,
+    PropertyDirections
+} from '../API/queries/types/graphqlFragmentTypes'
+import { Empty, Rate } from 'antd';
+import {fetchUser} from '../redux/actions/user'
 
 import {MapContainer, TileLayer, Marker, Polyline, Popup} from 'react-leaflet'
 
@@ -30,13 +38,13 @@ const SearchView = () => {
     const [leftFilterWidth, setLeftFilterWidth] = useState<number>(400)
     const [contentStart, setContentStart] = useState<number>(0)
     
-    const [properties, setProperties] = useState<Property[]>([])
+    const [properties, setProperties] = useState<PropertySearchResult[]>([])
 
     const history = useHistory();
     const cookie = new Cookies ();
 
     const resultsCount = useNumberCounter({
-        value: 50,
+        value: properties.length,
         duration: 1000
     })
 
@@ -62,20 +70,10 @@ const SearchView = () => {
     useEffect(() => {
 
         if (searchResponse && searchResponse.searchForProperties && searchResponse.searchForProperties.data) {
-            setProperties(searchResponse.searchForProperties.data.properties);
+            setProperties(searchResponse.searchForProperties.data.search_results);
         }
 
     }, [searchResponse]);
-
-    useEffect(() => {
-
-        if (user && user.user) {
-            shouldPromptToEnableNotifications(user)
-            .then((shouldPrompt: boolean) => {
-                if (shouldPrompt) history.push('/notifications/enable')
-            })
-        }
-    }, [user])
 
     const updateFilterWidth = () => {
         // filter width should be x% of the page width
@@ -103,7 +101,6 @@ const SearchView = () => {
             ]);
         }
 
-        console.log(`coords`, coords);
         return coords;
     }
 
@@ -221,7 +218,8 @@ const SearchView = () => {
                     </Marker>
 
                     {/* Put the coordinates information */}
-                    {properties.map((property: Property, i: number) => {
+                    {properties.map((res: PropertySearchResult, i: number) => {
+                        let property: Property = res.property;
                         if (!property.directions) return (<div key={i} />)
                         let directions_ = property.directions.filter((dir: PropertyDirections) => 
                             institute && institute._id && dir.institution_id == institute._id);
@@ -254,33 +252,61 @@ const SearchView = () => {
         }}>
 
             {/* Right Side */}
+            {properties.length > 0 &&
             <div className="right-side_">
-                {properties.map((property: Property, i: number) => 
-                    <SearchResult property={property} key={i} delay={i < 8 ? i * 100 : 0} />
+                {properties.map((property: PropertySearchResult, i: number) => 
+                    <SearchResult user={user}
+                    result={property} key={i} delay={i < 8 ? i * 100 : 0} />
                 )}
-            </div>
+            </div>}
+
+            {properties.length == 0 &&
+            <div style={{
+                textAlign: `center`,
+                margin: `0 auto`,
+                paddingTop: `150px`
+            }}>
+                <Empty
+                    description={
+                    <span>No properties could be found</span>
+                    }
+                />
+            </div>}
 
         </div>
     </ViewWrapper>)
 }
 
-const SearchResult = ({delay, property}: {delay: number, property: Property}) => {
+const desc = ['terrible', 'bad', 'normal', 'good', 'wonderful'];
+const SearchResult = ({delay, result, user}: {delay: number, result: PropertySearchResult, user: any}) => {
 
+    const dispatch = useDispatch();
+
+    const propertySaved = (): boolean => {
+        if (!user || !user.user) return false;
+        if (user.user.saved_collection.includes(result.property._id)) return true;
+        return false;
+    }
+
+    const [AddCollection, {data: addCollectionResponse}] = useAddCollectionMutation();
+    const [RemoveCollection, {data: removeCollectionResponse}] = useRemoveCollectionMutation();
+
+    useEffect(() => {
+        if (
+            (addCollectionResponse && addCollectionResponse.addPropertyToStudentCollection
+            && addCollectionResponse.addPropertyToStudentCollection.data
+            && addCollectionResponse.addPropertyToStudentCollection.success)
+        ||
+            (removeCollectionResponse && removeCollectionResponse.removePropertyFromStudentCollection
+            && removeCollectionResponse.removePropertyFromStudentCollection.data
+            && removeCollectionResponse.removePropertyFromStudentCollection.success)) {
+                dispatch(fetchUser(user, {update: true}));   
+            }
+      }, [addCollectionResponse, removeCollectionResponse])
 
     const getPropertyPriceRange = () :string => {
-        if (!property.leases) return `unknown`;
-
-        if (property.leases.length == 1) return `$${property.leases[0].price_per_month}`;
-        let min_ = Number.MAX_VALUE;
-        let max_ = Number.MIN_VALUE;
-
-        // find the min and max
-        for (let i = 0; i < property.leases.length; ++i) {
-            min_ = Math.min(min_, property.leases[i].price_per_month);
-            max_ = Math.max(max_, property.leases[i].price_per_month);
-        }
-
-        return `$${min_}-$${max_}`;
+        if (result.price_range.length == 1) return `$${result.price_range[0]}`;
+        else return `$${result.price_range[0]}-$${result.price_range[1]}`
     }
 
     return (<div className="search-result-3">
@@ -293,7 +319,7 @@ const SearchResult = ({delay, property}: {delay: number, property: Property}) =>
             </div>
 
             {/* # of rooms avaliable */}
-            {property.leases && <div className="lease-count">{property.leases.length} lease(s) available</div>}
+            { <div className="lease-count">{result.lease_count} lease(s) available</div>}
         </div>
 
         {/* Image Side */}
@@ -316,29 +342,34 @@ const SearchResult = ({delay, property}: {delay: number, property: Property}) =>
                 
                 {/* Property Location Info */}
                 <div className="prop-info">
-                    <div className="addr-line">{property.address_line.toLowerCase()}</div>
-                    {property.address_line_2 && property.address_line_2 != ""
-                    && <div className="addr-line">{property.address_line_2.toLowerCase()}</div>}
+                    <div className="addr-line">{result.property.address_line.toLowerCase()}</div>
+                    {result.property.address_line_2 && result.property.address_line_2 != ""
+                    && <div className="addr-line">{result.property.address_line_2.toLowerCase()}</div>}
                     <div className="addr-line-2">
-                        {property.city.toLowerCase()} {property.state}, {property.zip}
+                        {result.property.city.toLowerCase()} {result.property.state}, {result.property.zip}
                     </div>
 
                     {/* Show the amenities */}
                     <div style={{marginTop: `5px`}}>
                         {function () {
                             let amentities: string[] = [];
-                            if (property.details && property.details.furnished) amentities.push("Furnished");
-                            if (property.details && property.details.has_heater) amentities.push("Heating");
-                            if (property.details && property.details.has_ac) amentities.push("AC");
-                            if (property.details && property.details.has_washer) amentities.push("Washer");
+                            if (result.property.details && result.property.details.furnished) amentities.push("Furnished");
+                            if (result.property.details && result.property.details.has_heater) amentities.push("Heating");
+                            if (result.property.details && result.property.details.has_ac) amentities.push("AC");
+                            if (result.property.details && result.property.details.has_washer) amentities.push("Washer");
 
                             return amentities.map((amenity: string, i: number) => 
                                 <div key={i} className="info-tag">{amenity}</div>)
                         }()}
                     </div>
 
-                    {/* Rating Placeholder */}
-                    <div>RATINGS GO HERE</div>
+                    {/* Property Rating Placeholder */}
+                    {result.property_rating_count > 0 && <div>
+                        <div style={{fontWeight: 600, marginTop: `8px`}}>Property Ratings</div>
+                        <Rate tooltips={desc} disabled value={result.property_rating_avg * 5} />
+                        <div>from {result.property_rating_count} Ratings</div>
+                    </div>}
+                    {result.property_rating_count == 0 && <div style={{marginTop: `10px`, fontStyle: `italic`}}>No property ratings yet</div>}
                 </div>
 
                 {/* Landlord Info */}
@@ -348,8 +379,15 @@ const SearchResult = ({delay, property}: {delay: number, property: Property}) =>
                         fontWeight: 600,
                         fontFamily: "khumbh-sans"
                     }}>Landlord</div>
-                    <div className="info-line">Sample Landlord</div>
-                    <div>RATINGS GO HERE</div>
+                    <div className="info-line">{result.landlord_first_name} {result.landlord_last_name}</div>
+                    <div>
+                        {result.landlord_rating_count > 0 && <div>
+                            <div style={{fontWeight: 600, marginTop: `8px`}}>Landlord Ratings</div>
+                            <Rate tooltips={desc} disabled value={result.landlord_rating_avg * 5} />
+                            <div>from {result.landlord_rating_count} Ratings</div>
+                        </div>}
+                        {result.landlord_rating_count == 0 && <div style={{marginTop: `10px`, fontStyle: `italic`}}>No landlord ratings yet</div>}
+                    </div>
 
                 </div>
 
@@ -357,7 +395,55 @@ const SearchResult = ({delay, property}: {delay: number, property: Property}) =>
 
             {/* Bottom Side */}
             <div className="property-info-bottom">
-                Y
+                
+                {/* More Info on Property */}
+                <div style={{
+                    position: 'absolute',
+                    right: `15px`,
+                    bottom: `10px`,
+                    display: `flex`
+                }}>
+                    <div style={{marginRight: `5px`}}>
+                        <Button 
+                            text={propertySaved() ? `Remove` : `Save`}
+                            background="#848CFF"
+                            bold={true}
+                            textColor="white"
+                            transformDisabled={true}
+                            onClick={() => {
+                                // Do save stuff ...
+                                if (user && user.user) {
+                                    if (propertySaved()) {
+                                        RemoveCollection({
+                                            variables: {
+                                                student_id: user.user._id,
+                                                property_id: result.property._id
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        AddCollection({
+                                            variables: {
+                                                student_id: user.user._id,
+                                                property_id: result.property._id
+                                            }
+                                        });
+                                    }
+                                }
+                            }}
+                        /> 
+                    </div>
+                    <div>
+                        <Button 
+                            text="View Property"
+                            background="#E0777D"
+                            bold={true}
+                            textColor="white"
+                            transformDisabled={true}
+                            link_to={`/info/property/${result.property._id}`}
+                        /> 
+                    </div>
+                </div>
             </div>
 
         </div>

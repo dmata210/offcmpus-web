@@ -181,6 +181,8 @@ const PhoneVerifyView = () => {
                             text="Verify"
                             background="#3B4353"
                             textColor="white"
+                            bold={true}
+                            transformDisabled={true}
                             onClick={verify}
                         />
                     </div>
@@ -193,6 +195,8 @@ const PhoneVerifyView = () => {
                             text="Resend"
                             background="#E4E4E4"
                             onClick={resendVerification}
+                            bold={true}
+                            transformDisabled={true}
                         />
                     </div>
 
@@ -204,6 +208,8 @@ const PhoneVerifyView = () => {
                         <Button 
                             text="Cancel"
                             background="#E4E4E4"
+                            bold={true}
+                            transformDisabled={true}
                         />
                     </div>
                 </div>

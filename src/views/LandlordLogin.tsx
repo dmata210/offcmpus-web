@@ -16,6 +16,7 @@ import {useDispatch, useSelector} from 'react-redux'
 import {fetchUser} from '../redux/actions/user'
 import queryString from 'query-string'
 import urlencode from 'urlencode'
+import Cookies from 'universal-cookie'
 
 interface ILoginFields {
   email: string
@@ -70,6 +71,8 @@ const LandlordLogin = () => {
       LandlordAPI.login(loginFields.email, loginFields.password)
       .then(res => {
         if (res.data.success) { 
+
+          handleRedirect ();
           dispatch(fetchUser(user, {update: true}))
         }
       })
@@ -81,6 +84,20 @@ const LandlordLogin = () => {
       })
     }
 
+  }
+
+  /** 
+   * If there is a redirect url in the url query parameters, parse it and
+   * store it as a cookie. Once the user is authenticated, the redirect will be parsed from the cookie
+   * and the landlord will be taken to the page
+  */
+  const handleRedirect = () => {
+    let params = queryString.parse(window.location.search);
+
+    if (Object.prototype.hasOwnProperty.call(params, `redirect`)) {
+      const cookies = new Cookies();
+      cookies.set('landlord_redirect', params['redirect'], {path: '/'});
+    }
   }
 
   const fieldCallback = (field_name: 'email' | 'password') => {

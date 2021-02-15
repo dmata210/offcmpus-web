@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"housing-database.students"}],"uuid":"7956e4e4d0914a87ada3476223a48530"}

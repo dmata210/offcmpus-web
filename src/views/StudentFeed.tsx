@@ -1,12 +1,18 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {HiCheck} from 'react-icons/hi'
+import {useSelector} from 'react-redux'
+import {useHistory} from 'react-router'
+import {shouldPromptToEnableNotifications} from './PushNotificationsPrompt'
 
 import ViewWrapper from '../components/ViewWrapper'
 import Button from '../components/toolbox/form/Button'
 import Popup, {PopupHeader} from '../components/toolbox/misc/Popup'
+import {ReduxState} from '../redux/reducers/all_reducers'
 
 const StudentFeed = () => {
 
+    const history = useHistory()
+    const user = useSelector((state: ReduxState) => state.user)
     const [showPropertyPopup, setShowPropertyPopup] = useState<boolean>(false)
     const [popupTab, setPopupTab] = useState<number>(0)
 
@@ -14,6 +20,17 @@ const StudentFeed = () => {
         setShowPropertyPopup(true);
         setPopupTab(0);
     }
+
+    useEffect(() => {
+
+        if (user && user.user) {
+            shouldPromptToEnableNotifications(user)
+            .then((shouldPrompt: boolean) => {
+                if (shouldPrompt) history.push('/notifications/enable')
+            })
+        }
+
+    }, [user]);
 
     return (<ViewWrapper>
 

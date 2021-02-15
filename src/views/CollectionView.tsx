@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import {useHistory} from 'react-router'
+import {Empty} from 'antd'
 
 import {useCollectionLazyQuery, useRemoveCollectionMutation} from '../API/queries/types/graphqlFragmentTypes'
 import {fetchUser} from '../redux/actions/user'
@@ -109,7 +110,9 @@ const CollectionView = () => {
 
         {collectionData != null && collectionData.length == 0 &&
           <div className="centered-empty">
-            No Properties in Colection
+            <Empty 
+              description={<div>No Properties in Colection</div>}
+            />
           </div>
         }
 

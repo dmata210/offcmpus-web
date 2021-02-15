@@ -9,16 +9,21 @@ import AuthAPI from '../API/AuthAPI'
 import {dateToMonthAndYear} from './toolbox/form/RangeSlider'
 import {pushRedirect} from './hooks/usePushRedirect'
 import Popup, {PopupHeader, ConfirmLine} from '../components/toolbox/misc/Popup'
-import { HiOutlineNewspaper, HiCheckCircle, HiTerminal, HiOutlinePencil,
+import { HiOutlineNewspaper, HiDocument, HiCheckCircle, HiTerminal, HiOutlinePencil,
   HiLogout, HiClipboard, HiOutlineChatAlt, HiOutlineAdjustments,
   HiOutlineChevronLeft, HiOutlineChevronRight, HiCog } from 'react-icons/hi';
 import {RiLayoutMasonryLine} from 'react-icons/ri';
 import { FiFileText } from 'react-icons/fi';
 import { BiSearch, BiCollection } from "react-icons/bi";
+import { FaBell } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import {useSelector} from 'react-redux'
 import {ReduxState} from '../redux/reducers/all_reducers'
-import {useSubmitFeedbackMutation} from '../API/queries/types/graphqlFragmentTypes'
+import {
+  useSubmitFeedbackMutation,
+  useGetStudentNotificationsLazyQuery,
+  StudentNotification
+} from '../API/queries/types/graphqlFragmentTypes'
 import {objectURI} from '../API/S3API'
 
 interface IFeedbackInfo {
@@ -56,12 +61,17 @@ const ViewWrapper = ({children,
   const location = useLocation();
   const contentStartRef = useRef<HTMLDivElement>(null)
   const contentEndRef = useRef<HTMLDivElement>(null)
-  const [SubmitFeedback, {data: submissionData}] = useSubmitFeedbackMutation()
+
+  const [SubmitFeedback, {data: submissionData}] = useSubmitFeedbackMutation();
+  const [GetNotifications, {data: notificationsResponse}] = useGetStudentNotificationsLazyQuery({
+    fetchPolicy: 'no-cache'
+  });
   const user = useSelector((state: ReduxState) => state.user)
   // const [viewWidth, setViewWidth] = useState<number>(1400)
   const [feedbackSubmitted, setFeedbackSubmitted] = useState<boolean>(false)
   const [menuCollapsed, setMenuCollapsed] = useState<boolean>(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(hide_sidebar ? true : false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(hide_sidebar ? true : false);
+  const [studentNotifs, setStudentNotifs] = useState<StudentNotification[]>([]);
 
   useEffect(() => {
     if (submissionData) {
@@ -95,7 +105,27 @@ const ViewWrapper = ({children,
   const [initCollapseSet, setInitCollapseSet] = useState<boolean>(false);
 
   useEffect(() => {
+    if (notificationsResponse
+      && notificationsResponse.getStudentNotifications
+      && notificationsResponse.getStudentNotifications.success
+      && !notificationsResponse.getStudentNotifications.error
+      && notificationsResponse.getStudentNotifications.data) {
+        setStudentNotifs(
+          notificationsResponse.getStudentNotifications.data.notifications
+        );
+      }
+  }, [notificationsResponse]);
+
+  useEffect(() => {
     if (user){
+
+      if (user && user.type == 'student' && user.user) {
+        GetNotifications({
+          variables: {
+            student_id: user.user._id
+          }
+        });
+      }
 
       if (user && user.user && !initCollapseSet) {
         let collapsed_val = getUserCookieSettings({
@@ -120,6 +150,16 @@ const ViewWrapper = ({children,
             target: '/search',
             icon: <BiSearch />,
             name: 'Search'
+          },
+          accepted_leases: {
+            target: '/student/accepted_leases',
+            icon: <HiDocument />,
+            name: "Accepted Leases"
+          },
+          notifications: {
+            target: `/student/notifications`,
+            icon: <FaBell />,
+            name: `Notifications`
           },
           collection: {
             target: '/collection',
@@ -531,6 +571,10 @@ const ViewWrapper = ({children,
           {Object.keys(pageLinks).map((page_: any, index: number) => 
           (<Link className="subtle-link" to={pageLinks[page_].target} key={index}>
             <div className={`menu-link ${window.location.pathname.toLowerCase() === pageLinks[page_].target.toLowerCase() ? 'active' : ''}`}>
+              {page_ == "notifications" 
+                // Only show the notifications bubble if there is at least 1 NEW notification (notification that has not been marked as seen)
+                && studentNotifs.filter((notif: StudentNotification) => notif.date_seen == undefined).length > 0
+                && <div className="bubble-count">{studentNotifs.filter((notif: StudentNotification) => notif.date_seen == undefined).length}</div>}
               <div className={`icon ${menuCollapsed ? 'collapsed' : ''}`}>{pageLinks[page_].icon}</div>
               <motion.div className="text" style={{opacity: menuCollapseInitSpring}}>{pageLinks[page_].name}</motion.div>
           </div>

@@ -3,7 +3,7 @@ import {useMediaQuery} from 'react-responsive'
 import {useHistory} from 'react-router'
 import {useSelector} from 'react-redux'
 // @ts-ignore
-import { Breadcrumb, BreadcrumbItem } from "shards-react";
+import { Breadcrumb } from 'antd';
 import {Link} from 'react-router-dom'
 
 import {OwnershipDocument, Property} from '../API/queries/types/graphqlFragmentTypes'
@@ -15,7 +15,7 @@ import {
 } from '../API/queries/types/graphqlFragmentTypes'
 import Button from '../components/toolbox/form/Button'
 import Centered from '../components/toolbox/layout/Centered'
-import {FloatingLogo} from '../components/Logo'
+import Logo from '../components/Logo'
 import {uploadObjects, objectURI} from '../API/S3API'
 
 interface ILandlordOwnershipDocuments {
@@ -230,20 +230,24 @@ const LandlordOwnershipDocuments = ({ownership_id}:ILandlordOwnershipDocuments) 
   const isMobile = useMediaQuery({ query: '(max-width: 500px)' })
   return (<Centered width={isMobile ? 300 : 600} height={`100%`}>
 
-    <div style={{paddingTop: '80px'}}>
-    
-      <Breadcrumb>
-        <BreadcrumbItem>
-          <Link to="/landlord/dashboard">Dashboard</Link>
-        </BreadcrumbItem>
-        <BreadcrumbItem active>Property Ownership</BreadcrumbItem>
-      </Breadcrumb>
+    <div style={{paddingTop: '20px'}}>
 
-
-      <FloatingLogo />
-      {/* Button Area */}
-      <div style={{marginBottom: '20px', width: '40%'}}>
+      <div style={{
+        marginBottom: `20px`
+      }}>
+        <Logo
+          withText={true}
+        />
       </div>
+
+      <div style={{marginTop: `10px`}}>
+        <Breadcrumb>
+          <Breadcrumb.Item href="/landlord/dashboard">Dashboard</Breadcrumb.Item>
+          <Breadcrumb.Item>Property Ownership</Breadcrumb.Item>
+        </Breadcrumb>
+      </div>
+
+
       <div className="section-header-3">
         <div className="title-area">Property Ownership</div>
       </div>
@@ -277,6 +281,21 @@ const LandlordOwnershipDocuments = ({ownership_id}:ILandlordOwnershipDocuments) 
           :[]}
         pending={uploadsInFlight}
       />
+
+      <div style={{
+        width: `150px`,
+        float: `right`,
+        marginTop: `20px`
+      }}>
+        <Button 
+          link_to="/landlord/dashboard"
+          transformDisabled={true}
+          bold={true}
+          text="Save"
+          background="#3B4353"
+          textColor="white"
+        />
+      </div>
       
     </div>
   </Centered>)
