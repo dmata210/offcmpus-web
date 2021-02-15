@@ -45,7 +45,7 @@ export interface LeaseOccupant {
   __typename: "Student";
   _id: string;
   first_name: string;
-  phone_number: string;
+  phone_number: string | null;
   last_name: string;
   email: string;
   elevated_privileges: string[] | null;

@@ -47,7 +47,7 @@ export interface UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_occup
   __typename: "Student";
   _id: string;
   first_name: string;
-  phone_number: string;
+  phone_number: string | null;
   last_name: string;
   email: string;
   elevated_privileges: string[] | null;
@@ -63,6 +63,50 @@ export interface UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_prior
   end_date: string;
 }
 
+export interface UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_lease_history_review_of_property {
+  __typename: "ReviewAndResponse";
+  rating: number;
+  review: string;
+  response: string | null;
+}
+
+export interface UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_lease_history_review_of_landlord {
+  __typename: "ReviewAndResponse";
+  rating: number;
+  review: string;
+  response: string | null;
+}
+
+export interface UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_lease_history_property_images {
+  __typename: "LeaseImageInfo";
+  s3_key: string;
+  date_uploaded: string;
+}
+
+export interface UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_lease_history {
+  __typename: "LeaseHistory";
+  price: number;
+  student_id: string;
+  start_date: string;
+  end_date: string;
+  review_of_property: UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_lease_history_review_of_property | null;
+  review_of_landlord: UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_lease_history_review_of_landlord | null;
+  property_images: UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_lease_history_property_images[];
+}
+
+export interface UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_student_interests {
+  __typename: "StudentInterest";
+  student_id: string;
+  date: string;
+  accepted: boolean | null;
+}
+
+export interface UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_students_that_declined {
+  __typename: "DeclineInfo";
+  date: string;
+  student_id: string;
+}
+
 export interface UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases {
   __typename: "Lease";
   _id: string;
@@ -76,6 +120,9 @@ export interface UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases {
   lease_document_id: string | null;
   lease_availability_start_date: string | null;
   lease_availability_end_date: string | null;
+  lease_history: UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_lease_history[];
+  student_interests: UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_student_interests[];
+  students_that_declined: UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_students_that_declined[] | null;
 }
 
 export interface UpdateUnoccupiedLeases_updateUnoccupiedLeases_data {

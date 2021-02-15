@@ -19,12 +19,15 @@ export type Query = {
   resendEamilConfirmation: LandlordApiResponse;
   getStudent: StudentApiResponse;
   getStudentSavedCollection: PropertyCollectionEntriesApiResponse;
+  getStudentNotifications: StudentNotificationApiResponse;
   getProperty: PropertyApiResponse;
+  getPropertyForOwnership: PropertyApiResponse;
   getPropertyOwnedByLandlord: PropertyApiResponse;
   searchProperties: PropertyListApiResponse;
-  searchForProperties: PropertyListApiResponse;
+  searchForProperties: PropertySearchResultCollectionApiResult;
   getPropertiesForLandlord: PropertyListApiResponse;
   verifyAddress: AddressVerificationApiResponse;
+  getPropertySummary: PropertySummaryApiResponse;
   getInstitution: InstitutionApiResponse;
   getMatchingInstitutions: InstitutionListApiResponse;
   getOwnershipForProperty: OwnershipApiResponse;
@@ -33,7 +36,13 @@ export type Query = {
   getOwnershipsForLandlord: OwnershipCollectionApiResponse;
   getOwnershipConflicts: OwnershipCollectionApiResponse;
   getFeedback: FeedbackCollectionApiResponse;
+  checkEligibleForLeaseAgreement: LeaseApiResponse;
+  getRoomNo: NumberApiResponse;
   getLeasesAndOccupants: LeaseCollectionApiResponse;
+  getAcceptedLeaseInfo: LeaseHistorySummaryApiResponse;
+  getAcceptedLeases: LeaseHistorySummaryCollectionApiResponse;
+  getLeaseSummary: LeaseSummaryApiResponse;
+  canAddReview: DigitApiResponse;
   getLeaseDocumentsForLandlord: MultipleLeaseDocumentsApiResponse;
 };
 
@@ -59,6 +68,11 @@ export type QueryGetStudentSavedCollectionArgs = {
 };
 
 
+export type QueryGetStudentNotificationsArgs = {
+  student_id: Scalars['String'];
+};
+
+
 export type QueryGetPropertyArgs = {
   withLandlord: Scalars['Boolean'];
   reviewOptions: PropertyReviewInput;
@@ -66,7 +80,13 @@ export type QueryGetPropertyArgs = {
 };
 
 
+export type QueryGetPropertyForOwnershipArgs = {
+  ownership_id: Scalars['String'];
+};
+
+
 export type QueryGetPropertyOwnedByLandlordArgs = {
+  with_leases?: Maybe<Scalars['Boolean']>;
   landlord_id: Scalars['String'];
   property_id: Scalars['String'];
 };
@@ -87,6 +107,7 @@ export type QuerySearchForPropertiesArgs = {
 
 export type QueryGetPropertiesForLandlordArgs = {
   status?: Maybe<Scalars['String']>;
+  with_leases?: Maybe<Scalars['Boolean']>;
   landlord_id: Scalars['String'];
 };
 
@@ -97,6 +118,12 @@ export type QueryVerifyAddressArgs = {
   city: Scalars['String'];
   address_2: Scalars['String'];
   address_1: Scalars['String'];
+};
+
+
+export type QueryGetPropertySummaryArgs = {
+  student_id: Scalars['String'];
+  property_id: Scalars['String'];
 };
 
 
@@ -139,8 +166,43 @@ export type QueryGetFeedbackArgs = {
 };
 
 
+export type QueryCheckEligibleForLeaseAgreementArgs = {
+  student_id: Scalars['String'];
+  lease_id: Scalars['String'];
+};
+
+
+export type QueryGetRoomNoArgs = {
+  lease_id: Scalars['String'];
+  ownership_id: Scalars['String'];
+};
+
+
 export type QueryGetLeasesAndOccupantsArgs = {
   ownership_id: Scalars['String'];
+};
+
+
+export type QueryGetAcceptedLeaseInfoArgs = {
+  history_id: Scalars['String'];
+  lease_id: Scalars['String'];
+  student_id: Scalars['String'];
+};
+
+
+export type QueryGetAcceptedLeasesArgs = {
+  student_id: Scalars['String'];
+};
+
+
+export type QueryGetLeaseSummaryArgs = {
+  lease_id: Scalars['String'];
+};
+
+
+export type QueryCanAddReviewArgs = {
+  property_id: Scalars['String'];
+  student_id: Scalars['String'];
 };
 
 
@@ -205,7 +267,7 @@ export type Student = {
   first_name: Scalars['String'];
   last_name: Scalars['String'];
   email: Scalars['String'];
-  phone_number: Scalars['String'];
+  phone_number?: Maybe<Scalars['String']>;
   auth_info?: Maybe<CasAuthInfo>;
   saved_collection?: Maybe<Array<Scalars['String']>>;
   type?: Maybe<Scalars['String']>;
@@ -213,6 +275,8 @@ export type Student = {
   confirmation_key?: Maybe<Array<Scalars['String']>>;
   user_settings?: Maybe<StudentUserSettings>;
   search_status?: Maybe<SearchStatus>;
+  notifications?: Maybe<Array<StudentNotification>>;
+  accepted_leases?: Maybe<Array<AcceptedLeaseInfo>>;
 };
 
 /** Cas Auth Information */
@@ -238,6 +302,28 @@ export type SearchStatus = {
   search_end?: Maybe<Scalars['String']>;
   price_start?: Maybe<Scalars['Float']>;
   price_end?: Maybe<Scalars['Float']>;
+};
+
+export type StudentNotification = {
+  __typename?: 'StudentNotification';
+  _id: Scalars['String'];
+  date_created: Scalars['String'];
+  date_seen?: Maybe<Scalars['String']>;
+  subject: Scalars['String'];
+  body: Scalars['String'];
+  action?: Maybe<NotificationAction>;
+};
+
+export type NotificationAction = {
+  __typename?: 'NotificationAction';
+  action_text: Scalars['String'];
+  action_url: Scalars['String'];
+};
+
+export type AcceptedLeaseInfo = {
+  __typename?: 'AcceptedLeaseInfo';
+  lease_id: Scalars['String'];
+  history_id: Scalars['String'];
 };
 
 export type PropertyCollectionEntriesApiResponse = {
@@ -320,6 +406,9 @@ export type Lease = {
   lease_document_id?: Maybe<Scalars['String']>;
   lease_availability_start_date?: Maybe<Scalars['String']>;
   lease_availability_end_date?: Maybe<Scalars['String']>;
+  lease_history: Array<LeaseHistory>;
+  student_interests: Array<StudentInterest>;
+  students_that_declined?: Maybe<Array<DeclineInfo>>;
 };
 
 /** Object model for the priority object for a lease */
@@ -330,9 +419,62 @@ export type LeasePriority = {
   end_date: Scalars['String'];
 };
 
+/** Information about an instance of a lease's activation */
+export type LeaseHistory = {
+  __typename?: 'LeaseHistory';
+  price: Scalars['Float'];
+  student_id: Scalars['String'];
+  start_date: Scalars['String'];
+  end_date: Scalars['String'];
+  review_of_property?: Maybe<ReviewAndResponse>;
+  review_of_landlord?: Maybe<ReviewAndResponse>;
+  property_images: Array<LeaseImageInfo>;
+};
+
+/** Review & Response */
+export type ReviewAndResponse = {
+  __typename?: 'ReviewAndResponse';
+  rating: Scalars['Float'];
+  review: Scalars['String'];
+  response?: Maybe<Scalars['String']>;
+};
+
+/** Property Image info */
+export type LeaseImageInfo = {
+  __typename?: 'LeaseImageInfo';
+  s3_key: Scalars['String'];
+  date_uploaded: Scalars['String'];
+};
+
+/** Student interest object */
+export type StudentInterest = {
+  __typename?: 'StudentInterest';
+  student_id: Scalars['String'];
+  date: Scalars['String'];
+  accepted?: Maybe<Scalars['Boolean']>;
+};
+
+export type DeclineInfo = {
+  __typename?: 'DeclineInfo';
+  date: Scalars['String'];
+  student_id: Scalars['String'];
+};
+
 export type CollectionFetchInput = {
   offset: Scalars['Int'];
   count: Scalars['Int'];
+};
+
+export type StudentNotificationApiResponse = {
+  __typename?: 'StudentNotificationAPIResponse';
+  success: Scalars['Boolean'];
+  error?: Maybe<Scalars['String']>;
+  data?: Maybe<StudentNotificationCollection>;
+};
+
+export type StudentNotificationCollection = {
+  __typename?: 'StudentNotificationCollection';
+  notifications: Array<StudentNotification>;
 };
 
 export type PropertyApiResponse = {
@@ -366,6 +508,31 @@ export type PropertySearchInput = {
   count?: Maybe<Scalars['Int']>;
 };
 
+export type PropertySearchResultCollectionApiResult = {
+  __typename?: 'PropertySearchResultCollectionAPIResult';
+  success: Scalars['Boolean'];
+  error?: Maybe<Scalars['String']>;
+  data?: Maybe<PropertySearchResultCollection>;
+};
+
+export type PropertySearchResultCollection = {
+  __typename?: 'PropertySearchResultCollection';
+  search_results: Array<PropertySearchResult>;
+};
+
+export type PropertySearchResult = {
+  __typename?: 'PropertySearchResult';
+  property: Property;
+  landlord_first_name: Scalars['String'];
+  landlord_last_name: Scalars['String'];
+  price_range: Array<Scalars['Int']>;
+  lease_count: Scalars['Int'];
+  landlord_rating_avg: Scalars['Float'];
+  landlord_rating_count: Scalars['Int'];
+  property_rating_avg: Scalars['Float'];
+  property_rating_count: Scalars['Int'];
+};
+
 export type AddressVerificationApiResponse = {
   __typename?: 'AddressVerificationAPIResponse';
   success: Scalars['Boolean'];
@@ -381,6 +548,26 @@ export type AddressVerification = {
   city: Scalars['String'];
   state: Scalars['String'];
   zip: Scalars['String'];
+};
+
+export type PropertySummaryApiResponse = {
+  __typename?: 'PropertySummaryAPIResponse';
+  success: Scalars['Boolean'];
+  error?: Maybe<Scalars['String']>;
+  data?: Maybe<PropertySummary>;
+};
+
+export type PropertySummary = {
+  __typename?: 'PropertySummary';
+  property: Property;
+  leases: Array<LeaseAndAvailability>;
+  landlord: Landlord;
+};
+
+export type LeaseAndAvailability = {
+  __typename?: 'LeaseAndAvailability';
+  lease: Lease;
+  able_to_lease: Scalars['Boolean'];
 };
 
 export type InstitutionApiResponse = {
@@ -510,6 +697,26 @@ export type Feedback = {
   tags: Array<Scalars['String']>;
 };
 
+/** API Response class for the Lease object. */
+export type LeaseApiResponse = {
+  __typename?: 'LeaseAPIResponse';
+  success: Scalars['Boolean'];
+  error?: Maybe<Scalars['String']>;
+  data?: Maybe<Lease>;
+};
+
+export type NumberApiResponse = {
+  __typename?: 'NumberAPIResponse';
+  success: Scalars['Boolean'];
+  error?: Maybe<Scalars['String']>;
+  data?: Maybe<NumberValue>;
+};
+
+export type NumberValue = {
+  __typename?: 'NumberValue';
+  value: Scalars['Float'];
+};
+
 /** API Response class for Lease collection object */
 export type LeaseCollectionApiResponse = {
   __typename?: 'LeaseCollectionAPIResponse';
@@ -524,18 +731,52 @@ export type LeaseCollection = {
   leases: Array<Lease>;
 };
 
-/** Multiple lease documents response */
-export type MultipleLeaseDocumentsApiResponse = {
-  __typename?: 'MultipleLeaseDocumentsAPIResponse';
+export type LeaseHistorySummaryApiResponse = {
+  __typename?: 'LeaseHistorySummaryAPIResponse';
   success: Scalars['Boolean'];
   error?: Maybe<Scalars['String']>;
-  data?: Maybe<MultipleLeaseDocuments>;
+  data?: Maybe<LeaseHistorySummary>;
 };
 
-/** Multiple lease documents */
-export type MultipleLeaseDocuments = {
-  __typename?: 'MultipleLeaseDocuments';
-  lease_documents: Array<LeaseDocument>;
+export type LeaseHistorySummary = {
+  __typename?: 'LeaseHistorySummary';
+  property: Property;
+  lease: Lease;
+  landlord: Landlord;
+  lease_history: LeaseHistory;
+  room_no: Scalars['Int'];
+  lease_history_id: Scalars['String'];
+};
+
+export type LeaseHistorySummaryCollectionApiResponse = {
+  __typename?: 'LeaseHistorySummaryCollectionAPIResponse';
+  success: Scalars['Boolean'];
+  error?: Maybe<Scalars['String']>;
+  data?: Maybe<LeaseHistorySummaryCollection>;
+};
+
+export type LeaseHistorySummaryCollection = {
+  __typename?: 'LeaseHistorySummaryCollection';
+  histories: Array<LeaseHistorySummary>;
+};
+
+/** API Response for lease summary */
+export type LeaseSummaryApiResponse = {
+  __typename?: 'LeaseSummaryAPIResponse';
+  success: Scalars['Boolean'];
+  error?: Maybe<Scalars['String']>;
+  data?: Maybe<LeaseSummary>;
+};
+
+/** Summary of lease information */
+export type LeaseSummary = {
+  __typename?: 'LeaseSummary';
+  room_no: Scalars['Int'];
+  property: Property;
+  lease: Lease;
+  institutions: Array<Institution>;
+  students: Array<Student>;
+  lease_doc?: Maybe<LeaseDocument>;
 };
 
 /** Lease Document Schema */
@@ -553,12 +794,40 @@ export type S3Document = {
   s3_key: Scalars['String'];
 };
 
+/** Represents a digit */
+export type DigitApiResponse = {
+  __typename?: 'DigitAPIResponse';
+  success: Scalars['Boolean'];
+  error?: Maybe<Scalars['String']>;
+  data?: Maybe<Digit>;
+};
+
+export type Digit = {
+  __typename?: 'Digit';
+  value: Scalars['Float'];
+};
+
+/** Multiple lease documents response */
+export type MultipleLeaseDocumentsApiResponse = {
+  __typename?: 'MultipleLeaseDocumentsAPIResponse';
+  success: Scalars['Boolean'];
+  error?: Maybe<Scalars['String']>;
+  data?: Maybe<MultipleLeaseDocuments>;
+};
+
+/** Multiple lease documents */
+export type MultipleLeaseDocuments = {
+  __typename?: 'MultipleLeaseDocuments';
+  lease_documents: Array<LeaseDocument>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createLandlord: LandlordApiResponse;
   updatePhoneNumber: LandlordApiResponse;
   confirmLandlordEmail: LandlordApiResponse;
   setLandlordOnboarded: LandlordApiResponse;
+  markStudentNotificationAsSeen: StudentNotificationApiResponse;
   updateStudentSearchStatus: StudentApiResponse;
   addPropertyToStudentCollection: PropertyCollectionEntriesApiResponse;
   removePropertyFromStudentCollection: PropertyCollectionEntriesApiResponse;
@@ -573,6 +842,12 @@ export type Mutation = {
   changeOwnershipStatus: OwnershipApiResponse;
   submitFeedback: FeedbackApiResponse;
   activateLease: LeaseApiResponse;
+  addLeaseHistory: LeaseApiResponse;
+  acceptOrDeclineStudentInterest: LeaseApiResponse;
+  expressInterest: LeaseApiResponse;
+  acceptLeaseAgreement: LeaseApiResponse;
+  declineLeaseAgreement: LeaseApiResponse;
+  addReviewForLease: LeaseApiResponse;
   updateUnoccupiedLeases: LeaseCollectionApiResponse;
   addNewLeaseDocument: LeaseDocumentApiResponse;
 };
@@ -597,6 +872,12 @@ export type MutationConfirmLandlordEmailArgs = {
 
 export type MutationSetLandlordOnboardedArgs = {
   landlord_id: Scalars['String'];
+};
+
+
+export type MutationMarkStudentNotificationAsSeenArgs = {
+  notification_id: Scalars['String'];
+  student_id: Scalars['String'];
 };
 
 
@@ -711,6 +992,50 @@ export type MutationActivateLeaseArgs = {
 };
 
 
+export type MutationAddLeaseHistoryArgs = {
+  end_date: Scalars['String'];
+  start_date: Scalars['String'];
+  student_id: Scalars['String'];
+  lease_id: Scalars['String'];
+};
+
+
+export type MutationAcceptOrDeclineStudentInterestArgs = {
+  lease_id: Scalars['String'];
+  student_id: Scalars['String'];
+  action: Scalars['String'];
+};
+
+
+export type MutationExpressInterestArgs = {
+  lease_id: Scalars['String'];
+  student_id: Scalars['String'];
+};
+
+
+export type MutationAcceptLeaseAgreementArgs = {
+  lease_id: Scalars['String'];
+  student_id: Scalars['String'];
+};
+
+
+export type MutationDeclineLeaseAgreementArgs = {
+  lease_id: Scalars['String'];
+  student_id: Scalars['String'];
+};
+
+
+export type MutationAddReviewForLeaseArgs = {
+  property_images: Array<Scalars['String']>;
+  landlord_rating: Scalars['Float'];
+  landlord_review: Scalars['String'];
+  property_rating: Scalars['Float'];
+  property_review: Scalars['String'];
+  student_id: Scalars['String'];
+  lease_id: Scalars['String'];
+};
+
+
 export type MutationUpdateUnoccupiedLeasesArgs = {
   leases_info: Array<LeaseUpdateInput>;
   ownership_id: Scalars['String'];
@@ -751,14 +1076,6 @@ export type FeedbackApiResponse = {
   success: Scalars['Boolean'];
   error?: Maybe<Scalars['String']>;
   data?: Maybe<Feedback>;
-};
-
-/** API Response class for the Lease object. */
-export type LeaseApiResponse = {
-  __typename?: 'LeaseAPIResponse';
-  success: Scalars['Boolean'];
-  error?: Maybe<Scalars['String']>;
-  data?: Maybe<Lease>;
 };
 
 /** Input for describing the creation of a lease */
@@ -940,6 +1257,19 @@ export type InstitutionListApiResponseFieldsFragment = (
   )> }
 );
 
+export type GetLandlordQueryVariables = Exact<{
+  landlord_id: Scalars['String'];
+}>;
+
+
+export type GetLandlordQuery = (
+  { __typename?: 'Query' }
+  & { getLandlord: (
+    { __typename?: 'LandlordAPIResponse' }
+    & LandlordApiResponseFieldsFragment
+  ) }
+);
+
 export type CreateLandlordMutationVariables = Exact<{
   first_name: Scalars['String'];
   last_name: Scalars['String'];
@@ -1103,6 +1433,235 @@ export type GetLeasesAndOccupantsQuery = (
   ) }
 );
 
+export type GetRoomNoQueryVariables = Exact<{
+  lease_id: Scalars['String'];
+  ownership_id: Scalars['String'];
+}>;
+
+
+export type GetRoomNoQuery = (
+  { __typename?: 'Query' }
+  & { getRoomNo: (
+    { __typename?: 'NumberAPIResponse' }
+    & NumberApiResponseFieldsFragment
+  ) }
+);
+
+export type CheckEligibleForLeaseAgreementQueryVariables = Exact<{
+  lease_id: Scalars['String'];
+  student_id: Scalars['String'];
+}>;
+
+
+export type CheckEligibleForLeaseAgreementQuery = (
+  { __typename?: 'Query' }
+  & { checkEligibleForLeaseAgreement: (
+    { __typename?: 'LeaseAPIResponse' }
+    & LeaseApiResponseFieldsFragment
+  ) }
+);
+
+export type CanAddReviewQueryVariables = Exact<{
+  student_id: Scalars['String'];
+  property_id: Scalars['String'];
+}>;
+
+
+export type CanAddReviewQuery = (
+  { __typename?: 'Query' }
+  & { canAddReview: (
+    { __typename?: 'DigitAPIResponse' }
+    & Pick<DigitApiResponse, 'success' | 'error'>
+    & { data?: Maybe<(
+      { __typename?: 'Digit' }
+      & Pick<Digit, 'value'>
+    )> }
+  ) }
+);
+
+export type GetAcceptedLeaseInfoQueryVariables = Exact<{
+  student_id: Scalars['String'];
+  lease_id: Scalars['String'];
+  history_id: Scalars['String'];
+}>;
+
+
+export type GetAcceptedLeaseInfoQuery = (
+  { __typename?: 'Query' }
+  & { getAcceptedLeaseInfo: (
+    { __typename?: 'LeaseHistorySummaryAPIResponse' }
+    & Pick<LeaseHistorySummaryApiResponse, 'success' | 'error'>
+    & { data?: Maybe<(
+      { __typename?: 'LeaseHistorySummary' }
+      & LeaseHistorySummaryFieldsFragment
+    )> }
+  ) }
+);
+
+export type GetAcceptedLeasesQueryVariables = Exact<{
+  student_id: Scalars['String'];
+}>;
+
+
+export type GetAcceptedLeasesQuery = (
+  { __typename?: 'Query' }
+  & { getAcceptedLeases: (
+    { __typename?: 'LeaseHistorySummaryCollectionAPIResponse' }
+    & Pick<LeaseHistorySummaryCollectionApiResponse, 'success' | 'error'>
+    & { data?: Maybe<(
+      { __typename?: 'LeaseHistorySummaryCollection' }
+      & { histories: Array<(
+        { __typename?: 'LeaseHistorySummary' }
+        & LeaseHistorySummaryFieldsFragment
+      )> }
+    )> }
+  ) }
+);
+
+export type GetLeaseSummaryQueryVariables = Exact<{
+  lease_id: Scalars['String'];
+}>;
+
+
+export type GetLeaseSummaryQuery = (
+  { __typename?: 'Query' }
+  & { getLeaseSummary: (
+    { __typename?: 'LeaseSummaryAPIResponse' }
+    & Pick<LeaseSummaryApiResponse, 'success' | 'error'>
+    & { data?: Maybe<(
+      { __typename?: 'LeaseSummary' }
+      & Pick<LeaseSummary, 'room_no'>
+      & { property: (
+        { __typename?: 'Property' }
+        & Pick<Property, '_id' | 'landlord' | 'address_line' | 'address_line_2' | 'city' | 'state' | 'zip'>
+      ), lease: (
+        { __typename?: 'Lease' }
+        & Pick<Lease, '_id' | 'active' | 'ownership_id' | 'price_per_month' | 'occupant_id' | 'external_occupant' | 'lease_document_id' | 'lease_availability_start_date' | 'lease_availability_end_date'>
+        & { priority?: Maybe<(
+          { __typename?: 'LeasePriority' }
+          & Pick<LeasePriority, 'level' | 'start_date' | 'end_date'>
+        )>, lease_history: Array<(
+          { __typename?: 'LeaseHistory' }
+          & Pick<LeaseHistory, 'price' | 'student_id' | 'start_date' | 'end_date'>
+          & { review_of_property?: Maybe<(
+            { __typename?: 'ReviewAndResponse' }
+            & Pick<ReviewAndResponse, 'rating' | 'review' | 'response'>
+          )>, review_of_landlord?: Maybe<(
+            { __typename?: 'ReviewAndResponse' }
+            & Pick<ReviewAndResponse, 'rating' | 'review' | 'response'>
+          )>, property_images: Array<(
+            { __typename?: 'LeaseImageInfo' }
+            & Pick<LeaseImageInfo, 's3_key' | 'date_uploaded'>
+          )> }
+        )>, student_interests: Array<(
+          { __typename?: 'StudentInterest' }
+          & Pick<StudentInterest, 'student_id' | 'date' | 'accepted'>
+        )>, students_that_declined?: Maybe<Array<(
+          { __typename?: 'DeclineInfo' }
+          & Pick<DeclineInfo, 'date' | 'student_id'>
+        )>> }
+      ), institutions: Array<(
+        { __typename?: 'Institution' }
+        & Pick<Institution, '_id' | 'name' | 's3_thumb_key'>
+        & { location: (
+          { __typename?: 'InstitutionLocationInfo' }
+          & Pick<InstitutionLocationInfo, 'address' | 'city' | 'state' | 'zip' | 'longitude' | 'latitude'>
+        ) }
+      )>, students: Array<(
+        { __typename?: 'Student' }
+        & Pick<Student, '_id' | 'first_name' | 'last_name' | 'email' | 'phone_number'>
+        & { auth_info?: Maybe<(
+          { __typename?: 'CasAuthInfo' }
+          & Pick<CasAuthInfo, 'institution_id'>
+        )> }
+      )>, lease_doc?: Maybe<(
+        { __typename?: 'LeaseDocument' }
+        & Pick<LeaseDocument, '_id' | 'lease_name' | 'landlord_id'>
+        & { documents: Array<(
+          { __typename?: 'S3Document' }
+          & Pick<S3Document, 'mime_type' | 's3_key'>
+        )> }
+      )> }
+    )> }
+  ) }
+);
+
+export type DeclineLeaseAgreementMutationVariables = Exact<{
+  student_id: Scalars['String'];
+  lease_id: Scalars['String'];
+}>;
+
+
+export type DeclineLeaseAgreementMutation = (
+  { __typename?: 'Mutation' }
+  & { declineLeaseAgreement: (
+    { __typename?: 'LeaseAPIResponse' }
+    & LeaseApiResponseFieldsFragment
+  ) }
+);
+
+export type AcceptLeaseAgreementMutationVariables = Exact<{
+  student_id: Scalars['String'];
+  lease_id: Scalars['String'];
+}>;
+
+
+export type AcceptLeaseAgreementMutation = (
+  { __typename?: 'Mutation' }
+  & { acceptLeaseAgreement: (
+    { __typename?: 'LeaseAPIResponse' }
+    & LeaseApiResponseFieldsFragment
+  ) }
+);
+
+export type AcceptOrDeclineStudentInterestMutationVariables = Exact<{
+  action: Scalars['String'];
+  student_id: Scalars['String'];
+  lease_id: Scalars['String'];
+}>;
+
+
+export type AcceptOrDeclineStudentInterestMutation = (
+  { __typename?: 'Mutation' }
+  & { acceptOrDeclineStudentInterest: (
+    { __typename?: 'LeaseAPIResponse' }
+    & LeaseApiResponseFieldsFragment
+  ) }
+);
+
+export type ExpressInterestMutationVariables = Exact<{
+  student_id: Scalars['String'];
+  lease_id: Scalars['String'];
+}>;
+
+
+export type ExpressInterestMutation = (
+  { __typename?: 'Mutation' }
+  & { expressInterest: (
+    { __typename?: 'LeaseAPIResponse' }
+    & LeaseApiResponseFieldsFragment
+  ) }
+);
+
+export type AddReviewForLeaseMutationVariables = Exact<{
+  lease_id: Scalars['String'];
+  student_id: Scalars['String'];
+  property_review: Scalars['String'];
+  property_rating: Scalars['Float'];
+  landlord_review: Scalars['String'];
+  landlord_rating: Scalars['Float'];
+  property_images: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+
+export type AddReviewForLeaseMutation = (
+  { __typename?: 'Mutation' }
+  & { addReviewForLease: (
+    { __typename?: 'LeaseAPIResponse' }
+    & LeaseApiResponseFieldsFragment
+  ) }
+);
+
 export type ActivateLeaseMutationVariables = Exact<{
   lease_id: Scalars['String'];
   lease_document_id: Scalars['String'];
@@ -1164,7 +1723,26 @@ export type LeaseFieldsFragment = (
   )>, priority?: Maybe<(
     { __typename?: 'LeasePriority' }
     & Pick<LeasePriority, 'level' | 'start_date' | 'end_date'>
-  )> }
+  )>, lease_history: Array<(
+    { __typename?: 'LeaseHistory' }
+    & Pick<LeaseHistory, 'price' | 'student_id' | 'start_date' | 'end_date'>
+    & { review_of_property?: Maybe<(
+      { __typename?: 'ReviewAndResponse' }
+      & Pick<ReviewAndResponse, 'rating' | 'review' | 'response'>
+    )>, review_of_landlord?: Maybe<(
+      { __typename?: 'ReviewAndResponse' }
+      & Pick<ReviewAndResponse, 'rating' | 'review' | 'response'>
+    )>, property_images: Array<(
+      { __typename?: 'LeaseImageInfo' }
+      & Pick<LeaseImageInfo, 's3_key' | 'date_uploaded'>
+    )> }
+  )>, student_interests: Array<(
+    { __typename?: 'StudentInterest' }
+    & Pick<StudentInterest, 'student_id' | 'date' | 'accepted'>
+  )>, students_that_declined?: Maybe<Array<(
+    { __typename?: 'DeclineInfo' }
+    & Pick<DeclineInfo, 'date' | 'student_id'>
+  )>> }
 );
 
 export type LeaseOccupantFragment = (
@@ -1188,6 +1766,48 @@ export type LeaseOccupantFragment = (
     { __typename?: 'SearchStatus' }
     & Pick<SearchStatus, 'date_updated' | 'searching' | 'search_start' | 'search_end' | 'price_start' | 'price_end'>
   )> }
+);
+
+export type NumberApiResponseFieldsFragment = (
+  { __typename?: 'NumberAPIResponse' }
+  & Pick<NumberApiResponse, 'success' | 'error'>
+  & { data?: Maybe<(
+    { __typename?: 'NumberValue' }
+    & Pick<NumberValue, 'value'>
+  )> }
+);
+
+export type LeaseHistoryFieldsFragment = (
+  { __typename?: 'LeaseHistory' }
+  & Pick<LeaseHistory, 'price' | 'student_id' | 'start_date' | 'end_date'>
+  & { review_of_property?: Maybe<(
+    { __typename?: 'ReviewAndResponse' }
+    & Pick<ReviewAndResponse, 'rating' | 'review' | 'response'>
+  )>, review_of_landlord?: Maybe<(
+    { __typename?: 'ReviewAndResponse' }
+    & Pick<ReviewAndResponse, 'rating' | 'review' | 'response'>
+  )>, property_images: Array<(
+    { __typename?: 'LeaseImageInfo' }
+    & Pick<LeaseImageInfo, 's3_key' | 'date_uploaded'>
+  )> }
+);
+
+export type LeaseHistorySummaryFieldsFragment = (
+  { __typename?: 'LeaseHistorySummary' }
+  & Pick<LeaseHistorySummary, 'room_no' | 'lease_history_id'>
+  & { lease_history: (
+    { __typename?: 'LeaseHistory' }
+    & LeaseHistoryFieldsFragment
+  ), landlord: (
+    { __typename?: 'Landlord' }
+    & LandlordFieldsFragment
+  ), lease: (
+    { __typename?: 'Lease' }
+    & LeaseFieldsFragment
+  ), property: (
+    { __typename?: 'Property' }
+    & PropertyFieldsFragment
+  ) }
 );
 
 export type GetOwnershipsForLandlordQueryVariables = Exact<{
@@ -1444,9 +2064,82 @@ export type GetPropertyQuery = (
   ) }
 );
 
+export type GetPropertyForOwnershipQueryVariables = Exact<{
+  ownership_id: Scalars['String'];
+}>;
+
+
+export type GetPropertyForOwnershipQuery = (
+  { __typename?: 'Query' }
+  & { getPropertyForOwnership: (
+    { __typename?: 'PropertyAPIResponse' }
+    & PropertyApiResponseFieldsFragment
+  ) }
+);
+
+export type GetPropertySummaryQueryVariables = Exact<{
+  property_id: Scalars['String'];
+  student_id: Scalars['String'];
+}>;
+
+
+export type GetPropertySummaryQuery = (
+  { __typename?: 'Query' }
+  & { getPropertySummary: (
+    { __typename?: 'PropertySummaryAPIResponse' }
+    & Pick<PropertySummaryApiResponse, 'success' | 'error'>
+    & { data?: Maybe<(
+      { __typename?: 'PropertySummary' }
+      & { property: (
+        { __typename?: 'Property' }
+        & Pick<Property, '_id' | 'address_line' | 'address_line_2' | 'city' | 'state' | 'zip'>
+        & { details?: Maybe<(
+          { __typename?: 'PropertyDetails' }
+          & Pick<PropertyDetails, 'description' | 'rooms' | 'bathrooms' | 'sq_ft' | 'furnished' | 'has_washer' | 'has_heater' | 'has_ac'>
+          & { property_images: Array<(
+            { __typename?: 'PropertyImageInfo' }
+            & Pick<PropertyImageInfo, 's3_key' | 'date_uploaded'>
+          )> }
+        )> }
+      ), leases: Array<(
+        { __typename?: 'LeaseAndAvailability' }
+        & Pick<LeaseAndAvailability, 'able_to_lease'>
+        & { lease: (
+          { __typename?: 'Lease' }
+          & Pick<Lease, '_id' | 'price_per_month' | 'lease_availability_start_date' | 'lease_availability_end_date'>
+          & { lease_history: Array<(
+            { __typename?: 'LeaseHistory' }
+            & Pick<LeaseHistory, 'student_id' | 'start_date' | 'end_date'>
+            & { review_of_property?: Maybe<(
+              { __typename?: 'ReviewAndResponse' }
+              & Pick<ReviewAndResponse, 'rating' | 'review' | 'response'>
+            )>, review_of_landlord?: Maybe<(
+              { __typename?: 'ReviewAndResponse' }
+              & Pick<ReviewAndResponse, 'rating' | 'review' | 'response'>
+            )>, property_images: Array<(
+              { __typename?: 'LeaseImageInfo' }
+              & Pick<LeaseImageInfo, 's3_key' | 'date_uploaded'>
+            )> }
+          )>, student_interests: Array<(
+            { __typename?: 'StudentInterest' }
+            & Pick<StudentInterest, 'student_id' | 'date'>
+          )>, students_that_declined?: Maybe<Array<(
+            { __typename?: 'DeclineInfo' }
+            & Pick<DeclineInfo, 'date' | 'student_id'>
+          )>> }
+        ) }
+      )>, landlord: (
+        { __typename?: 'Landlord' }
+        & Pick<Landlord, '_id' | 'first_name' | 'last_name'>
+      ) }
+    )> }
+  ) }
+);
+
 export type GetPropertyOwnedByLandlordQueryVariables = Exact<{
   property_id: Scalars['String'];
   landlord_id: Scalars['String'];
+  with_leases?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -1460,6 +2153,7 @@ export type GetPropertyOwnedByLandlordQuery = (
 
 export type GetPropertiesForLandlordQueryVariables = Exact<{
   landlord_id: Scalars['String'];
+  with_leases?: Maybe<Scalars['Boolean']>;
   status?: Maybe<Scalars['String']>;
 }>;
 
@@ -1468,7 +2162,7 @@ export type GetPropertiesForLandlordQuery = (
   { __typename?: 'Query' }
   & { getPropertiesForLandlord: (
     { __typename?: 'PropertyListAPIResponse' }
-    & PropertyListApiResponseFieldsFragment
+    & PropertyListWithLeasesApiResponseFieldsFragment
   ) }
 );
 
@@ -1500,8 +2194,19 @@ export type SearchForPropertiesQueryVariables = Exact<{
 export type SearchForPropertiesQuery = (
   { __typename?: 'Query' }
   & { searchForProperties: (
-    { __typename?: 'PropertyListAPIResponse' }
-    & PropertyListWithLeaseApiResponseFragment
+    { __typename?: 'PropertySearchResultCollectionAPIResult' }
+    & Pick<PropertySearchResultCollectionApiResult, 'success' | 'error'>
+    & { data?: Maybe<(
+      { __typename?: 'PropertySearchResultCollection' }
+      & { search_results: Array<(
+        { __typename?: 'PropertySearchResult' }
+        & Pick<PropertySearchResult, 'landlord_first_name' | 'landlord_last_name' | 'price_range' | 'lease_count' | 'landlord_rating_avg' | 'property_rating_avg' | 'landlord_rating_count' | 'property_rating_count'>
+        & { property: (
+          { __typename?: 'Property' }
+          & PropertyFieldsFragment
+        ) }
+      )> }
+    )> }
   ) }
 );
 
@@ -1575,6 +2280,39 @@ export type PropertyListApiResponseFieldsFragment = (
   )> }
 );
 
+export type PropertyListWithLeasesApiResponseFieldsFragment = (
+  { __typename?: 'PropertyListAPIResponse' }
+  & Pick<PropertyListApiResponse, 'success' | 'error'>
+  & { data?: Maybe<(
+    { __typename?: 'PropertyList' }
+    & { properties: Array<(
+      { __typename?: 'Property' }
+      & { leases?: Maybe<Array<(
+        { __typename?: 'Lease' }
+        & Pick<Lease, '_id' | 'active' | 'ownership_id' | 'price_per_month' | 'occupant_id' | 'external_occupant' | 'lease_document_id' | 'lease_availability_start_date' | 'lease_availability_end_date'>
+        & { lease_history: Array<(
+          { __typename?: 'LeaseHistory' }
+          & Pick<LeaseHistory, 'price' | 'student_id' | 'start_date' | 'end_date'>
+          & { review_of_property?: Maybe<(
+            { __typename?: 'ReviewAndResponse' }
+            & Pick<ReviewAndResponse, 'rating' | 'review' | 'response'>
+          )>, review_of_landlord?: Maybe<(
+            { __typename?: 'ReviewAndResponse' }
+            & Pick<ReviewAndResponse, 'rating' | 'review' | 'response'>
+          )>, property_images: Array<(
+            { __typename?: 'LeaseImageInfo' }
+            & Pick<LeaseImageInfo, 's3_key' | 'date_uploaded'>
+          )> }
+        )>, student_interests: Array<(
+          { __typename?: 'StudentInterest' }
+          & Pick<StudentInterest, 'student_id' | 'date'>
+        )> }
+      )>> }
+      & PropertyFieldsFragment
+    )> }
+  )> }
+);
+
 export type PropertyListWithLeaseApiResponseFragment = (
   { __typename?: 'PropertyListAPIResponse' }
   & Pick<PropertyListApiResponse, 'success' | 'error'>
@@ -1627,6 +2365,17 @@ export type PropertyWithLeaseFieldsFragment = (
   & { leases?: Maybe<Array<(
     { __typename?: 'Lease' }
     & Pick<Lease, '_id' | 'active' | 'ownership_id' | 'price_per_month' | 'external_occupant' | 'lease_availability_end_date' | 'lease_availability_start_date' | 'lease_document_id'>
+    & { lease_history: Array<(
+      { __typename?: 'LeaseHistory' }
+      & Pick<LeaseHistory, 'price' | 'student_id' | 'start_date' | 'end_date'>
+      & { property_images: Array<(
+        { __typename?: 'LeaseImageInfo' }
+        & Pick<LeaseImageInfo, 's3_key' | 'date_uploaded'>
+      )> }
+    )>, student_interests: Array<(
+      { __typename?: 'StudentInterest' }
+      & Pick<StudentInterest, 'student_id' | 'date'>
+    )> }
   )>> }
   & PropertyFieldsFragment
 );
@@ -1641,6 +2390,55 @@ export type StudentQuery = (
   & { getStudent: (
     { __typename?: 'StudentAPIResponse' }
     & StudentApiResponseFieldsFragment
+  ) }
+);
+
+export type GetStudentNotificationsQueryVariables = Exact<{
+  student_id: Scalars['String'];
+}>;
+
+
+export type GetStudentNotificationsQuery = (
+  { __typename?: 'Query' }
+  & { getStudentNotifications: (
+    { __typename?: 'StudentNotificationAPIResponse' }
+    & Pick<StudentNotificationApiResponse, 'success' | 'error'>
+    & { data?: Maybe<(
+      { __typename?: 'StudentNotificationCollection' }
+      & { notifications: Array<(
+        { __typename?: 'StudentNotification' }
+        & Pick<StudentNotification, '_id' | 'date_created' | 'date_seen' | 'subject' | 'body'>
+        & { action?: Maybe<(
+          { __typename?: 'NotificationAction' }
+          & Pick<NotificationAction, 'action_text' | 'action_url'>
+        )> }
+      )> }
+    )> }
+  ) }
+);
+
+export type MarkAsSeenMutationVariables = Exact<{
+  student_id: Scalars['String'];
+  notification_id: Scalars['String'];
+}>;
+
+
+export type MarkAsSeenMutation = (
+  { __typename?: 'Mutation' }
+  & { markStudentNotificationAsSeen: (
+    { __typename?: 'StudentNotificationAPIResponse' }
+    & Pick<StudentNotificationApiResponse, 'success' | 'error'>
+    & { data?: Maybe<(
+      { __typename?: 'StudentNotificationCollection' }
+      & { notifications: Array<(
+        { __typename?: 'StudentNotification' }
+        & Pick<StudentNotification, '_id' | 'date_created' | 'date_seen' | 'subject' | 'body'>
+        & { action?: Maybe<(
+          { __typename?: 'NotificationAction' }
+          & Pick<NotificationAction, 'action_text' | 'action_url'>
+        )> }
+      )> }
+    )> }
   ) }
 );
 
@@ -1919,6 +2717,35 @@ export const LeaseFieldsFragmentDoc = gql`
   lease_document_id
   lease_availability_start_date
   lease_availability_end_date
+  lease_history {
+    price
+    student_id
+    start_date
+    end_date
+    review_of_property {
+      rating
+      review
+      response
+    }
+    review_of_landlord {
+      rating
+      review
+      response
+    }
+    property_images {
+      s3_key
+      date_uploaded
+    }
+  }
+  student_interests {
+    student_id
+    date
+    accepted
+  }
+  students_that_declined {
+    date
+    student_id
+  }
 }
     ${LeaseOccupantFragmentDoc}`;
 export const LeaseApiResponseFieldsFragmentDoc = gql`
@@ -1941,6 +2768,37 @@ export const LeaseCollectionApiResponseFieldsFragmentDoc = gql`
   }
 }
     ${LeaseFieldsFragmentDoc}`;
+export const NumberApiResponseFieldsFragmentDoc = gql`
+    fragment NumberAPIResponseFields on NumberAPIResponse {
+  success
+  error
+  data {
+    value
+  }
+}
+    `;
+export const LeaseHistoryFieldsFragmentDoc = gql`
+    fragment LeaseHistoryFields on LeaseHistory {
+  price
+  student_id
+  start_date
+  end_date
+  review_of_property {
+    rating
+    review
+    response
+  }
+  review_of_landlord {
+    rating
+    review
+    response
+  }
+  property_images {
+    s3_key
+    date_uploaded
+  }
+}
+    `;
 export const LandlordFieldsFragmentDoc = gql`
     fragment LandlordFields on Landlord {
   _id
@@ -1950,6 +2808,67 @@ export const LandlordFieldsFragmentDoc = gql`
   phone_number
 }
     `;
+export const PropertyFieldsFragmentDoc = gql`
+    fragment PropertyFields on Property {
+  _id
+  landlord
+  address_line
+  address_line_2
+  city
+  state
+  zip
+  details {
+    description
+    rooms
+    bathrooms
+    sq_ft
+    furnished
+    has_washer
+    has_heater
+    has_ac
+    property_images {
+      s3_key
+      date_uploaded
+    }
+  }
+  directions {
+    institution_id
+    foot_walking_directions {
+      distance
+      coordinates
+    }
+    driving_car_directions {
+      distance
+      coordinates
+    }
+    cycling_regular_directions {
+      distance
+      coordinates
+    }
+  }
+}
+    `;
+export const LeaseHistorySummaryFieldsFragmentDoc = gql`
+    fragment LeaseHistorySummaryFields on LeaseHistorySummary {
+  room_no
+  lease_history_id
+  lease_history {
+    ...LeaseHistoryFields
+  }
+  landlord {
+    ...LandlordFields
+  }
+  lease {
+    ...LeaseFields
+  }
+  property {
+    ...PropertyFields
+  }
+}
+    ${LeaseHistoryFieldsFragmentDoc}
+${LandlordFieldsFragmentDoc}
+${LeaseFieldsFragmentDoc}
+${PropertyFieldsFragmentDoc}`;
 export const OwnershipDocumentFieldsFragmentDoc = gql`
     fragment ownershipDocumentFields on OwnershipDocument {
   s3_doc_key
@@ -2084,46 +3003,6 @@ export const OwnershipCollectionApiResponseFieldsFragmentDoc = gql`
 ${LandlordFieldsFragmentDoc}
 ${OwnershipDocumentFieldsFragmentDoc}
 ${StatusChangeInfoFieldsFragmentDoc}`;
-export const PropertyFieldsFragmentDoc = gql`
-    fragment PropertyFields on Property {
-  _id
-  landlord
-  address_line
-  address_line_2
-  city
-  state
-  zip
-  details {
-    description
-    rooms
-    bathrooms
-    sq_ft
-    furnished
-    has_washer
-    has_heater
-    has_ac
-    property_images {
-      s3_key
-      date_uploaded
-    }
-  }
-  directions {
-    institution_id
-    foot_walking_directions {
-      distance
-      coordinates
-    }
-    driving_car_directions {
-      distance
-      coordinates
-    }
-    cycling_regular_directions {
-      distance
-      coordinates
-    }
-  }
-}
-    `;
 export const PropertyApiResponseFieldsFragmentDoc = gql`
     fragment PropertyAPIResponseFields on PropertyAPIResponse {
   success
@@ -2144,6 +3023,52 @@ export const PropertyListApiResponseFieldsFragmentDoc = gql`
   }
 }
     ${PropertyFieldsFragmentDoc}`;
+export const PropertyListWithLeasesApiResponseFieldsFragmentDoc = gql`
+    fragment PropertyListWithLeasesAPIResponseFields on PropertyListAPIResponse {
+  success
+  error
+  data {
+    properties {
+      ...PropertyFields
+      leases {
+        _id
+        active
+        ownership_id
+        price_per_month
+        occupant_id
+        external_occupant
+        lease_document_id
+        lease_availability_start_date
+        lease_availability_end_date
+        lease_history {
+          price
+          student_id
+          start_date
+          end_date
+          review_of_property {
+            rating
+            review
+            response
+          }
+          review_of_landlord {
+            rating
+            review
+            response
+          }
+          property_images {
+            s3_key
+            date_uploaded
+          }
+        }
+        student_interests {
+          student_id
+          date
+        }
+      }
+    }
+  }
+}
+    ${PropertyFieldsFragmentDoc}`;
 export const PropertyWithLeaseFieldsFragmentDoc = gql`
     fragment PropertyWithLeaseFields on Property {
   ...PropertyFields
@@ -2156,6 +3081,20 @@ export const PropertyWithLeaseFieldsFragmentDoc = gql`
     lease_availability_end_date
     lease_availability_start_date
     lease_document_id
+    lease_history {
+      price
+      student_id
+      start_date
+      end_date
+      property_images {
+        s3_key
+        date_uploaded
+      }
+    }
+    student_interests {
+      student_id
+      date
+    }
   }
 }
     ${PropertyFieldsFragmentDoc}`;
@@ -2434,6 +3373,39 @@ export function useGetInstitutionLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type GetInstitutionQueryHookResult = ReturnType<typeof useGetInstitutionQuery>;
 export type GetInstitutionLazyQueryHookResult = ReturnType<typeof useGetInstitutionLazyQuery>;
 export type GetInstitutionQueryResult = Apollo.QueryResult<GetInstitutionQuery, GetInstitutionQueryVariables>;
+export const GetLandlordDocument = gql`
+    query GetLandlord($landlord_id: String!) {
+  getLandlord(_id: $landlord_id) {
+    ...LandlordAPIResponseFields
+  }
+}
+    ${LandlordApiResponseFieldsFragmentDoc}`;
+
+/**
+ * __useGetLandlordQuery__
+ *
+ * To run a query within a React component, call `useGetLandlordQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetLandlordQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetLandlordQuery({
+ *   variables: {
+ *      landlord_id: // value for 'landlord_id'
+ *   },
+ * });
+ */
+export function useGetLandlordQuery(baseOptions: Apollo.QueryHookOptions<GetLandlordQuery, GetLandlordQueryVariables>) {
+        return Apollo.useQuery<GetLandlordQuery, GetLandlordQueryVariables>(GetLandlordDocument, baseOptions);
+      }
+export function useGetLandlordLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetLandlordQuery, GetLandlordQueryVariables>) {
+          return Apollo.useLazyQuery<GetLandlordQuery, GetLandlordQueryVariables>(GetLandlordDocument, baseOptions);
+        }
+export type GetLandlordQueryHookResult = ReturnType<typeof useGetLandlordQuery>;
+export type GetLandlordLazyQueryHookResult = ReturnType<typeof useGetLandlordLazyQuery>;
+export type GetLandlordQueryResult = Apollo.QueryResult<GetLandlordQuery, GetLandlordQueryVariables>;
 export const CreateLandlordDocument = gql`
     mutation CreateLandlord($first_name: String!, $last_name: String!, $email: String!, $password: String!) {
   createLandlord(
@@ -2709,6 +3681,500 @@ export function useGetLeasesAndOccupantsLazyQuery(baseOptions?: Apollo.LazyQuery
 export type GetLeasesAndOccupantsQueryHookResult = ReturnType<typeof useGetLeasesAndOccupantsQuery>;
 export type GetLeasesAndOccupantsLazyQueryHookResult = ReturnType<typeof useGetLeasesAndOccupantsLazyQuery>;
 export type GetLeasesAndOccupantsQueryResult = Apollo.QueryResult<GetLeasesAndOccupantsQuery, GetLeasesAndOccupantsQueryVariables>;
+export const GetRoomNoDocument = gql`
+    query GetRoomNo($lease_id: String!, $ownership_id: String!) {
+  getRoomNo(lease_id: $lease_id, ownership_id: $ownership_id) {
+    ...NumberAPIResponseFields
+  }
+}
+    ${NumberApiResponseFieldsFragmentDoc}`;
+
+/**
+ * __useGetRoomNoQuery__
+ *
+ * To run a query within a React component, call `useGetRoomNoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetRoomNoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetRoomNoQuery({
+ *   variables: {
+ *      lease_id: // value for 'lease_id'
+ *      ownership_id: // value for 'ownership_id'
+ *   },
+ * });
+ */
+export function useGetRoomNoQuery(baseOptions: Apollo.QueryHookOptions<GetRoomNoQuery, GetRoomNoQueryVariables>) {
+        return Apollo.useQuery<GetRoomNoQuery, GetRoomNoQueryVariables>(GetRoomNoDocument, baseOptions);
+      }
+export function useGetRoomNoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetRoomNoQuery, GetRoomNoQueryVariables>) {
+          return Apollo.useLazyQuery<GetRoomNoQuery, GetRoomNoQueryVariables>(GetRoomNoDocument, baseOptions);
+        }
+export type GetRoomNoQueryHookResult = ReturnType<typeof useGetRoomNoQuery>;
+export type GetRoomNoLazyQueryHookResult = ReturnType<typeof useGetRoomNoLazyQuery>;
+export type GetRoomNoQueryResult = Apollo.QueryResult<GetRoomNoQuery, GetRoomNoQueryVariables>;
+export const CheckEligibleForLeaseAgreementDocument = gql`
+    query CheckEligibleForLeaseAgreement($lease_id: String!, $student_id: String!) {
+  checkEligibleForLeaseAgreement(lease_id: $lease_id, student_id: $student_id) {
+    ...LeaseAPIResponseFields
+  }
+}
+    ${LeaseApiResponseFieldsFragmentDoc}`;
+
+/**
+ * __useCheckEligibleForLeaseAgreementQuery__
+ *
+ * To run a query within a React component, call `useCheckEligibleForLeaseAgreementQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCheckEligibleForLeaseAgreementQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCheckEligibleForLeaseAgreementQuery({
+ *   variables: {
+ *      lease_id: // value for 'lease_id'
+ *      student_id: // value for 'student_id'
+ *   },
+ * });
+ */
+export function useCheckEligibleForLeaseAgreementQuery(baseOptions: Apollo.QueryHookOptions<CheckEligibleForLeaseAgreementQuery, CheckEligibleForLeaseAgreementQueryVariables>) {
+        return Apollo.useQuery<CheckEligibleForLeaseAgreementQuery, CheckEligibleForLeaseAgreementQueryVariables>(CheckEligibleForLeaseAgreementDocument, baseOptions);
+      }
+export function useCheckEligibleForLeaseAgreementLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CheckEligibleForLeaseAgreementQuery, CheckEligibleForLeaseAgreementQueryVariables>) {
+          return Apollo.useLazyQuery<CheckEligibleForLeaseAgreementQuery, CheckEligibleForLeaseAgreementQueryVariables>(CheckEligibleForLeaseAgreementDocument, baseOptions);
+        }
+export type CheckEligibleForLeaseAgreementQueryHookResult = ReturnType<typeof useCheckEligibleForLeaseAgreementQuery>;
+export type CheckEligibleForLeaseAgreementLazyQueryHookResult = ReturnType<typeof useCheckEligibleForLeaseAgreementLazyQuery>;
+export type CheckEligibleForLeaseAgreementQueryResult = Apollo.QueryResult<CheckEligibleForLeaseAgreementQuery, CheckEligibleForLeaseAgreementQueryVariables>;
+export const CanAddReviewDocument = gql`
+    query CanAddReview($student_id: String!, $property_id: String!) {
+  canAddReview(student_id: $student_id, property_id: $property_id) {
+    success
+    error
+    data {
+      value
+    }
+  }
+}
+    `;
+
+/**
+ * __useCanAddReviewQuery__
+ *
+ * To run a query within a React component, call `useCanAddReviewQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCanAddReviewQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCanAddReviewQuery({
+ *   variables: {
+ *      student_id: // value for 'student_id'
+ *      property_id: // value for 'property_id'
+ *   },
+ * });
+ */
+export function useCanAddReviewQuery(baseOptions: Apollo.QueryHookOptions<CanAddReviewQuery, CanAddReviewQueryVariables>) {
+        return Apollo.useQuery<CanAddReviewQuery, CanAddReviewQueryVariables>(CanAddReviewDocument, baseOptions);
+      }
+export function useCanAddReviewLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CanAddReviewQuery, CanAddReviewQueryVariables>) {
+          return Apollo.useLazyQuery<CanAddReviewQuery, CanAddReviewQueryVariables>(CanAddReviewDocument, baseOptions);
+        }
+export type CanAddReviewQueryHookResult = ReturnType<typeof useCanAddReviewQuery>;
+export type CanAddReviewLazyQueryHookResult = ReturnType<typeof useCanAddReviewLazyQuery>;
+export type CanAddReviewQueryResult = Apollo.QueryResult<CanAddReviewQuery, CanAddReviewQueryVariables>;
+export const GetAcceptedLeaseInfoDocument = gql`
+    query GetAcceptedLeaseInfo($student_id: String!, $lease_id: String!, $history_id: String!) {
+  getAcceptedLeaseInfo(
+    student_id: $student_id
+    lease_id: $lease_id
+    history_id: $history_id
+  ) {
+    success
+    error
+    data {
+      ...LeaseHistorySummaryFields
+    }
+  }
+}
+    ${LeaseHistorySummaryFieldsFragmentDoc}`;
+
+/**
+ * __useGetAcceptedLeaseInfoQuery__
+ *
+ * To run a query within a React component, call `useGetAcceptedLeaseInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAcceptedLeaseInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAcceptedLeaseInfoQuery({
+ *   variables: {
+ *      student_id: // value for 'student_id'
+ *      lease_id: // value for 'lease_id'
+ *      history_id: // value for 'history_id'
+ *   },
+ * });
+ */
+export function useGetAcceptedLeaseInfoQuery(baseOptions: Apollo.QueryHookOptions<GetAcceptedLeaseInfoQuery, GetAcceptedLeaseInfoQueryVariables>) {
+        return Apollo.useQuery<GetAcceptedLeaseInfoQuery, GetAcceptedLeaseInfoQueryVariables>(GetAcceptedLeaseInfoDocument, baseOptions);
+      }
+export function useGetAcceptedLeaseInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAcceptedLeaseInfoQuery, GetAcceptedLeaseInfoQueryVariables>) {
+          return Apollo.useLazyQuery<GetAcceptedLeaseInfoQuery, GetAcceptedLeaseInfoQueryVariables>(GetAcceptedLeaseInfoDocument, baseOptions);
+        }
+export type GetAcceptedLeaseInfoQueryHookResult = ReturnType<typeof useGetAcceptedLeaseInfoQuery>;
+export type GetAcceptedLeaseInfoLazyQueryHookResult = ReturnType<typeof useGetAcceptedLeaseInfoLazyQuery>;
+export type GetAcceptedLeaseInfoQueryResult = Apollo.QueryResult<GetAcceptedLeaseInfoQuery, GetAcceptedLeaseInfoQueryVariables>;
+export const GetAcceptedLeasesDocument = gql`
+    query GetAcceptedLeases($student_id: String!) {
+  getAcceptedLeases(student_id: $student_id) {
+    success
+    error
+    data {
+      histories {
+        ...LeaseHistorySummaryFields
+      }
+    }
+  }
+}
+    ${LeaseHistorySummaryFieldsFragmentDoc}`;
+
+/**
+ * __useGetAcceptedLeasesQuery__
+ *
+ * To run a query within a React component, call `useGetAcceptedLeasesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAcceptedLeasesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAcceptedLeasesQuery({
+ *   variables: {
+ *      student_id: // value for 'student_id'
+ *   },
+ * });
+ */
+export function useGetAcceptedLeasesQuery(baseOptions: Apollo.QueryHookOptions<GetAcceptedLeasesQuery, GetAcceptedLeasesQueryVariables>) {
+        return Apollo.useQuery<GetAcceptedLeasesQuery, GetAcceptedLeasesQueryVariables>(GetAcceptedLeasesDocument, baseOptions);
+      }
+export function useGetAcceptedLeasesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAcceptedLeasesQuery, GetAcceptedLeasesQueryVariables>) {
+          return Apollo.useLazyQuery<GetAcceptedLeasesQuery, GetAcceptedLeasesQueryVariables>(GetAcceptedLeasesDocument, baseOptions);
+        }
+export type GetAcceptedLeasesQueryHookResult = ReturnType<typeof useGetAcceptedLeasesQuery>;
+export type GetAcceptedLeasesLazyQueryHookResult = ReturnType<typeof useGetAcceptedLeasesLazyQuery>;
+export type GetAcceptedLeasesQueryResult = Apollo.QueryResult<GetAcceptedLeasesQuery, GetAcceptedLeasesQueryVariables>;
+export const GetLeaseSummaryDocument = gql`
+    query GetLeaseSummary($lease_id: String!) {
+  getLeaseSummary(lease_id: $lease_id) {
+    success
+    error
+    data {
+      room_no
+      property {
+        _id
+        landlord
+        address_line
+        address_line_2
+        city
+        state
+        zip
+      }
+      lease {
+        _id
+        active
+        ownership_id
+        price_per_month
+        occupant_id
+        external_occupant
+        priority {
+          level
+          start_date
+          end_date
+        }
+        lease_document_id
+        lease_availability_start_date
+        lease_availability_end_date
+        lease_history {
+          price
+          student_id
+          start_date
+          end_date
+          review_of_property {
+            rating
+            review
+            response
+          }
+          review_of_landlord {
+            rating
+            review
+            response
+          }
+          property_images {
+            s3_key
+            date_uploaded
+          }
+        }
+        student_interests {
+          student_id
+          date
+          accepted
+        }
+        students_that_declined {
+          date
+          student_id
+        }
+      }
+      institutions {
+        _id
+        name
+        s3_thumb_key
+        location {
+          address
+          city
+          state
+          zip
+          longitude
+          latitude
+        }
+      }
+      students {
+        _id
+        first_name
+        last_name
+        email
+        phone_number
+        auth_info {
+          institution_id
+        }
+      }
+      lease_doc {
+        _id
+        lease_name
+        documents {
+          mime_type
+          s3_key
+        }
+        landlord_id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetLeaseSummaryQuery__
+ *
+ * To run a query within a React component, call `useGetLeaseSummaryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetLeaseSummaryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetLeaseSummaryQuery({
+ *   variables: {
+ *      lease_id: // value for 'lease_id'
+ *   },
+ * });
+ */
+export function useGetLeaseSummaryQuery(baseOptions: Apollo.QueryHookOptions<GetLeaseSummaryQuery, GetLeaseSummaryQueryVariables>) {
+        return Apollo.useQuery<GetLeaseSummaryQuery, GetLeaseSummaryQueryVariables>(GetLeaseSummaryDocument, baseOptions);
+      }
+export function useGetLeaseSummaryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetLeaseSummaryQuery, GetLeaseSummaryQueryVariables>) {
+          return Apollo.useLazyQuery<GetLeaseSummaryQuery, GetLeaseSummaryQueryVariables>(GetLeaseSummaryDocument, baseOptions);
+        }
+export type GetLeaseSummaryQueryHookResult = ReturnType<typeof useGetLeaseSummaryQuery>;
+export type GetLeaseSummaryLazyQueryHookResult = ReturnType<typeof useGetLeaseSummaryLazyQuery>;
+export type GetLeaseSummaryQueryResult = Apollo.QueryResult<GetLeaseSummaryQuery, GetLeaseSummaryQueryVariables>;
+export const DeclineLeaseAgreementDocument = gql`
+    mutation DeclineLeaseAgreement($student_id: String!, $lease_id: String!) {
+  declineLeaseAgreement(student_id: $student_id, lease_id: $lease_id) {
+    ...LeaseAPIResponseFields
+  }
+}
+    ${LeaseApiResponseFieldsFragmentDoc}`;
+export type DeclineLeaseAgreementMutationFn = Apollo.MutationFunction<DeclineLeaseAgreementMutation, DeclineLeaseAgreementMutationVariables>;
+
+/**
+ * __useDeclineLeaseAgreementMutation__
+ *
+ * To run a mutation, you first call `useDeclineLeaseAgreementMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeclineLeaseAgreementMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [declineLeaseAgreementMutation, { data, loading, error }] = useDeclineLeaseAgreementMutation({
+ *   variables: {
+ *      student_id: // value for 'student_id'
+ *      lease_id: // value for 'lease_id'
+ *   },
+ * });
+ */
+export function useDeclineLeaseAgreementMutation(baseOptions?: Apollo.MutationHookOptions<DeclineLeaseAgreementMutation, DeclineLeaseAgreementMutationVariables>) {
+        return Apollo.useMutation<DeclineLeaseAgreementMutation, DeclineLeaseAgreementMutationVariables>(DeclineLeaseAgreementDocument, baseOptions);
+      }
+export type DeclineLeaseAgreementMutationHookResult = ReturnType<typeof useDeclineLeaseAgreementMutation>;
+export type DeclineLeaseAgreementMutationResult = Apollo.MutationResult<DeclineLeaseAgreementMutation>;
+export type DeclineLeaseAgreementMutationOptions = Apollo.BaseMutationOptions<DeclineLeaseAgreementMutation, DeclineLeaseAgreementMutationVariables>;
+export const AcceptLeaseAgreementDocument = gql`
+    mutation AcceptLeaseAgreement($student_id: String!, $lease_id: String!) {
+  acceptLeaseAgreement(student_id: $student_id, lease_id: $lease_id) {
+    ...LeaseAPIResponseFields
+  }
+}
+    ${LeaseApiResponseFieldsFragmentDoc}`;
+export type AcceptLeaseAgreementMutationFn = Apollo.MutationFunction<AcceptLeaseAgreementMutation, AcceptLeaseAgreementMutationVariables>;
+
+/**
+ * __useAcceptLeaseAgreementMutation__
+ *
+ * To run a mutation, you first call `useAcceptLeaseAgreementMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAcceptLeaseAgreementMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [acceptLeaseAgreementMutation, { data, loading, error }] = useAcceptLeaseAgreementMutation({
+ *   variables: {
+ *      student_id: // value for 'student_id'
+ *      lease_id: // value for 'lease_id'
+ *   },
+ * });
+ */
+export function useAcceptLeaseAgreementMutation(baseOptions?: Apollo.MutationHookOptions<AcceptLeaseAgreementMutation, AcceptLeaseAgreementMutationVariables>) {
+        return Apollo.useMutation<AcceptLeaseAgreementMutation, AcceptLeaseAgreementMutationVariables>(AcceptLeaseAgreementDocument, baseOptions);
+      }
+export type AcceptLeaseAgreementMutationHookResult = ReturnType<typeof useAcceptLeaseAgreementMutation>;
+export type AcceptLeaseAgreementMutationResult = Apollo.MutationResult<AcceptLeaseAgreementMutation>;
+export type AcceptLeaseAgreementMutationOptions = Apollo.BaseMutationOptions<AcceptLeaseAgreementMutation, AcceptLeaseAgreementMutationVariables>;
+export const AcceptOrDeclineStudentInterestDocument = gql`
+    mutation AcceptOrDeclineStudentInterest($action: String!, $student_id: String!, $lease_id: String!) {
+  acceptOrDeclineStudentInterest(
+    action: $action
+    student_id: $student_id
+    lease_id: $lease_id
+  ) {
+    ...LeaseAPIResponseFields
+  }
+}
+    ${LeaseApiResponseFieldsFragmentDoc}`;
+export type AcceptOrDeclineStudentInterestMutationFn = Apollo.MutationFunction<AcceptOrDeclineStudentInterestMutation, AcceptOrDeclineStudentInterestMutationVariables>;
+
+/**
+ * __useAcceptOrDeclineStudentInterestMutation__
+ *
+ * To run a mutation, you first call `useAcceptOrDeclineStudentInterestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAcceptOrDeclineStudentInterestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [acceptOrDeclineStudentInterestMutation, { data, loading, error }] = useAcceptOrDeclineStudentInterestMutation({
+ *   variables: {
+ *      action: // value for 'action'
+ *      student_id: // value for 'student_id'
+ *      lease_id: // value for 'lease_id'
+ *   },
+ * });
+ */
+export function useAcceptOrDeclineStudentInterestMutation(baseOptions?: Apollo.MutationHookOptions<AcceptOrDeclineStudentInterestMutation, AcceptOrDeclineStudentInterestMutationVariables>) {
+        return Apollo.useMutation<AcceptOrDeclineStudentInterestMutation, AcceptOrDeclineStudentInterestMutationVariables>(AcceptOrDeclineStudentInterestDocument, baseOptions);
+      }
+export type AcceptOrDeclineStudentInterestMutationHookResult = ReturnType<typeof useAcceptOrDeclineStudentInterestMutation>;
+export type AcceptOrDeclineStudentInterestMutationResult = Apollo.MutationResult<AcceptOrDeclineStudentInterestMutation>;
+export type AcceptOrDeclineStudentInterestMutationOptions = Apollo.BaseMutationOptions<AcceptOrDeclineStudentInterestMutation, AcceptOrDeclineStudentInterestMutationVariables>;
+export const ExpressInterestDocument = gql`
+    mutation expressInterest($student_id: String!, $lease_id: String!) {
+  expressInterest(student_id: $student_id, lease_id: $lease_id) {
+    ...LeaseAPIResponseFields
+  }
+}
+    ${LeaseApiResponseFieldsFragmentDoc}`;
+export type ExpressInterestMutationFn = Apollo.MutationFunction<ExpressInterestMutation, ExpressInterestMutationVariables>;
+
+/**
+ * __useExpressInterestMutation__
+ *
+ * To run a mutation, you first call `useExpressInterestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useExpressInterestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [expressInterestMutation, { data, loading, error }] = useExpressInterestMutation({
+ *   variables: {
+ *      student_id: // value for 'student_id'
+ *      lease_id: // value for 'lease_id'
+ *   },
+ * });
+ */
+export function useExpressInterestMutation(baseOptions?: Apollo.MutationHookOptions<ExpressInterestMutation, ExpressInterestMutationVariables>) {
+        return Apollo.useMutation<ExpressInterestMutation, ExpressInterestMutationVariables>(ExpressInterestDocument, baseOptions);
+      }
+export type ExpressInterestMutationHookResult = ReturnType<typeof useExpressInterestMutation>;
+export type ExpressInterestMutationResult = Apollo.MutationResult<ExpressInterestMutation>;
+export type ExpressInterestMutationOptions = Apollo.BaseMutationOptions<ExpressInterestMutation, ExpressInterestMutationVariables>;
+export const AddReviewForLeaseDocument = gql`
+    mutation AddReviewForLease($lease_id: String!, $student_id: String!, $property_review: String!, $property_rating: Float!, $landlord_review: String!, $landlord_rating: Float!, $property_images: [String!]!) {
+  addReviewForLease(
+    lease_id: $lease_id
+    student_id: $student_id
+    property_review: $property_review
+    property_rating: $property_rating
+    landlord_review: $landlord_review
+    landlord_rating: $landlord_rating
+    property_images: $property_images
+  ) {
+    ...LeaseAPIResponseFields
+  }
+}
+    ${LeaseApiResponseFieldsFragmentDoc}`;
+export type AddReviewForLeaseMutationFn = Apollo.MutationFunction<AddReviewForLeaseMutation, AddReviewForLeaseMutationVariables>;
+
+/**
+ * __useAddReviewForLeaseMutation__
+ *
+ * To run a mutation, you first call `useAddReviewForLeaseMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddReviewForLeaseMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addReviewForLeaseMutation, { data, loading, error }] = useAddReviewForLeaseMutation({
+ *   variables: {
+ *      lease_id: // value for 'lease_id'
+ *      student_id: // value for 'student_id'
+ *      property_review: // value for 'property_review'
+ *      property_rating: // value for 'property_rating'
+ *      landlord_review: // value for 'landlord_review'
+ *      landlord_rating: // value for 'landlord_rating'
+ *      property_images: // value for 'property_images'
+ *   },
+ * });
+ */
+export function useAddReviewForLeaseMutation(baseOptions?: Apollo.MutationHookOptions<AddReviewForLeaseMutation, AddReviewForLeaseMutationVariables>) {
+        return Apollo.useMutation<AddReviewForLeaseMutation, AddReviewForLeaseMutationVariables>(AddReviewForLeaseDocument, baseOptions);
+      }
+export type AddReviewForLeaseMutationHookResult = ReturnType<typeof useAddReviewForLeaseMutation>;
+export type AddReviewForLeaseMutationResult = Apollo.MutationResult<AddReviewForLeaseMutation>;
+export type AddReviewForLeaseMutationOptions = Apollo.BaseMutationOptions<AddReviewForLeaseMutation, AddReviewForLeaseMutationVariables>;
 export const ActivateLeaseDocument = gql`
     mutation ActivateLease($lease_id: String!, $lease_document_id: String!, $price_per_month: Float!, $lease_start_date: String!, $lease_end_date: String!) {
   activateLease(
@@ -3196,9 +4662,146 @@ export function useGetPropertyLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type GetPropertyQueryHookResult = ReturnType<typeof useGetPropertyQuery>;
 export type GetPropertyLazyQueryHookResult = ReturnType<typeof useGetPropertyLazyQuery>;
 export type GetPropertyQueryResult = Apollo.QueryResult<GetPropertyQuery, GetPropertyQueryVariables>;
+export const GetPropertyForOwnershipDocument = gql`
+    query getPropertyForOwnership($ownership_id: String!) {
+  getPropertyForOwnership(ownership_id: $ownership_id) {
+    ...PropertyAPIResponseFields
+  }
+}
+    ${PropertyApiResponseFieldsFragmentDoc}`;
+
+/**
+ * __useGetPropertyForOwnershipQuery__
+ *
+ * To run a query within a React component, call `useGetPropertyForOwnershipQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPropertyForOwnershipQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPropertyForOwnershipQuery({
+ *   variables: {
+ *      ownership_id: // value for 'ownership_id'
+ *   },
+ * });
+ */
+export function useGetPropertyForOwnershipQuery(baseOptions: Apollo.QueryHookOptions<GetPropertyForOwnershipQuery, GetPropertyForOwnershipQueryVariables>) {
+        return Apollo.useQuery<GetPropertyForOwnershipQuery, GetPropertyForOwnershipQueryVariables>(GetPropertyForOwnershipDocument, baseOptions);
+      }
+export function useGetPropertyForOwnershipLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPropertyForOwnershipQuery, GetPropertyForOwnershipQueryVariables>) {
+          return Apollo.useLazyQuery<GetPropertyForOwnershipQuery, GetPropertyForOwnershipQueryVariables>(GetPropertyForOwnershipDocument, baseOptions);
+        }
+export type GetPropertyForOwnershipQueryHookResult = ReturnType<typeof useGetPropertyForOwnershipQuery>;
+export type GetPropertyForOwnershipLazyQueryHookResult = ReturnType<typeof useGetPropertyForOwnershipLazyQuery>;
+export type GetPropertyForOwnershipQueryResult = Apollo.QueryResult<GetPropertyForOwnershipQuery, GetPropertyForOwnershipQueryVariables>;
+export const GetPropertySummaryDocument = gql`
+    query GetPropertySummary($property_id: String!, $student_id: String!) {
+  getPropertySummary(property_id: $property_id, student_id: $student_id) {
+    success
+    error
+    data {
+      property {
+        _id
+        address_line
+        address_line_2
+        city
+        state
+        zip
+        details {
+          description
+          rooms
+          bathrooms
+          sq_ft
+          furnished
+          has_washer
+          has_heater
+          has_ac
+          property_images {
+            s3_key
+            date_uploaded
+          }
+        }
+      }
+      leases {
+        able_to_lease
+        lease {
+          _id
+          price_per_month
+          lease_availability_start_date
+          lease_availability_end_date
+          lease_history {
+            student_id
+            start_date
+            end_date
+            review_of_property {
+              rating
+              review
+              response
+            }
+            review_of_landlord {
+              rating
+              review
+              response
+            }
+            property_images {
+              s3_key
+              date_uploaded
+            }
+          }
+          student_interests {
+            student_id
+            date
+          }
+          students_that_declined {
+            date
+            student_id
+          }
+        }
+      }
+      landlord {
+        _id
+        first_name
+        last_name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetPropertySummaryQuery__
+ *
+ * To run a query within a React component, call `useGetPropertySummaryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPropertySummaryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPropertySummaryQuery({
+ *   variables: {
+ *      property_id: // value for 'property_id'
+ *      student_id: // value for 'student_id'
+ *   },
+ * });
+ */
+export function useGetPropertySummaryQuery(baseOptions: Apollo.QueryHookOptions<GetPropertySummaryQuery, GetPropertySummaryQueryVariables>) {
+        return Apollo.useQuery<GetPropertySummaryQuery, GetPropertySummaryQueryVariables>(GetPropertySummaryDocument, baseOptions);
+      }
+export function useGetPropertySummaryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPropertySummaryQuery, GetPropertySummaryQueryVariables>) {
+          return Apollo.useLazyQuery<GetPropertySummaryQuery, GetPropertySummaryQueryVariables>(GetPropertySummaryDocument, baseOptions);
+        }
+export type GetPropertySummaryQueryHookResult = ReturnType<typeof useGetPropertySummaryQuery>;
+export type GetPropertySummaryLazyQueryHookResult = ReturnType<typeof useGetPropertySummaryLazyQuery>;
+export type GetPropertySummaryQueryResult = Apollo.QueryResult<GetPropertySummaryQuery, GetPropertySummaryQueryVariables>;
 export const GetPropertyOwnedByLandlordDocument = gql`
-    query GetPropertyOwnedByLandlord($property_id: String!, $landlord_id: String!) {
-  getPropertyOwnedByLandlord(property_id: $property_id, landlord_id: $landlord_id) {
+    query GetPropertyOwnedByLandlord($property_id: String!, $landlord_id: String!, $with_leases: Boolean) {
+  getPropertyOwnedByLandlord(
+    property_id: $property_id
+    landlord_id: $landlord_id
+    with_leases: $with_leases
+  ) {
     ...PropertyAPIResponseFields
   }
 }
@@ -3218,6 +4821,7 @@ export const GetPropertyOwnedByLandlordDocument = gql`
  *   variables: {
  *      property_id: // value for 'property_id'
  *      landlord_id: // value for 'landlord_id'
+ *      with_leases: // value for 'with_leases'
  *   },
  * });
  */
@@ -3231,12 +4835,16 @@ export type GetPropertyOwnedByLandlordQueryHookResult = ReturnType<typeof useGet
 export type GetPropertyOwnedByLandlordLazyQueryHookResult = ReturnType<typeof useGetPropertyOwnedByLandlordLazyQuery>;
 export type GetPropertyOwnedByLandlordQueryResult = Apollo.QueryResult<GetPropertyOwnedByLandlordQuery, GetPropertyOwnedByLandlordQueryVariables>;
 export const GetPropertiesForLandlordDocument = gql`
-    query GetPropertiesForLandlord($landlord_id: String!, $status: String) {
-  getPropertiesForLandlord(landlord_id: $landlord_id, status: $status) {
-    ...PropertyListAPIResponseFields
+    query GetPropertiesForLandlord($landlord_id: String!, $with_leases: Boolean, $status: String) {
+  getPropertiesForLandlord(
+    landlord_id: $landlord_id
+    with_leases: $with_leases
+    status: $status
+  ) {
+    ...PropertyListWithLeasesAPIResponseFields
   }
 }
-    ${PropertyListApiResponseFieldsFragmentDoc}`;
+    ${PropertyListWithLeasesApiResponseFieldsFragmentDoc}`;
 
 /**
  * __useGetPropertiesForLandlordQuery__
@@ -3251,6 +4859,7 @@ export const GetPropertiesForLandlordDocument = gql`
  * const { data, loading, error } = useGetPropertiesForLandlordQuery({
  *   variables: {
  *      landlord_id: // value for 'landlord_id'
+ *      with_leases: // value for 'with_leases'
  *      status: // value for 'status'
  *   },
  * });
@@ -3315,10 +4924,26 @@ export const SearchForPropertiesDocument = gql`
     rooms: $rooms
     distance: $distance
   ) {
-    ...PropertyListWithLeaseAPIResponse
+    success
+    error
+    data {
+      search_results {
+        property {
+          ...PropertyFields
+        }
+        landlord_first_name
+        landlord_last_name
+        price_range
+        lease_count
+        landlord_rating_avg
+        property_rating_avg
+        landlord_rating_count
+        property_rating_count
+      }
+    }
   }
 }
-    ${PropertyListWithLeaseApiResponseFragmentDoc}`;
+    ${PropertyFieldsFragmentDoc}`;
 
 /**
  * __useSearchForPropertiesQuery__
@@ -3497,6 +5122,103 @@ export function useStudentLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<St
 export type StudentQueryHookResult = ReturnType<typeof useStudentQuery>;
 export type StudentLazyQueryHookResult = ReturnType<typeof useStudentLazyQuery>;
 export type StudentQueryResult = Apollo.QueryResult<StudentQuery, StudentQueryVariables>;
+export const GetStudentNotificationsDocument = gql`
+    query GetStudentNotifications($student_id: String!) {
+  getStudentNotifications(student_id: $student_id) {
+    success
+    error
+    data {
+      notifications {
+        _id
+        date_created
+        date_seen
+        subject
+        body
+        action {
+          action_text
+          action_url
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetStudentNotificationsQuery__
+ *
+ * To run a query within a React component, call `useGetStudentNotificationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStudentNotificationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStudentNotificationsQuery({
+ *   variables: {
+ *      student_id: // value for 'student_id'
+ *   },
+ * });
+ */
+export function useGetStudentNotificationsQuery(baseOptions: Apollo.QueryHookOptions<GetStudentNotificationsQuery, GetStudentNotificationsQueryVariables>) {
+        return Apollo.useQuery<GetStudentNotificationsQuery, GetStudentNotificationsQueryVariables>(GetStudentNotificationsDocument, baseOptions);
+      }
+export function useGetStudentNotificationsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetStudentNotificationsQuery, GetStudentNotificationsQueryVariables>) {
+          return Apollo.useLazyQuery<GetStudentNotificationsQuery, GetStudentNotificationsQueryVariables>(GetStudentNotificationsDocument, baseOptions);
+        }
+export type GetStudentNotificationsQueryHookResult = ReturnType<typeof useGetStudentNotificationsQuery>;
+export type GetStudentNotificationsLazyQueryHookResult = ReturnType<typeof useGetStudentNotificationsLazyQuery>;
+export type GetStudentNotificationsQueryResult = Apollo.QueryResult<GetStudentNotificationsQuery, GetStudentNotificationsQueryVariables>;
+export const MarkAsSeenDocument = gql`
+    mutation MarkAsSeen($student_id: String!, $notification_id: String!) {
+  markStudentNotificationAsSeen(
+    student_id: $student_id
+    notification_id: $notification_id
+  ) {
+    success
+    error
+    data {
+      notifications {
+        _id
+        date_created
+        date_seen
+        subject
+        body
+        action {
+          action_text
+          action_url
+        }
+      }
+    }
+  }
+}
+    `;
+export type MarkAsSeenMutationFn = Apollo.MutationFunction<MarkAsSeenMutation, MarkAsSeenMutationVariables>;
+
+/**
+ * __useMarkAsSeenMutation__
+ *
+ * To run a mutation, you first call `useMarkAsSeenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkAsSeenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markAsSeenMutation, { data, loading, error }] = useMarkAsSeenMutation({
+ *   variables: {
+ *      student_id: // value for 'student_id'
+ *      notification_id: // value for 'notification_id'
+ *   },
+ * });
+ */
+export function useMarkAsSeenMutation(baseOptions?: Apollo.MutationHookOptions<MarkAsSeenMutation, MarkAsSeenMutationVariables>) {
+        return Apollo.useMutation<MarkAsSeenMutation, MarkAsSeenMutationVariables>(MarkAsSeenDocument, baseOptions);
+      }
+export type MarkAsSeenMutationHookResult = ReturnType<typeof useMarkAsSeenMutation>;
+export type MarkAsSeenMutationResult = Apollo.MutationResult<MarkAsSeenMutation>;
+export type MarkAsSeenMutationOptions = Apollo.BaseMutationOptions<MarkAsSeenMutation, MarkAsSeenMutationVariables>;
 export const UpdateStudentDocument = gql`
     mutation UpdateStudent($id: String!, $first_name: String!, $last_name: String!, $email: String!) {
   updateStudent(
