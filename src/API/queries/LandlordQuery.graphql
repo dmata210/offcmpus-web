@@ -4,6 +4,21 @@ query GetLandlord($landlord_id: String!) {
   }
 }
 
+mutation LandlordResetPassword(
+  $email: String!,
+  $reset_key: String!,
+  $new_password: String!
+) {
+  resetPassword (
+    email: $email,
+    reset_key: $reset_key,
+    new_password: $new_password
+  ) {
+    success
+    error
+  }
+}
+
 mutation CreateLandlord(
   $first_name: String!,
   $last_name: String!,
@@ -16,6 +31,14 @@ mutation CreateLandlord(
   }
 }
 
+query CheckPasswordResetKey(
+  $reset_key: String!, $email: String!
+) {
+  checkPasswordResetKey(reset_key: $reset_key, email: $email) {
+    success
+  }
+}
+
 query ResendEmailConfirmation (
   $landlord_id: String!
 ) {
@@ -23,6 +46,14 @@ query ResendEmailConfirmation (
     landlord_id:$landlord_id
   ) {
     success, error
+  }
+}
+
+mutation SendPasswordReset(
+  $email: String!
+) {
+  sendPasswordReset(email: $email) {
+    success
   }
 }
 

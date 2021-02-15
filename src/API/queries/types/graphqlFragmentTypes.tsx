@@ -17,6 +17,7 @@ export type Query = {
   __typename?: 'Query';
   getLandlord: LandlordApiResponse;
   resendEamilConfirmation: LandlordApiResponse;
+  checkPasswordResetKey: LandlordApiResponse;
   getStudent: StudentApiResponse;
   getStudentSavedCollection: PropertyCollectionEntriesApiResponse;
   getStudentNotifications: StudentNotificationApiResponse;
@@ -54,6 +55,12 @@ export type QueryGetLandlordArgs = {
 
 export type QueryResendEamilConfirmationArgs = {
   landlord_id: Scalars['String'];
+};
+
+
+export type QueryCheckPasswordResetKeyArgs = {
+  email: Scalars['String'];
+  reset_key: Scalars['String'];
 };
 
 
@@ -230,6 +237,8 @@ export type Landlord = {
   confirmation_key?: Maybe<Scalars['String']>;
   onboarded?: Maybe<Scalars['Boolean']>;
   user_settings?: Maybe<LandlordUserSettings>;
+  landlord_reset_key?: Maybe<Scalars['String']>;
+  landlord_reset_link_exp?: Maybe<Scalars['String']>;
 };
 
 /** Landlord User Settings */
@@ -825,6 +834,8 @@ export type Mutation = {
   __typename?: 'Mutation';
   createLandlord: LandlordApiResponse;
   updatePhoneNumber: LandlordApiResponse;
+  sendPasswordReset: LandlordApiResponse;
+  resetPassword: LandlordApiResponse;
   confirmLandlordEmail: LandlordApiResponse;
   setLandlordOnboarded: LandlordApiResponse;
   markStudentNotificationAsSeen: StudentNotificationApiResponse;
@@ -861,6 +872,18 @@ export type MutationCreateLandlordArgs = {
 export type MutationUpdatePhoneNumberArgs = {
   phone_number: Scalars['String'];
   landlord_id: Scalars['String'];
+};
+
+
+export type MutationSendPasswordResetArgs = {
+  email: Scalars['String'];
+};
+
+
+export type MutationResetPasswordArgs = {
+  new_password: Scalars['String'];
+  reset_key: Scalars['String'];
+  email: Scalars['String'];
 };
 
 
@@ -1270,6 +1293,21 @@ export type GetLandlordQuery = (
   ) }
 );
 
+export type LandlordResetPasswordMutationVariables = Exact<{
+  email: Scalars['String'];
+  reset_key: Scalars['String'];
+  new_password: Scalars['String'];
+}>;
+
+
+export type LandlordResetPasswordMutation = (
+  { __typename?: 'Mutation' }
+  & { resetPassword: (
+    { __typename?: 'LandlordAPIResponse' }
+    & Pick<LandlordApiResponse, 'success' | 'error'>
+  ) }
+);
+
 export type CreateLandlordMutationVariables = Exact<{
   first_name: Scalars['String'];
   last_name: Scalars['String'];
@@ -1286,6 +1324,20 @@ export type CreateLandlordMutation = (
   ) }
 );
 
+export type CheckPasswordResetKeyQueryVariables = Exact<{
+  reset_key: Scalars['String'];
+  email: Scalars['String'];
+}>;
+
+
+export type CheckPasswordResetKeyQuery = (
+  { __typename?: 'Query' }
+  & { checkPasswordResetKey: (
+    { __typename?: 'LandlordAPIResponse' }
+    & Pick<LandlordApiResponse, 'success'>
+  ) }
+);
+
 export type ResendEmailConfirmationQueryVariables = Exact<{
   landlord_id: Scalars['String'];
 }>;
@@ -1296,6 +1348,19 @@ export type ResendEmailConfirmationQuery = (
   & { resendEamilConfirmation: (
     { __typename?: 'LandlordAPIResponse' }
     & Pick<LandlordApiResponse, 'success' | 'error'>
+  ) }
+);
+
+export type SendPasswordResetMutationVariables = Exact<{
+  email: Scalars['String'];
+}>;
+
+
+export type SendPasswordResetMutation = (
+  { __typename?: 'Mutation' }
+  & { sendPasswordReset: (
+    { __typename?: 'LandlordAPIResponse' }
+    & Pick<LandlordApiResponse, 'success'>
   ) }
 );
 
@@ -3406,6 +3471,41 @@ export function useGetLandlordLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type GetLandlordQueryHookResult = ReturnType<typeof useGetLandlordQuery>;
 export type GetLandlordLazyQueryHookResult = ReturnType<typeof useGetLandlordLazyQuery>;
 export type GetLandlordQueryResult = Apollo.QueryResult<GetLandlordQuery, GetLandlordQueryVariables>;
+export const LandlordResetPasswordDocument = gql`
+    mutation LandlordResetPassword($email: String!, $reset_key: String!, $new_password: String!) {
+  resetPassword(email: $email, reset_key: $reset_key, new_password: $new_password) {
+    success
+    error
+  }
+}
+    `;
+export type LandlordResetPasswordMutationFn = Apollo.MutationFunction<LandlordResetPasswordMutation, LandlordResetPasswordMutationVariables>;
+
+/**
+ * __useLandlordResetPasswordMutation__
+ *
+ * To run a mutation, you first call `useLandlordResetPasswordMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLandlordResetPasswordMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [landlordResetPasswordMutation, { data, loading, error }] = useLandlordResetPasswordMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *      reset_key: // value for 'reset_key'
+ *      new_password: // value for 'new_password'
+ *   },
+ * });
+ */
+export function useLandlordResetPasswordMutation(baseOptions?: Apollo.MutationHookOptions<LandlordResetPasswordMutation, LandlordResetPasswordMutationVariables>) {
+        return Apollo.useMutation<LandlordResetPasswordMutation, LandlordResetPasswordMutationVariables>(LandlordResetPasswordDocument, baseOptions);
+      }
+export type LandlordResetPasswordMutationHookResult = ReturnType<typeof useLandlordResetPasswordMutation>;
+export type LandlordResetPasswordMutationResult = Apollo.MutationResult<LandlordResetPasswordMutation>;
+export type LandlordResetPasswordMutationOptions = Apollo.BaseMutationOptions<LandlordResetPasswordMutation, LandlordResetPasswordMutationVariables>;
 export const CreateLandlordDocument = gql`
     mutation CreateLandlord($first_name: String!, $last_name: String!, $email: String!, $password: String!) {
   createLandlord(
@@ -3443,6 +3543,40 @@ export function useCreateLandlordMutation(baseOptions?: Apollo.MutationHookOptio
 export type CreateLandlordMutationHookResult = ReturnType<typeof useCreateLandlordMutation>;
 export type CreateLandlordMutationResult = Apollo.MutationResult<CreateLandlordMutation>;
 export type CreateLandlordMutationOptions = Apollo.BaseMutationOptions<CreateLandlordMutation, CreateLandlordMutationVariables>;
+export const CheckPasswordResetKeyDocument = gql`
+    query CheckPasswordResetKey($reset_key: String!, $email: String!) {
+  checkPasswordResetKey(reset_key: $reset_key, email: $email) {
+    success
+  }
+}
+    `;
+
+/**
+ * __useCheckPasswordResetKeyQuery__
+ *
+ * To run a query within a React component, call `useCheckPasswordResetKeyQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCheckPasswordResetKeyQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCheckPasswordResetKeyQuery({
+ *   variables: {
+ *      reset_key: // value for 'reset_key'
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useCheckPasswordResetKeyQuery(baseOptions: Apollo.QueryHookOptions<CheckPasswordResetKeyQuery, CheckPasswordResetKeyQueryVariables>) {
+        return Apollo.useQuery<CheckPasswordResetKeyQuery, CheckPasswordResetKeyQueryVariables>(CheckPasswordResetKeyDocument, baseOptions);
+      }
+export function useCheckPasswordResetKeyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CheckPasswordResetKeyQuery, CheckPasswordResetKeyQueryVariables>) {
+          return Apollo.useLazyQuery<CheckPasswordResetKeyQuery, CheckPasswordResetKeyQueryVariables>(CheckPasswordResetKeyDocument, baseOptions);
+        }
+export type CheckPasswordResetKeyQueryHookResult = ReturnType<typeof useCheckPasswordResetKeyQuery>;
+export type CheckPasswordResetKeyLazyQueryHookResult = ReturnType<typeof useCheckPasswordResetKeyLazyQuery>;
+export type CheckPasswordResetKeyQueryResult = Apollo.QueryResult<CheckPasswordResetKeyQuery, CheckPasswordResetKeyQueryVariables>;
 export const ResendEmailConfirmationDocument = gql`
     query ResendEmailConfirmation($landlord_id: String!) {
   resendEamilConfirmation(landlord_id: $landlord_id) {
@@ -3477,6 +3611,38 @@ export function useResendEmailConfirmationLazyQuery(baseOptions?: Apollo.LazyQue
 export type ResendEmailConfirmationQueryHookResult = ReturnType<typeof useResendEmailConfirmationQuery>;
 export type ResendEmailConfirmationLazyQueryHookResult = ReturnType<typeof useResendEmailConfirmationLazyQuery>;
 export type ResendEmailConfirmationQueryResult = Apollo.QueryResult<ResendEmailConfirmationQuery, ResendEmailConfirmationQueryVariables>;
+export const SendPasswordResetDocument = gql`
+    mutation SendPasswordReset($email: String!) {
+  sendPasswordReset(email: $email) {
+    success
+  }
+}
+    `;
+export type SendPasswordResetMutationFn = Apollo.MutationFunction<SendPasswordResetMutation, SendPasswordResetMutationVariables>;
+
+/**
+ * __useSendPasswordResetMutation__
+ *
+ * To run a mutation, you first call `useSendPasswordResetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendPasswordResetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendPasswordResetMutation, { data, loading, error }] = useSendPasswordResetMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useSendPasswordResetMutation(baseOptions?: Apollo.MutationHookOptions<SendPasswordResetMutation, SendPasswordResetMutationVariables>) {
+        return Apollo.useMutation<SendPasswordResetMutation, SendPasswordResetMutationVariables>(SendPasswordResetDocument, baseOptions);
+      }
+export type SendPasswordResetMutationHookResult = ReturnType<typeof useSendPasswordResetMutation>;
+export type SendPasswordResetMutationResult = Apollo.MutationResult<SendPasswordResetMutation>;
+export type SendPasswordResetMutationOptions = Apollo.BaseMutationOptions<SendPasswordResetMutation, SendPasswordResetMutationVariables>;
 export const UpdatePhoneNumberDocument = gql`
     mutation UpdatePhoneNumber($landlord_id: String!, $phone_number: String!) {
   updatePhoneNumber(landlord_id: $landlord_id, phone_number: $phone_number) {
