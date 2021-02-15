@@ -16,8 +16,6 @@ const StudentLoginViewRPI = () => {
     //===================== FUNCTIONS =====================
     const getRedirect = (): string => {
         let params = queryString.parse(window.location.search);
-        console.log(`Search query: `, window.location.search);
-        console.log(`Params: `, params);
 
         if (Object.prototype.hasOwnProperty.call(params, `redirect`)) {
             return params.redirect as string;

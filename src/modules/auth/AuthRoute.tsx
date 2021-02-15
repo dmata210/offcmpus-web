@@ -156,6 +156,11 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
     return `/student/login?redirect=${redirect_path}`
   }
 
+  const getLandlordLoginRedirectLink = (): string => {
+    let redirect_path: string = urlencode(window.location.pathname);
+    return `/landlord/login?redirect=${redirect_path}`
+  }
+
   /**
    * @desc Given the access parameters of the route in accessLevel,
    * determine based on the value of getUserType, whether the user has
@@ -175,6 +180,15 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
       // If I am authenticated, I can access components with accessLevel of authenticated user
       if (user.authenticated) {
         if (canAccess()) {
+
+          // If the page is for landlords and they are able to access this page, and there
+          // is a redirect url in the cookies, then redirect to that page.
+          if ((accessLevel & AccessLevels.LANDLORD) != 0 && cookie.get('landlord_redirect') != undefined) {
+            let redir: string = cookie.get('landlord_redirect');
+            cookie.remove('landlord_redirect', {path: '/'});
+            return <Redirect to={urlencode.decode(redir)} />
+          }
+
           return <Component {...props} />
         }
         else {
@@ -190,6 +204,7 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
         // only students, redirect them to the student login view with the `redirect` query parameter
         // set to this page.
         else if ((accessLevel & AccessLevels.STUDENT) != 0) return <Redirect to={getLoginRedirectLink()} />
+        else if ((accessLevel & AccessLevels.LANDLORD) != 0) return <Redirect to={getLandlordLoginRedirectLink()} />
 
         else return <Redirect to={defaultRoute(getUserType())} />
 
