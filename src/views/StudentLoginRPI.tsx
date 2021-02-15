@@ -55,15 +55,15 @@ const StudentLoginViewRPI = () => {
 
     
     //===================== RENDER =====================
-    return (<Centered width={400} height={500}>
+    return (<Centered width={400} height={400}>
 
         <div>
 
-            <div style={{width: `150px`, margin: `0 auto`, marginBottom: `40px`,}}>
+            <div style={{width: `150px`, margin: `0 auto`, marginBottom: `30px`,}}>
                 <Logo withBeta={true} withText={true} />
             </div>
             
-            {/* Continue as section... */}
+            {/* Continue as section...
             <div className="rp-saved-user-area">
                 <div className="school-logo"></div>
                 <div className="info-area">
@@ -78,13 +78,13 @@ const StudentLoginViewRPI = () => {
                         />
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             {/* Different Login section... */}
             <div>
-                <div style={{marginBottom: `5px`}}>Not Abdul-Muiz?</div>
+                {/* <div style={{marginBottom: `5px`}}>Not Abdul-Muiz?</div> */}
                 <Button 
-                    text="Login as a Different Student"
+                    text="Login with RPI CAS"
                     textColor="white"
                     bold={true}
                     transformDisabled={true}
