@@ -45,7 +45,7 @@ export interface LeaseCollectionAPIResponseFields_data_leases_occupant_doc {
   __typename: "Student";
   _id: string;
   first_name: string;
-  phone_number: string;
+  phone_number: string | null;
   last_name: string;
   email: string;
   elevated_privileges: string[] | null;
@@ -61,6 +61,50 @@ export interface LeaseCollectionAPIResponseFields_data_leases_priority {
   end_date: string;
 }
 
+export interface LeaseCollectionAPIResponseFields_data_leases_lease_history_review_of_property {
+  __typename: "ReviewAndResponse";
+  rating: number;
+  review: string;
+  response: string | null;
+}
+
+export interface LeaseCollectionAPIResponseFields_data_leases_lease_history_review_of_landlord {
+  __typename: "ReviewAndResponse";
+  rating: number;
+  review: string;
+  response: string | null;
+}
+
+export interface LeaseCollectionAPIResponseFields_data_leases_lease_history_property_images {
+  __typename: "LeaseImageInfo";
+  s3_key: string;
+  date_uploaded: string;
+}
+
+export interface LeaseCollectionAPIResponseFields_data_leases_lease_history {
+  __typename: "LeaseHistory";
+  price: number;
+  student_id: string;
+  start_date: string;
+  end_date: string;
+  review_of_property: LeaseCollectionAPIResponseFields_data_leases_lease_history_review_of_property | null;
+  review_of_landlord: LeaseCollectionAPIResponseFields_data_leases_lease_history_review_of_landlord | null;
+  property_images: LeaseCollectionAPIResponseFields_data_leases_lease_history_property_images[];
+}
+
+export interface LeaseCollectionAPIResponseFields_data_leases_student_interests {
+  __typename: "StudentInterest";
+  student_id: string;
+  date: string;
+  accepted: boolean | null;
+}
+
+export interface LeaseCollectionAPIResponseFields_data_leases_students_that_declined {
+  __typename: "DeclineInfo";
+  date: string;
+  student_id: string;
+}
+
 export interface LeaseCollectionAPIResponseFields_data_leases {
   __typename: "Lease";
   _id: string;
@@ -74,6 +118,9 @@ export interface LeaseCollectionAPIResponseFields_data_leases {
   lease_document_id: string | null;
   lease_availability_start_date: string | null;
   lease_availability_end_date: string | null;
+  lease_history: LeaseCollectionAPIResponseFields_data_leases_lease_history[];
+  student_interests: LeaseCollectionAPIResponseFields_data_leases_student_interests[];
+  students_that_declined: LeaseCollectionAPIResponseFields_data_leases_students_that_declined[] | null;
 }
 
 export interface LeaseCollectionAPIResponseFields_data {

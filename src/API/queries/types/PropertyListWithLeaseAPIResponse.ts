@@ -52,6 +52,27 @@ export interface PropertyListWithLeaseAPIResponse_data_properties_directions {
   cycling_regular_directions: PropertyListWithLeaseAPIResponse_data_properties_directions_cycling_regular_directions[] | null;
 }
 
+export interface PropertyListWithLeaseAPIResponse_data_properties_leases_lease_history_property_images {
+  __typename: "LeaseImageInfo";
+  s3_key: string;
+  date_uploaded: string;
+}
+
+export interface PropertyListWithLeaseAPIResponse_data_properties_leases_lease_history {
+  __typename: "LeaseHistory";
+  price: number;
+  student_id: string;
+  start_date: string;
+  end_date: string;
+  property_images: PropertyListWithLeaseAPIResponse_data_properties_leases_lease_history_property_images[];
+}
+
+export interface PropertyListWithLeaseAPIResponse_data_properties_leases_student_interests {
+  __typename: "StudentInterest";
+  student_id: string;
+  date: string;
+}
+
 export interface PropertyListWithLeaseAPIResponse_data_properties_leases {
   __typename: "Lease";
   _id: string;
@@ -62,6 +83,8 @@ export interface PropertyListWithLeaseAPIResponse_data_properties_leases {
   lease_availability_end_date: string | null;
   lease_availability_start_date: string | null;
   lease_document_id: string | null;
+  lease_history: PropertyListWithLeaseAPIResponse_data_properties_leases_lease_history[];
+  student_interests: PropertyListWithLeaseAPIResponse_data_properties_leases_student_interests[];
 }
 
 export interface PropertyListWithLeaseAPIResponse_data_properties {

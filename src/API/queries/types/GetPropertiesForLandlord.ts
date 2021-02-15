@@ -52,6 +52,58 @@ export interface GetPropertiesForLandlord_getPropertiesForLandlord_data_properti
   cycling_regular_directions: GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_directions_cycling_regular_directions[] | null;
 }
 
+export interface GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_leases_lease_history_review_of_property {
+  __typename: "ReviewAndResponse";
+  rating: number;
+  review: string;
+  response: string | null;
+}
+
+export interface GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_leases_lease_history_review_of_landlord {
+  __typename: "ReviewAndResponse";
+  rating: number;
+  review: string;
+  response: string | null;
+}
+
+export interface GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_leases_lease_history_property_images {
+  __typename: "LeaseImageInfo";
+  s3_key: string;
+  date_uploaded: string;
+}
+
+export interface GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_leases_lease_history {
+  __typename: "LeaseHistory";
+  price: number;
+  student_id: string;
+  start_date: string;
+  end_date: string;
+  review_of_property: GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_leases_lease_history_review_of_property | null;
+  review_of_landlord: GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_leases_lease_history_review_of_landlord | null;
+  property_images: GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_leases_lease_history_property_images[];
+}
+
+export interface GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_leases_student_interests {
+  __typename: "StudentInterest";
+  student_id: string;
+  date: string;
+}
+
+export interface GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_leases {
+  __typename: "Lease";
+  _id: string;
+  active: boolean;
+  ownership_id: string;
+  price_per_month: number;
+  occupant_id: string | null;
+  external_occupant: boolean;
+  lease_document_id: string | null;
+  lease_availability_start_date: string | null;
+  lease_availability_end_date: string | null;
+  lease_history: GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_leases_lease_history[];
+  student_interests: GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_leases_student_interests[];
+}
+
 export interface GetPropertiesForLandlord_getPropertiesForLandlord_data_properties {
   __typename: "Property";
   _id: string;
@@ -63,6 +115,7 @@ export interface GetPropertiesForLandlord_getPropertiesForLandlord_data_properti
   zip: string;
   details: GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_details | null;
   directions: GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_directions[] | null;
+  leases: GetPropertiesForLandlord_getPropertiesForLandlord_data_properties_leases[] | null;
 }
 
 export interface GetPropertiesForLandlord_getPropertiesForLandlord_data {
@@ -83,5 +136,6 @@ export interface GetPropertiesForLandlord {
 
 export interface GetPropertiesForLandlordVariables {
   landlord_id: string;
+  with_leases?: boolean | null;
   status?: string | null;
 }

@@ -79,4 +79,5 @@ export interface GetPropertyOwnedByLandlord {
 export interface GetPropertyOwnedByLandlordVariables {
   property_id: string;
   landlord_id: string;
+  with_leases?: boolean | null;
 }

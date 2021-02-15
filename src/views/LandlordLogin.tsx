@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import {useHistory} from 'react-router'
+import {Link} from 'react-router-dom'
 
 import LandlordAPI from '../API/LandlordAPI'
 import Centered from '../components/toolbox/layout/Centered'
@@ -159,7 +160,7 @@ const LandlordLogin = () => {
 
       <div className="padded upper">
         <LeftAndRight
-          left={<div style={{fontSize: '0.8rem'}}>Forgot password?</div>}
+          left={<Link to="/landlord/forgot-password"><div style={{fontSize: '0.8rem'}}>Forgot password?</div></Link>}
           right={<Button 
             text="Login"
             bold={true}
