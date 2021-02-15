@@ -6,6 +6,7 @@ import Cookies from 'universal-cookie'
 import {useHistory, useLocation} from 'react-router'
 import NoInternetConnection from '../../views/NoInternetConnection'
 import {pushRedirect} from '../../components/hooks/usePushRedirect'
+import urlencode from 'urlencode'
 
 import _ from 'lodash'
 
@@ -14,7 +15,6 @@ import {fetchUser, setInstitution} from '../../redux/actions/user'
 import {ReduxState} from '../../redux/reducers/all_reducers'
 import {useDispatch, useSelector} from 'react-redux'
 import {useGetInstitutionLazyQuery} from '../../API/queries/types/graphqlFragmentTypes'
-import {Student, Landlord} from '../../API/queries/types/graphqlFragmentTypes'
 
 const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
 
@@ -58,7 +58,7 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
   const institution = useSelector((state: ReduxState) => state.institution)
 
   const [institutionId, setInstitutionId] = useState<string | null>(null)
-  const [getInstitution, {data: instutionData, loading: institutionLoading, error}] = useGetInstitutionLazyQuery({variables: {id: institutionId == null ? "" : institutionId}})
+  const [getInstitution, {data: instutionData, loading: institutionLoading}] = useGetInstitutionLazyQuery({variables: {id: institutionId == null ? "" : institutionId}})
 
   useEffect(() => {
 
@@ -148,6 +148,14 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
 
   const hasAccess = (access_flag: number): boolean => ( accessLevel & access_flag ) != 0
 
+  // Get the link to the student login page with the redirect query parameter
+  // set to the current page so that once the student successfully logs in, they will
+  // be redirected back to this page.
+  const getLoginRedirectLink = (): string => {
+    let redirect_path: string = urlencode(window.location.pathname);
+    return `/student/login?redirect=${redirect_path}`
+  }
+
   /**
    * @desc Given the access parameters of the route in accessLevel,
    * determine based on the value of getUserType, whether the user has
@@ -177,6 +185,11 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
       }
       else {
         if (hasAccess(AccessLevels.UNAUTH)) return <Component {...props} />
+
+        // if the student isn't logged in and they try to access a route that is restricted to 
+        // only students, redirect them to the student login view with the `redirect` query parameter
+        // set to this page.
+        else if ((accessLevel & AccessLevels.STUDENT) != 0) return <Redirect to={getLoginRedirectLink()} />
 
         else return <Redirect to={defaultRoute(getUserType())} />
 
