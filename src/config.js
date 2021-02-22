@@ -4,7 +4,7 @@ including environmen variable setup.
 */
 
 const config = () => {
-  
+
   const dotenv = require('dotenv')
   // Load environmental variables
   dotenv.config({ path: `../.env` });
@@ -26,7 +26,7 @@ const getFrontendBaseUrl = () => {
   }
   if (process.env.REACT_APP_ENV == 'production') {
     // TODO place base production url here
-    return 'http://PLACEHOLDER'
+    return 'https://www.offcmpus.io'
   }
 
   return 'ERR'
@@ -40,7 +40,7 @@ const getBackendBaseUrl = () => {
   }
   if (process.env.REACT_APP_ENV == 'production') {
     // TODO place base production url here
-    return 'http://PLACEHOLDER'
+    return 'https://api.offcmpus.io'
   }
   return 'ERR'
 }
@@ -53,4 +53,4 @@ const frontendPath = (path) => {
   return `${getFrontendBaseUrl()}${path}`
 }
 
-export { config, backendPath, frontendPath}
+export { config, backendPath, frontendPath }
