@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef, createRef, useLayoutEffect} from 're
 // @ts-ignore
 import {Form, FormSelect , FormCheckbox, FormTextarea, FormInput, FormGroup} from 'shards-react'
 import {HiOutlineCloudUpload, HiX} from 'react-icons/hi'
-import DatePicker from '../toolbox/form/DatePicker'
+import {DateRangePicker} from '../toolbox/form/DatePicker2'
 import Error from '../toolbox/form/Error'
 
 interface RadioInputConfig {
@@ -224,8 +224,7 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
             case 'date-range':
                 return (<FormGroup>
                     <label htmlFor={`#${field_key}_${formId}`}>{input.text}</label>
-                    <DatePicker 
-                        type='range'
+                    <DateRangePicker
                         onChange={(start: Date | null, end: Date | null) => {
 
                             if (formInputRefs[field_key] == undefined) return;
