@@ -12,6 +12,7 @@ import Button from '../components/toolbox/form/Button'
 import {useUpdateStudentSearchStatusMutation} from '../API/queries/types/graphqlFragmentTypes'
 import {ReduxState} from '../redux/reducers/all_reducers'
 import {fetchUser} from '../redux/actions/user'
+import {DateRangePicker} from '../components/toolbox/form/DatePicker2'
 
 const StudentStatus = () => {
 
@@ -146,7 +147,7 @@ const StudentStatus = () => {
             {/* Date Picker */}
             {searching == true && <div style={{marginTop: `20px`}}>
                 <div style={{marginBottom: `20px`}}>What time frame are you looking to lease for?</div>
-                <DatePicker type="range" onChange={(start: Date | null, end: Date | null) => {
+                <DateRangePicker  onChange={(start: Date | null, end: Date | null) => {
                     setDateInfo([start, end]);
                 }} />
             </div>}

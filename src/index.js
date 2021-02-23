@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
@@ -67,16 +67,16 @@ import Testing from './views/Testing'
 
 // Redux setup
 import store from './redux/store'
-import {Provider} from 'react-redux'
+import { Provider } from 'react-redux'
 
 // Apollo GraphQL Providers
 import ApolloClient from 'apollo-boost'
-import {ApolloProvider} from '@apollo/client'
+import { ApolloProvider } from '@apollo/client'
 
 // setup routes
 const Routes = () => {
 
-  const [alertCtxValue, setAlertCtxValue] = useState({id: 0, value: "", data: null})
+  const [alertCtxValue, setAlertCtxValue] = useState({ id: 0, value: "", data: null })
   const successAlert = (data) => {
     setAlertCtxValue({
       id: alertCtxValue.id + 1,
@@ -99,64 +99,64 @@ const Routes = () => {
       errorAlert: errorAlert
     }}>
       <AlertController alertInfo={alertCtxValue} />
-        <Switch>
+      <Switch>
 
-          {/* <AuthRoute accessLevel={AccessLevels.ANY} exact path="/testing_" component={Testing} /> */}
-          <Route exact path="/landlord/confirm/:confirm_key" component={({match}) => (<LandlordConfirmEmail confirm_key={match.params.confirm_key} />)} />
-          <Route exact path="/student/confirm/:confirm_key" component={({match}) => (<StudentConfirmEmail confirm_key={match.params.confirm_key} />)} />
+        <AuthRoute accessLevel={AccessLevels.ANY} exact path="/testing_" component={Testing} />
+        <Route exact path="/landlord/confirm/:confirm_key" component={({ match }) => (<LandlordConfirmEmail confirm_key={match.params.confirm_key} />)} />
+        <Route exact path="/student/confirm/:confirm_key" component={({ match }) => (<StudentConfirmEmail confirm_key={match.params.confirm_key} />)} />
 
-          {/* Unrestricted Paths */}
-          <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/" component={LandingView} />
-          <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/auth-cas" component={StudentCASAuth} />
-          <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/login" component={LandlordLoginView} />
-          <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/login" component={StudentLoginViewRPI} />
-          <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/register" component={LandlordRegisterView} />
-          <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/forgot-password" component={LandlordForgotPasswordView} />
-          <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/password-reset/:reset_key" component={({match}) => <LandlordPasswordResetView reset_key={match.params.reset_key} />} />
-          
-          {/* Restricted Paths */}
-            {/* Student Only  */}
-            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/register/complete" component={StudentRegisterComplete} />
-            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/search" component={SearchView_} />
-            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/collection" component={CollectionView} />
-            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/s/status" component={StudentStatus} />
-            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/feed" component={StudentFeed} />
-            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/info/property/:id" component={({match}) => (<StudentPropertyInfoView property_id={match.params.id} />)} />
-            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/notifications" component={StudentNotificationsView} />
-            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/lease/:id" component={({match}) => (<StudentLeaseAgreementView lease_id={match.params.id} />)} />
-            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/accepted_leases" component={StudentAcceptedLeasesView} />
-            <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/lease/info/:lease_id/:history_id" component={({match}) => <StudentAcceptedLeaseInfoView lease_id={match.params.lease_id} history_id={match.params.history_id} />} />
+        {/* Unrestricted Paths */}
+        <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/" component={LandingView} />
+        <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/auth-cas" component={StudentCASAuth} />
+        <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/login" component={LandlordLoginView} />
+        <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/login" component={StudentLoginViewRPI} />
+        <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/register" component={LandlordRegisterView} />
+        <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/forgot-password" component={LandlordForgotPasswordView} />
+        <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/password-reset/:reset_key" component={({ match }) => <LandlordPasswordResetView reset_key={match.params.reset_key} />} />
 
-              {/* Mod Console (Ownership Reviewer) */}
-              <AuthRoute accessLevel={AccessLevels.OWNERSHIP_REVIEWER} exact path="/ownership/review" component={OwnershipReview} />
-              <AuthRoute accessLevel={AccessLevels.OWNERSHIP_REVIEWER} exact path="/mod/console" component={ModConsole} />
-              <AuthRoute accessLevel={AccessLevels.OWNERSHIP_REVIEWER} exact path="/ownership/review/:id" component={({match}) => (<OwnershipDoc ownership_id={match.params.id} />)} />
+        {/* Restricted Paths */}
+        {/* Student Only  */}
+        <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/register/complete" component={StudentRegisterComplete} />
+        <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/search" component={SearchView_} />
+        <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/collection" component={CollectionView} />
+        <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/s/status" component={StudentStatus} />
+        <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/feed" component={StudentFeed} />
+        <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/info/property/:id" component={({ match }) => (<StudentPropertyInfoView property_id={match.params.id} />)} />
+        <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/notifications" component={StudentNotificationsView} />
+        <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/lease/:id" component={({ match }) => (<StudentLeaseAgreementView lease_id={match.params.id} />)} />
+        <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/accepted_leases" component={StudentAcceptedLeasesView} />
+        <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/lease/info/:lease_id/:history_id" component={({ match }) => <StudentAcceptedLeaseInfoView lease_id={match.params.lease_id} history_id={match.params.history_id} />} />
 
-            {/* Landlord Only */}
-            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/welcome" component={LandlordOnboarding} />
-            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/dashboard" component={LandlordDashboard} />
-            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/new-property" component={LandlordNewProperty} />
-            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/ownership-documents/:id" component={({match}) => (<LandlordOwnershipDocuments ownership_id={match.params.id} />)} />
-            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/verify/phone-number" component={PhoneVerifyView} />
-            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/:id" component={({match}) => (<PropertyDetails property_id={match.params.id} />)} />
-            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/:id/new" component={({match}) => (<PropertyInitialDetails property_id={match.params.id} />)} />
-            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/lease/new/:id" component={({match}) => (<NewLeaseView property_id={match.params.id} />)} />
-            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/lease/priority/:id" component={({match}) => (<PriorityFeatureCreationVew property_id={match.params.id} /> )} />
-            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/leases" component={LandlordAllLeasesView} />
-            <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/lease/:property_id/:lease_id" component={({match}) => (<LandlordLeaseInfoView property_id={match.params.property_id} lease_id={match.params.lease_id} />)} />
+        {/* Mod Console (Ownership Reviewer) */}
+        <AuthRoute accessLevel={AccessLevels.OWNERSHIP_REVIEWER} exact path="/ownership/review" component={OwnershipReview} />
+        <AuthRoute accessLevel={AccessLevels.OWNERSHIP_REVIEWER} exact path="/mod/console" component={ModConsole} />
+        <AuthRoute accessLevel={AccessLevels.OWNERSHIP_REVIEWER} exact path="/ownership/review/:id" component={({ match }) => (<OwnershipDoc ownership_id={match.params.id} />)} />
 
-            {/* Landlord and Student */}
-            <AuthRoute accessLevel={AccessLevels.STUDENT | AccessLevels.LANDLORD} exact path="/property/:id" component={({match}) => (<PropertyView property_id={match.params.id} />)} />
-            <AuthRoute accessLevel={AccessLevels.STUDENT | AccessLevels.LANDLORD} exact path="/notifications/enable" component={PushNotificationsPrompt} />
-          
-          {/* 404 */}
-          <Route component={NotFound} />
-        </Switch>
+        {/* Landlord Only */}
+        <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/welcome" component={LandlordOnboarding} />
+        <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/dashboard" component={LandlordDashboard} />
+        <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/new-property" component={LandlordNewProperty} />
+        <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/ownership-documents/:id" component={({ match }) => (<LandlordOwnershipDocuments ownership_id={match.params.id} />)} />
+        <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/verify/phone-number" component={PhoneVerifyView} />
+        <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/:id" component={({ match }) => (<PropertyDetails property_id={match.params.id} />)} />
+        <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/:id/new" component={({ match }) => (<PropertyInitialDetails property_id={match.params.id} />)} />
+        <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/lease/new/:id" component={({ match }) => (<NewLeaseView property_id={match.params.id} />)} />
+        <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/property/lease/priority/:id" component={({ match }) => (<PriorityFeatureCreationVew property_id={match.params.id} />)} />
+        <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/leases" component={LandlordAllLeasesView} />
+        <AuthRoute accessLevel={AccessLevels.LANDLORD} exact path="/landlord/lease/:property_id/:lease_id" component={({ match }) => (<LandlordLeaseInfoView property_id={match.params.property_id} lease_id={match.params.lease_id} />)} />
+
+        {/* Landlord and Student */}
+        <AuthRoute accessLevel={AccessLevels.STUDENT | AccessLevels.LANDLORD} exact path="/property/:id" component={({ match }) => (<PropertyView property_id={match.params.id} />)} />
+        <AuthRoute accessLevel={AccessLevels.STUDENT | AccessLevels.LANDLORD} exact path="/notifications/enable" component={PushNotificationsPrompt} />
+
+        {/* 404 */}
+        <Route component={NotFound} />
+      </Switch>
     </AlertContext.Provider>
   </Router>)
 }
 
-config ()
+config()
 
 const _client = new ApolloClient({
   uri: backendPath('/graphql')
@@ -164,9 +164,9 @@ const _client = new ApolloClient({
 
 ReactDOM.render(
   <ApolloProvider client={_client}>
-      <Provider store={store}>
-        <Routes />
-      </Provider>
+    <Provider store={store}>
+      <Routes />
+    </Provider>
   </ApolloProvider>,
   document.getElementById('root')
 );
