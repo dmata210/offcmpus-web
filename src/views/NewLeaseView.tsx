@@ -186,13 +186,10 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
     config: {
 
       leasePrice: {
-        type: 'input',
-        inputType: 'text',
-        label: {
-          placeholder: false,
-          text: 'What is the monthly price for this lease? (USD)'
-        },
-        validator: numbersOnly
+        type: 'float-input',
+        suffix: '/month',
+        prefix: '$',
+        label: 'What is the monthly price for this lease? (USD)'
       },
 
       dateAvailable: {
@@ -253,8 +250,7 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
     
     if (!Object.prototype.hasOwnProperty.call(leaseFormCtrl, 'leasePrice')
     || leaseFormCtrl.leasePrice == null
-    || leaseFormCtrl.leasePrice.length == 0
-    || !numbersOnly(leaseFormCtrl.leasePrice)) {
+    || leaseFormCtrl.leasePrice.length == 0) {
       setFormError("You must provide a monthly lease value.");
       return;
     }
@@ -352,7 +348,7 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
         variables: {
           lease_id: targetLeaseId as string,
           lease_document_id: leaseDocuments!.filter((leaseDoc: LeaseDocument) => leaseDoc.lease_name == savedLeaseSelectCtrl.savedLeaseOptions)[0]._id,
-          price_per_month: parseInt(leaseFormCtrl.leasePrice),
+          price_per_month: parseFloat(leaseFormCtrl.leasePrice),
           lease_start_date: leaseFormCtrl.dateAvailable[0].toISOString(),
           lease_end_date: leaseFormCtrl.dateAvailable[1].toISOString()
         }
@@ -371,7 +367,7 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
           variables: {
             lease_id: targetLeaseId as string,
             lease_document_id: leaseDcoumentResponse.addNewLeaseDocument.data._id,
-            price_per_month: parseInt(leaseFormCtrl.leasePrice),
+            price_per_month: parseFloat(leaseFormCtrl.leasePrice),
             lease_start_date: leaseFormCtrl.dateAvailable[0].toISOString(),
             lease_end_date: leaseFormCtrl.dateAvailable[1].toISOString()
           }

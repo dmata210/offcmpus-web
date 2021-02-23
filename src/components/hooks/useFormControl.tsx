@@ -3,7 +3,8 @@ import React, {useState, useEffect, useRef, createRef, useLayoutEffect} from 're
 import {Form, FormSelect , FormCheckbox, FormTextarea, FormInput, FormGroup} from 'shards-react'
 import {HiOutlineCloudUpload, HiX} from 'react-icons/hi'
 import {DateRangePicker} from '../toolbox/form/DatePicker2'
-import Error from '../toolbox/form/Error'
+import Error from '../toolbox/form/Error';
+import FloatInput from '../toolbox/form/FloatInput';
 
 interface RadioInputConfig {
     type: 'radio'
@@ -20,6 +21,13 @@ interface InputFieldConfig {
     type: 'input'
     inputType: 'text' | 'password' | 'email'
     label: { placeholder?: boolean, text: string }
+}
+
+interface TextFieldConfig {
+    type: 'float-input'
+    prefix: string
+    suffix: string
+    label: string
 }
 
 interface CheckboxInputConfig {
@@ -49,7 +57,7 @@ interface FileUploadConfig {
     max_filesize: number
 }
 
-type FormInputConfig = ((InputFieldConfig | DataRangeInputConfig | RadioInputConfig | TextareaInputConfig | SelectInputConfig) & {
+type FormInputConfig = ((InputFieldConfig | DataRangeInputConfig | TextFieldConfig | RadioInputConfig | TextareaInputConfig | SelectInputConfig) & {
     // a function that, when given the value of the input, return a 
     // boolean representing if the value is a valid form input or not
     validator?: (value: string) => boolean
@@ -104,33 +112,6 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
         setFormInputStates(newformInputStates);
 
     }, []);
-
-    // useEffect(() => {
-    //     console.log(`Form Input Refs Changed.`, formInputRefs)
-    //     // Setup callbacks for each input's refs.
-    //     let keys = Object.keys(formInputRefs)
-    //     for (let i = 0; i < keys.length; ++i) {
-
-    //         // skip setting onchange event for radio ref
-    //         if (config[keys[i]].type == 'radio' 
-    //         || config[keys[i]].type == 'checkbox'
-    //         || config[keys[i]].type == 'textarea'
-    //         || config[keys[i]].type == 'date-range'
-    //         || config[keys[i]].type == 'fileupload') continue;
-
-    //         let ref_ = formInputRefs[keys[i]].current;
-    //         if (!ref_) console.log(`Ref for key ${keys[i]} is not set.`)
-    //         else {
-    //             let id = ref_.getAttribute('id')
-    //             id = id.substring(1, id.indexOf('_'));
-
-    //             // attach an onchange function to the ref
-    //             ref_.addEventListener('change', (e: any) => {
-    //                 setFormInputStates(getInputStates());
-    //             });
-    //         }
-    //     }
-    // }, [formInputRefs])
 
     const getInputStates = (): {[key: string]: any} => {
         let keys = Object.keys(config);
@@ -221,6 +202,21 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
         }
 
         switch (input.type) {
+            case 'float-input':
+                return (<FormGroup>
+                    <label htmlFor={`#${field_key}_${formId}`}>{input.label}</label>
+                    <FloatInput 
+                        suffix={input.suffix}
+                        prefix={input.prefix}
+                        onChange={(val: number) => {
+                            if (formInputRefs[field_key] == undefined) return;
+                            let newState = {...formInputStates};
+                            formInputRefs[field_key].current = val;
+                            newState[field_key] = val;
+                            setFormInputStates(newState);
+                        }}
+                    />
+                </FormGroup>)
             case 'date-range':
                 return (<FormGroup>
                     <label htmlFor={`#${field_key}_${formId}`}>{input.text}</label>
@@ -306,14 +302,6 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
             case 'select':
                 return (<FormGroup>
                     <label htmlFor={`#${field_key}_${formId}`}>{input.text}</label>
-                    {/* <FormSelect 
-                        id={`#${field_key}_${formId}`}
-                        innerRef={formInputRefs[field_key]}
-                        >
-                        {input.options.map((option: string, i: number) =>
-                            <option key={i} value={option}>{option}</option>
-                        )}
-                    </FormSelect> */}
                     <CustomSelect 
                         options={input.options}
                         onChange={(e: any) => {

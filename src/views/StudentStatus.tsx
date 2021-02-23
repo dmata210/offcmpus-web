@@ -6,7 +6,6 @@ import {Helmet} from "react-helmet";
 import {resolveRedirect} from '../components/hooks/usePushRedirect'
 import Centered from '../components/toolbox/layout/Centered'
 import RatioInput from '../components/toolbox/form/RadioInput'
-import DatePicker from '../components/toolbox/form/DatePicker'
 import RangeSlider from '../components/toolbox/form/RangeSlider'
 import Button from '../components/toolbox/form/Button'
 import {useUpdateStudentSearchStatusMutation} from '../API/queries/types/graphqlFragmentTypes'

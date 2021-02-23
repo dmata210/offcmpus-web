@@ -3,6 +3,8 @@ import {useSpring, motion, useTransform} from 'framer-motion'
 import {RiBookOpenLine} from 'react-icons/ri'
 import Input, {alnumOnly, noSpaces, $and, numbersOnly} from '../components/toolbox/form/Input'
 
+import FloatInput from '../components/toolbox/form/FloatInput'
+
 const Testing = () => {
 
   return (<div style={{
@@ -12,6 +14,8 @@ const Testing = () => {
     left: `50%`, top: `50%`,
     transform: `translateX(-50%) translateY(-50%)`
   }}>
+    <FloatInput prefix="#" onChange={(i: number) => {
+    }} />
   </div>)
 }
 

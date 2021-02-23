@@ -5714,3 +5714,47 @@ a.subtle-link {
     }
   }
 }
+
+.text-input-field {
+  display: flex;
+  width: 100%;
+
+  .prefix_ {
+    font-size: 2rem;
+    font-weight: 600;
+    transition: color 0.25s;
+
+    &.focused {
+      color: $green;
+    }
+  }
+
+  .suffix_ {
+    font-size: 2rem;
+    font-weight: 600;
+    opacity: 0.2;
+  }
+
+  .field {
+    max-width: 96%;
+    box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0);
+    border-bottom: 2px solid $navy;
+    transition: border 0.25s;
+    font-weight: 600;
+    font-size: 2rem;
+
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    outline: none;
+
+    &:focus {
+      border-bottom: 2px solid $green;
+    }
+  }
+}
+
+.text-input_ {
+  font-size: 2rem;
+}
