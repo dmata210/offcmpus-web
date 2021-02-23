@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {Helmet} from "react-helmet";
 import ViewWrapper from '../components/ViewWrapper';
 import Tabs from '../components/toolbox/misc/Tabs';
@@ -18,6 +18,7 @@ import { useGetPropertySummaryLazyQuery,
     LeaseAndAvailability,
     PropertySummary, 
     PropertyDetails} from '../API/queries/types/graphqlFragmentTypes'
+import {IoMdQrScanner} from 'react-icons/io'
 
 import {fetchUser} from '../redux/actions/user'
 import { ReduxState } from '../redux/reducers/all_reducers';
@@ -26,6 +27,7 @@ import Popup, {PopupHeader, ConfirmLine} from '../components/toolbox/misc/Popup'
 import { UploadFile } from 'antd/lib/upload/interface';
 import {uploadObjects} from '../API/S3API';
 import MoreDetails from '../components/toolbox/misc/MoreDetails2';
+import ImageGalleryPopup from '../components/toolbox/misc/ImageGalleryPopup'
 
 const { Option } = Select;
 const { Dragger } = Upload;
@@ -35,6 +37,12 @@ const dateAbbr = (date: Date): string => {
     return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
 
+const images = [
+    "https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG",
+    "https://img.chime.me/imagesrc/mls-listing/20210219/14/original_202030175-12573062901660652.jpg",
+    "https://img.chime.me/imagesrc/mls-listing/20210217/14/original_202030175-12402065906477274.jpg",
+    'https://www.houselogic.com/wp-content/uploads/2016/08/property-tax-appeal-retina_retina_9f661fd354bfde92b764d39542dfee75.jpg'
+];
 const desc = ['terrible', 'bad', 'normal', 'good', 'wonderful'];
 const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
 
@@ -47,6 +55,20 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
     const [userLeaseHistory, setUserLeaseHistory] = useState<LeaseHistory | null>(null);
     const [reviewPopupPage, setReviewPopupPage] = useState<number>(0);
     const [leaseInfoPopup, setLeaseInfoPopup] = useState<boolean>(false);
+    const [showImageGallery, setShowImageGallery] = useState<boolean>(false);
+
+    const [imageIndex, setImageIndex] = useState<number>(0);
+    const imageIndexRef = useRef<number>(0);
+    const timerTickerRef= useRef(null);
+
+    useEffect(() => {
+
+        setInterval(() => {
+            imageIndexRef.current = (imageIndexRef.current + 1) % images.length;
+            setImageIndex(imageIndexRef.current);
+        }, 5000);
+
+    }, []);
 
     const closePopup = () => {
         setReviewPopupPage(0);
@@ -358,6 +380,9 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
             <title>offcmpus | Property Info</title>
         </Helmet>
 
+        {/* Image Gallery */}
+        <ImageGalleryPopup show={showImageGallery} />
+
         {/* Add Review Popup */}
         <Popup show={canAddReviewResponse != undefined && canAddReviewResponse.canAddReview 
             && canAddReviewResponse.canAddReview.success && showAddReview} width={600} height={700}>
@@ -624,8 +649,45 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
             {/* Property Info & Image */}
             <div className="property-info">
                 
-                <div className="image-area_">
+                <div className="image-area_ no-select">
+
+                    {/* Top Icon Area */}
+                    <div className="image-icon-area">
+                        <div className="icon_" 
+                            onClick={() => setShowImageGallery(true)}
+                        ><IoMdQrScanner /></div>
+                    </div>
                     
+                    <div className="iamge-container" style={{
+                        width: `calc(100% * ${images.length})`,
+                        transform: `translateX(calc(calc(100%/${images.length}) * ${imageIndex * -1})`
+                    }}>
+                        
+                        {images.map((img: string, i: number) =>
+                            <div key={i} 
+                            className="preview-image-holder"
+                            style={{
+                                width: '100%', height: '100%',
+                        }}>
+                            <img
+                                className="preview-image"
+                                style={{
+                                    position: 'relative',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)'
+                                }}
+                                src={img}
+                                width="100%"
+                            />
+                        </div>
+                        )}
+
+                    </div>
+
+                    <div className="image-timer">
+                        <div className="timer-ticker" ref={timerTickerRef} />
+                    </div>
+
                 </div>
                 <div className="info-area_">
                     
@@ -741,6 +803,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                                 <div>
                                     <Rate disabled value={getAveragePropertyReviewScale() * 5} />
                                 </div>
+                                <div>of 0 Reviews</div>
 
                             </div>
                             <div className="ratings_">
@@ -748,6 +811,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                                 <div>
                                     <Rate disabled value={getAverageLandlordReviewScale() * 5} />
                                 </div>
+                                <div>of 0 Reviews</div>
                             </div>
 
                         </div>
@@ -755,7 +819,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                     </div>
 
                     {/* Image Area */}
-                    <div className="img-thumbs">
+                    {/* <div className="img-thumbs">
                         {function () {
                             let arr: any[] = [];
 
@@ -773,7 +837,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
 
                             return arr;
                         }()}
-                    </div>
+                    </div> */}
 
                 </div>
 
