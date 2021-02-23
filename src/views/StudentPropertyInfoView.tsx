@@ -41,6 +41,50 @@ const images = [
     "https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG",
     "https://img.chime.me/imagesrc/mls-listing/20210219/14/original_202030175-12573062901660652.jpg",
     "https://img.chime.me/imagesrc/mls-listing/20210217/14/original_202030175-12402065906477274.jpg",
+    'https://www.houselogic.com/wp-content/uploads/2016/08/property-tax-appeal-retina_retina_9f661fd354bfde92b764d39542dfee75.jpg',
+    "https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG",
+    "https://img.chime.me/imagesrc/mls-listing/20210219/14/original_202030175-12573062901660652.jpg",
+    "https://img.chime.me/imagesrc/mls-listing/20210217/14/original_202030175-12402065906477274.jpg",
+    'https://www.houselogic.com/wp-content/uploads/2016/08/property-tax-appeal-retina_retina_9f661fd354bfde92b764d39542dfee75.jpg',
+    "https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG",
+    "https://img.chime.me/imagesrc/mls-listing/20210219/14/original_202030175-12573062901660652.jpg",
+    "https://img.chime.me/imagesrc/mls-listing/20210217/14/original_202030175-12402065906477274.jpg",
+    'https://www.houselogic.com/wp-content/uploads/2016/08/property-tax-appeal-retina_retina_9f661fd354bfde92b764d39542dfee75.jpg',
+    "https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG",
+    "https://img.chime.me/imagesrc/mls-listing/20210219/14/original_202030175-12573062901660652.jpg",
+    "https://img.chime.me/imagesrc/mls-listing/20210217/14/original_202030175-12402065906477274.jpg",
+    'https://www.houselogic.com/wp-content/uploads/2016/08/property-tax-appeal-retina_retina_9f661fd354bfde92b764d39542dfee75.jpg',
+    "https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG",
+    "https://img.chime.me/imagesrc/mls-listing/20210219/14/original_202030175-12573062901660652.jpg",
+    "https://img.chime.me/imagesrc/mls-listing/20210217/14/original_202030175-12402065906477274.jpg",
+    'https://www.houselogic.com/wp-content/uploads/2016/08/property-tax-appeal-retina_retina_9f661fd354bfde92b764d39542dfee75.jpg',
+    "https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG",
+    "https://img.chime.me/imagesrc/mls-listing/20210219/14/original_202030175-12573062901660652.jpg",
+    "https://img.chime.me/imagesrc/mls-listing/20210217/14/original_202030175-12402065906477274.jpg",
+    'https://www.houselogic.com/wp-content/uploads/2016/08/property-tax-appeal-retina_retina_9f661fd354bfde92b764d39542dfee75.jpg',
+    "https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG",
+    "https://img.chime.me/imagesrc/mls-listing/20210219/14/original_202030175-12573062901660652.jpg",
+    "https://img.chime.me/imagesrc/mls-listing/20210217/14/original_202030175-12402065906477274.jpg",
+    'https://www.houselogic.com/wp-content/uploads/2016/08/property-tax-appeal-retina_retina_9f661fd354bfde92b764d39542dfee75.jpg',
+    "https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG",
+    "https://img.chime.me/imagesrc/mls-listing/20210219/14/original_202030175-12573062901660652.jpg",
+    "https://img.chime.me/imagesrc/mls-listing/20210217/14/original_202030175-12402065906477274.jpg",
+    'https://www.houselogic.com/wp-content/uploads/2016/08/property-tax-appeal-retina_retina_9f661fd354bfde92b764d39542dfee75.jpg',
+    "https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG",
+    "https://img.chime.me/imagesrc/mls-listing/20210219/14/original_202030175-12573062901660652.jpg",
+    "https://img.chime.me/imagesrc/mls-listing/20210217/14/original_202030175-12402065906477274.jpg",
+    'https://www.houselogic.com/wp-content/uploads/2016/08/property-tax-appeal-retina_retina_9f661fd354bfde92b764d39542dfee75.jpg',
+    "https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG",
+    "https://img.chime.me/imagesrc/mls-listing/20210219/14/original_202030175-12573062901660652.jpg",
+    "https://img.chime.me/imagesrc/mls-listing/20210217/14/original_202030175-12402065906477274.jpg",
+    'https://www.houselogic.com/wp-content/uploads/2016/08/property-tax-appeal-retina_retina_9f661fd354bfde92b764d39542dfee75.jpg',
+    "https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG",
+    "https://img.chime.me/imagesrc/mls-listing/20210219/14/original_202030175-12573062901660652.jpg",
+    "https://img.chime.me/imagesrc/mls-listing/20210217/14/original_202030175-12402065906477274.jpg",
+    'https://www.houselogic.com/wp-content/uploads/2016/08/property-tax-appeal-retina_retina_9f661fd354bfde92b764d39542dfee75.jpg',
+    "https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG",
+    "https://img.chime.me/imagesrc/mls-listing/20210219/14/original_202030175-12573062901660652.jpg",
+    "https://img.chime.me/imagesrc/mls-listing/20210217/14/original_202030175-12402065906477274.jpg",
     'https://www.houselogic.com/wp-content/uploads/2016/08/property-tax-appeal-retina_retina_9f661fd354bfde92b764d39542dfee75.jpg'
 ];
 const desc = ['terrible', 'bad', 'normal', 'good', 'wonderful'];
@@ -381,7 +425,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
         </Helmet>
 
         {/* Image Gallery */}
-        <ImageGalleryPopup show={showImageGallery} />
+        <ImageGalleryPopup images={images} onClose={() => setShowImageGallery(false)} show={showImageGallery} />
 
         {/* Add Review Popup */}
         <Popup show={canAddReviewResponse != undefined && canAddReviewResponse.canAddReview 
