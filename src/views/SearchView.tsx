@@ -411,7 +411,8 @@ const SearchResult = ({delay, result, user}: {delay: number, result: PropertySea
                     display: `flex`
                 }}>
                     <div style={{marginRight: `5px`}}>
-                        <Button 
+                        {/* Disable save-property feature */}
+                        {/* <Button 
                             text={propertySaved() ? `Remove` : `Save`}
                             background="#848CFF"
                             bold={true}
@@ -438,7 +439,7 @@ const SearchResult = ({delay, result, user}: {delay: number, result: PropertySea
                                     }
                                 }
                             }}
-                        /> 
+                        />  */}
                     </div>
                     <div>
                         <Button 

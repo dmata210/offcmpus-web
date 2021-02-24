@@ -173,6 +173,8 @@ const StudentStatus = () => {
                         text="Cancel"
                         textColor="#1E2019"
                         background="#F6F7F9"
+                        bold={true}
+                        transformDisabled={true}
                         onClick={() => resolveRedirect(history)}
                     />     
                 </div> 
@@ -180,6 +182,8 @@ const StudentStatus = () => {
                     <Button 
                         text="Save Status"
                         textColor="white"
+                        bold={true}
+                        transformDisabled={true}
                         background="#55c98b"
                         onClick={() => saveForm()}
                     />     

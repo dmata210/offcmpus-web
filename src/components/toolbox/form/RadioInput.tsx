@@ -16,12 +16,36 @@ const RadioInput = ({question, options, onChange}: RadioInputProps) => {
 
     return (<div className="radio-input-control">
         <Question>{question}</Question>
-        <div style={{display: `flex`, flexWrap: `wrap`}}>
+
+        <div className="answer-options-area">
+            
+            {(() => {
+                let question_row: any[] = [];
+                
+                let k = 0;
+                for (let i = 0; i < options.length; ++i) {
+
+                    if (k == 0) question_row.push([]);
+
+                    let el = <div 
+                        onClick={() => setSelected(i)}
+                        className={`option-item ${selected == i ? 'selected' : ''} ${k == 0 ? 'left' : 'right'}`}>{options[i]}</div>;
+
+                    question_row[question_row.length - 1].push(el);
+                    k = (k + 1) % 2;
+                }
+
+                return question_row.map(p => <div className="option-row">{p}</div>)
+            })()}
+
+        </div>
+
+        {/* <div style={{display: `flex`, flexWrap: `wrap`}}>
             {options.map((option: string, i: number) => <Option 
                 className={selected == i ? `selected` : ``} 
                 onClick={() => setSelected(i)}
                 key={i}>{option}</Option>)}
-        </div>
+        </div> */}
     </div>)
 }
 

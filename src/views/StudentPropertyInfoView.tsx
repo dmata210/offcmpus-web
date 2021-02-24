@@ -792,7 +792,8 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                                 }
                             </div>
                             <div style={{marginRight: `10px`}}>
-                                <Button 
+                                {/* Disable save feature */}
+                                {/* <Button 
                                     text={propertySaved() ? `Remove From Collection` : `Save To Collection`}
                                     background="#848CFF"
                                     textColor="white"
@@ -818,7 +819,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                                             }
                                         }
                                     }}
-                                />
+                                /> */}
                             </div>
                         </div>
 
