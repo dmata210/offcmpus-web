@@ -7,6 +7,7 @@ import {
 import {useHistory} from 'react-router';
 import {Link} from 'react-router-dom';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
+import { useMediaQuery } from 'react-responsive';
 
 import {objectURI} from '../API/S3API'
 import ViewWrapper from '../components/ViewWrapper'
@@ -73,6 +74,9 @@ const LandlordLeaseInfoView = ({
     const [students, setStudents] = useState<{[key: string]: Student}>({});
     const [institution, setInstitution] = useState<{[key: string]: Institution}>({});
     const [showDoc, setShowDoc] = useState<boolean>(false);
+    const compressedView = useMediaQuery({
+        query: '(max-width: 1440px)'
+    });
 
     //============== HOOKS ==============
     const history = useHistory();
@@ -194,6 +198,15 @@ const LandlordLeaseInfoView = ({
                             </div>
                         </div>
                     </div>}
+
+                    {compressedView && <StudentInterests
+                        institution={institution}
+                        students={students}
+                        lease={lease}
+                        lease_id={lease_id}
+                        setLease={setLease}
+                        unbounded={true}
+                    />}
                     
                     <div className="container_">
                         <div className="title">Statistics</div>
@@ -376,72 +389,89 @@ const LandlordLeaseInfoView = ({
                     </div>
 
                 </div>
-                <div className="interests-area">
-
-                    
-                    <div className="container_">
-                        <div className="title">Student Interests</div>
-                        <div className="body">
-
-                            <div>
-                                See the students who have expressed interest in this lease.
-                            </div>
-
-                            {function () {
-                                if (lease == null || lease.student_interests.length == 0) return (<div style={{
-                                    marginTop: `15px`
-                                }}>
-                                    <Empty
-                                        description={
-                                        <span>
-                                            No interests yet
-                                        </span>
-                                        }
-                                    >
-                                    </Empty>
-                                </div>);
-                                else {
-                                    return /*getUndecidedInterested(lease)*/lease.student_interests
-                                        .filter((interest: StudentInterest) => {
-                                            // filter out the documents where the student cant be found
-                                            // or the institution cant be found
-                                            if (!Object.prototype.hasOwnProperty.call(students, interest.student_id))
-                                                return false;
-                                            
-                                            let student_: Student = students[interest.student_id];
-                                            if (student_.auth_info == undefined || student_.auth_info == null) return false;
-                                            if (student_.auth_info.institution_id == undefined || student_.auth_info.institution_id == null)
-                                                return false;
-
-                                            if (!Object.prototype.hasOwnProperty.call(institution, student_.auth_info.institution_id)) 
-                                                return false;
-                                            return true;
-                                        })
-                                        .map((interest: StudentInterest, i: number) => {
-                                        let student_: Student = students[interest.student_id];
-                                        let institution_: Institution = institution[student_.auth_info!.institution_id!];
-                                        return (<StudentInterestInfo
-                                            lease_id={lease_id}
-                                            key={i}
-                                            status={interest.accepted}
-                                            student={student_}
-                                            institution={institution_}
-                                            onUpdate={(lease: Lease) => {
-                                                setLease(lease);
-                                            }}
-                                        />)
-                                    });
-                                }
-                            }()}
-
-                        </div>
-                    </div>
-
-                </div>
+                {!compressedView && <StudentInterests
+                    institution={institution}
+                    students={students}
+                    lease={lease}
+                    lease_id={lease_id}
+                    setLease={setLease}
+                />}
             </div>
 
         </div>
     </ViewWrapper>)
+}
+
+const StudentInterests = ({lease, institution, students, lease_id, setLease, unbounded}: {
+    lease: Lease | null, institution: {[key: string]: Institution},
+    students: {[key: string]: Student},
+    lease_id: string, setLease: Function, unbounded?: boolean
+}) => {
+
+    return (<div className="interests-area" style={{
+        width: unbounded == true ? `100%` : `350px`
+    }}>
+
+                    
+    <div className="container_">
+        <div className="title">Student Interests</div>
+        <div className="body">
+
+            <div>
+                See the students who have expressed interest in this lease.
+            </div>
+
+            {function () {
+                if (lease == null || lease.student_interests.length == 0) return (<div style={{
+                    marginTop: `15px`
+                }}>
+                    <Empty
+                        description={
+                        <span>
+                            No interests yet
+                        </span>
+                        }
+                    >
+                    </Empty>
+                </div>);
+                else {
+                    return /*getUndecidedInterested(lease)*/lease.student_interests
+                        .filter((interest: StudentInterest) => {
+                            // filter out the documents where the student cant be found
+                            // or the institution cant be found
+                            if (!Object.prototype.hasOwnProperty.call(students, interest.student_id))
+                                return false;
+                            
+                            let student_: Student = students[interest.student_id];
+                            if (student_.auth_info == undefined || student_.auth_info == null) return false;
+                            if (student_.auth_info.institution_id == undefined || student_.auth_info.institution_id == null)
+                                return false;
+
+                            if (!Object.prototype.hasOwnProperty.call(institution, student_.auth_info.institution_id)) 
+                                return false;
+                            return true;
+                        })
+                        .map((interest: StudentInterest, i: number) => {
+                        let student_: Student = students[interest.student_id];
+                        let institution_: Institution = institution[student_.auth_info!.institution_id!];
+                        return (<StudentInterestInfo
+                            lease_id={lease_id}
+                            key={i}
+                            status={interest.accepted}
+                            student={student_}
+                            institution={institution_}
+                            onUpdate={(lease: Lease) => {
+                                setLease(lease);
+                            }}
+                        />)
+                    });
+                }
+            }()}
+
+        </div>
+    </div>
+
+</div>);
 }
 
 const StudentInterestInfo = ({
