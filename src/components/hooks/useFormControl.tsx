@@ -5,6 +5,7 @@ import {HiOutlineCloudUpload, HiX} from 'react-icons/hi'
 import {DateRangePicker} from '../toolbox/form/DatePicker2'
 import Error from '../toolbox/form/Error';
 import FloatInput from '../toolbox/form/FloatInput';
+import RadioInput from '../toolbox/form/RadioInput';
 
 interface RadioInputConfig {
     type: 'radio'
@@ -344,9 +345,19 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
                 </FormGroup>)
             case 'radio':
                 return(<FormGroup>
-                    <label htmlFor={`#${field_key}_${formId}`}>{input.text}</label>
+                    {/* <label htmlFor={`#${field_key}_${formId}`}>{input.text}</label> */}
                     <div className="radio-group_">
-                        {input.options.map((option: string, i: number) => 
+                        <RadioInput 
+                            question={input.text}
+                            options={input.options}
+                            onChange={(option: string) => {
+                                let newState = {...formInputStates};
+                                newState[field_key] = option;
+                                formInputRefs[field_key].current = option;
+                                setFormInputStates(newState);
+                            }}
+                        />
+                        {/* {input.options.map((option: string, i: number) => 
                         <RadioBubble 
                             key={i}
                             selected={formInputStates[field_key] == option}
@@ -357,7 +368,7 @@ export const useFormControl = ({formTitle, config}: FormControlHookConfig) => {
                                 formInputRefs[field_key].current = option;
                                 setFormInputStates(newState);
                             }}
-                        />)}
+                        />)} */}
                     </div>
                 </FormGroup>)
             case 'checkbox':
