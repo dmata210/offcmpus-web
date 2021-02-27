@@ -431,6 +431,7 @@ export type LeasePriority = {
 /** Information about an instance of a lease's activation */
 export type LeaseHistory = {
   __typename?: 'LeaseHistory';
+  _id?: Maybe<Scalars['String']>;
   price: Scalars['Float'];
   student_id: Scalars['String'];
   start_date: Scalars['String'];
@@ -857,7 +858,9 @@ export type Mutation = {
   acceptOrDeclineStudentInterest: LeaseApiResponse;
   expressInterest: LeaseApiResponse;
   acceptLeaseAgreement: LeaseApiResponse;
+  addLandlordResponse: LeaseApiResponse;
   declineLeaseAgreement: LeaseApiResponse;
+  addLandlordResponseToReview: LeaseApiResponse;
   addReviewForLease: LeaseApiResponse;
   updateUnoccupiedLeases: LeaseCollectionApiResponse;
   addNewLeaseDocument: LeaseDocumentApiResponse;
@@ -1042,9 +1045,25 @@ export type MutationAcceptLeaseAgreementArgs = {
 };
 
 
+export type MutationAddLandlordResponseArgs = {
+  response_type: Scalars['String'];
+  review_response: Scalars['String'];
+  history_id: Scalars['String'];
+  lease_id: Scalars['String'];
+};
+
+
 export type MutationDeclineLeaseAgreementArgs = {
   lease_id: Scalars['String'];
   student_id: Scalars['String'];
+};
+
+
+export type MutationAddLandlordResponseToReviewArgs = {
+  landlord_response: Scalars['String'];
+  lease_history_id: Scalars['String'];
+  lease_id: Scalars['String'];
+  landlord_id: Scalars['String'];
 };
 
 
@@ -1607,7 +1626,7 @@ export type GetLeaseSummaryQuery = (
           & Pick<LeasePriority, 'level' | 'start_date' | 'end_date'>
         )>, lease_history: Array<(
           { __typename?: 'LeaseHistory' }
-          & Pick<LeaseHistory, 'price' | 'student_id' | 'start_date' | 'end_date'>
+          & Pick<LeaseHistory, '_id' | 'price' | 'student_id' | 'start_date' | 'end_date'>
           & { review_of_property?: Maybe<(
             { __typename?: 'ReviewAndResponse' }
             & Pick<ReviewAndResponse, 'rating' | 'review' | 'response'>
@@ -1648,6 +1667,22 @@ export type GetLeaseSummaryQuery = (
         )> }
       )> }
     )> }
+  ) }
+);
+
+export type AddLandlordResponseMutationVariables = Exact<{
+  lease_id: Scalars['String'];
+  history_id: Scalars['String'];
+  review_response: Scalars['String'];
+  response_type: Scalars['String'];
+}>;
+
+
+export type AddLandlordResponseMutation = (
+  { __typename?: 'Mutation' }
+  & { addLandlordResponse: (
+    { __typename?: 'LeaseAPIResponse' }
+    & LeaseApiResponseFieldsFragment
   ) }
 );
 
@@ -4067,6 +4102,7 @@ export const GetLeaseSummaryDocument = gql`
         lease_availability_start_date
         lease_availability_end_date
         lease_history {
+          _id
           price
           student_id
           start_date
@@ -4158,6 +4194,46 @@ export function useGetLeaseSummaryLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
 export type GetLeaseSummaryQueryHookResult = ReturnType<typeof useGetLeaseSummaryQuery>;
 export type GetLeaseSummaryLazyQueryHookResult = ReturnType<typeof useGetLeaseSummaryLazyQuery>;
 export type GetLeaseSummaryQueryResult = Apollo.QueryResult<GetLeaseSummaryQuery, GetLeaseSummaryQueryVariables>;
+export const AddLandlordResponseDocument = gql`
+    mutation AddLandlordResponse($lease_id: String!, $history_id: String!, $review_response: String!, $response_type: String!) {
+  addLandlordResponse(
+    lease_id: $lease_id
+    history_id: $history_id
+    review_response: $review_response
+    response_type: $response_type
+  ) {
+    ...LeaseAPIResponseFields
+  }
+}
+    ${LeaseApiResponseFieldsFragmentDoc}`;
+export type AddLandlordResponseMutationFn = Apollo.MutationFunction<AddLandlordResponseMutation, AddLandlordResponseMutationVariables>;
+
+/**
+ * __useAddLandlordResponseMutation__
+ *
+ * To run a mutation, you first call `useAddLandlordResponseMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddLandlordResponseMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addLandlordResponseMutation, { data, loading, error }] = useAddLandlordResponseMutation({
+ *   variables: {
+ *      lease_id: // value for 'lease_id'
+ *      history_id: // value for 'history_id'
+ *      review_response: // value for 'review_response'
+ *      response_type: // value for 'response_type'
+ *   },
+ * });
+ */
+export function useAddLandlordResponseMutation(baseOptions?: Apollo.MutationHookOptions<AddLandlordResponseMutation, AddLandlordResponseMutationVariables>) {
+        return Apollo.useMutation<AddLandlordResponseMutation, AddLandlordResponseMutationVariables>(AddLandlordResponseDocument, baseOptions);
+      }
+export type AddLandlordResponseMutationHookResult = ReturnType<typeof useAddLandlordResponseMutation>;
+export type AddLandlordResponseMutationResult = Apollo.MutationResult<AddLandlordResponseMutation>;
+export type AddLandlordResponseMutationOptions = Apollo.BaseMutationOptions<AddLandlordResponseMutation, AddLandlordResponseMutationVariables>;
 export const DeclineLeaseAgreementDocument = gql`
     mutation DeclineLeaseAgreement($student_id: String!, $lease_id: String!) {
   declineLeaseAgreement(student_id: $student_id, lease_id: $lease_id) {

@@ -47,6 +47,7 @@ export interface GetLeaseSummary_getLeaseSummary_data_lease_lease_history_proper
 
 export interface GetLeaseSummary_getLeaseSummary_data_lease_lease_history {
   __typename: "LeaseHistory";
+  _id: string | null;
   price: number;
   student_id: string;
   start_date: string;

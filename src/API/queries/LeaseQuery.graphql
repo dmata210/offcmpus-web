@@ -1,407 +1,398 @@
-query GetLeasesAndOccupants ($ownership_id: String!) {
-    getLeasesAndOccupants (ownership_id: $ownership_id) {
-        ...LeaseCollectionAPIResponseFields
-    }
+query GetLeasesAndOccupants($ownership_id: String!) {
+  getLeasesAndOccupants(ownership_id: $ownership_id) {
+    ...LeaseCollectionAPIResponseFields
+  }
 }
 
-query GetRoomNo(
-    $lease_id: String!,
-    $ownership_id: String!
-) {
-    getRoomNo(lease_id: $lease_id, ownership_id: $ownership_id) {
-        ...NumberAPIResponseFields
-    }
+query GetRoomNo($lease_id: String!, $ownership_id: String!) {
+  getRoomNo(lease_id: $lease_id, ownership_id: $ownership_id) {
+    ...NumberAPIResponseFields
+  }
 }
 
-query CheckEligibleForLeaseAgreement(
-    $lease_id: String!,
-    $student_id: String!
-) {
-    checkEligibleForLeaseAgreement(
-        lease_id: $lease_id,
-        student_id: $student_id
-    ) {
-        ...LeaseAPIResponseFields
-    }
+query CheckEligibleForLeaseAgreement($lease_id: String!, $student_id: String!) {
+  checkEligibleForLeaseAgreement(lease_id: $lease_id, student_id: $student_id) {
+    ...LeaseAPIResponseFields
+  }
 }
 
-query CanAddReview (
-    $student_id: String!,
-    $property_id: String!
-) {
-    canAddReview(student_id: $student_id, property_id: $property_id) {
-        success
-        error
-        data {
-            value
-        }
+query CanAddReview($student_id: String!, $property_id: String!) {
+  canAddReview(student_id: $student_id, property_id: $property_id) {
+    success
+    error
+    data {
+      value
     }
+  }
 }
 
-query GetAcceptedLeaseInfo (
-    $student_id: String!,
-    $lease_id: String!,
-    $history_id: String!
+query GetAcceptedLeaseInfo(
+  $student_id: String!
+  $lease_id: String!
+  $history_id: String!
 ) {
-    getAcceptedLeaseInfo(
-        student_id: $student_id,
-        lease_id: $lease_id,
-        history_id: $history_id
-    ) {
-        success
-        error
-        data {
-            ...LeaseHistorySummaryFields
-        }
+  getAcceptedLeaseInfo(
+    student_id: $student_id
+    lease_id: $lease_id
+    history_id: $history_id
+  ) {
+    success
+    error
+    data {
+      ...LeaseHistorySummaryFields
     }
+  }
 }
 
-query GetAcceptedLeases (
-    $student_id: String!
-) {
-    getAcceptedLeases (student_id: $student_id) {
-        success,
-        error,
-        data {
-            histories {
-                ...LeaseHistorySummaryFields
-            }
-        }
+query GetAcceptedLeases($student_id: String!) {
+  getAcceptedLeases(student_id: $student_id) {
+    success
+    error
+    data {
+      histories {
+        ...LeaseHistorySummaryFields
+      }
     }
+  }
 }
 
 query GetLeaseSummary($lease_id: String!) {
-
-    getLeaseSummary (lease_id: $lease_id) {
-        success
-        error
-        data {
-            room_no
-            property {
-                _id
-                landlord
-                address_line
-                address_line_2
-                city
-                state
-                zip
-            }
-            lease {
-                _id
-                active
-                ownership_id
-                price_per_month
-                occupant_id
-                external_occupant
-                priority {
-                    level
-                    start_date
-                    end_date
-                }
-                lease_document_id
-                lease_availability_start_date
-                lease_availability_end_date
-                lease_history {
-                    price
-                    student_id
-                    start_date
-                    end_date
-                    review_of_property {
-                        rating
-                        review
-                        response
-                    }
-                    review_of_landlord {
-                        rating
-                        review
-                        response
-                    }
-                    property_images {
-                        s3_key
-                        date_uploaded
-                    }
-                }
-                student_interests {
-                    student_id
-                    date
-                    accepted
-                }
-                students_that_declined {
-                    date
-                    student_id
-                }
-            }
-            institutions {
-                _id
-                name
-                s3_thumb_key
-                location {
-                    address
-                    city
-                    state
-                    zip
-                    longitude
-                    latitude
-                }
-            }
-            students {
-                _id
-                first_name
-                last_name
-                email
-                phone_number
-                auth_info {
-                    institution_id
-                }
-            }
-            lease_doc {
-                _id
-                lease_name
-                documents {
-                    mime_type
-                    s3_key
-                }
-                landlord_id
-            }
-
+  getLeaseSummary(lease_id: $lease_id) {
+    success
+    error
+    data {
+      room_no
+      property {
+        _id
+        landlord
+        address_line
+        address_line_2
+        city
+        state
+        zip
+      }
+      lease {
+        _id
+        active
+        ownership_id
+        price_per_month
+        occupant_id
+        external_occupant
+        priority {
+          level
+          start_date
+          end_date
         }
+        lease_document_id
+        lease_availability_start_date
+        lease_availability_end_date
+        lease_history {
+          _id
+          price
+          student_id
+          start_date
+          end_date
+          review_of_property {
+            rating
+            review
+            response
+          }
+          review_of_landlord {
+            rating
+            review
+            response
+          }
+          property_images {
+            s3_key
+            date_uploaded
+          }
+        }
+        student_interests {
+          student_id
+          date
+          accepted
+        }
+        students_that_declined {
+          date
+          student_id
+        }
+      }
+      institutions {
+        _id
+        name
+        s3_thumb_key
+        location {
+          address
+          city
+          state
+          zip
+          longitude
+          latitude
+        }
+      }
+      students {
+        _id
+        first_name
+        last_name
+        email
+        phone_number
+        auth_info {
+          institution_id
+        }
+      }
+      lease_doc {
+        _id
+        lease_name
+        documents {
+          mime_type
+          s3_key
+        }
+        landlord_id
+      }
     }
-    
+  }
 }
 
-mutation DeclineLeaseAgreement(
-    $student_id: String!,
-    $lease_id: String!
+mutation AddLandlordResponse(
+  $lease_id: String!
+  $history_id: String!
+  $review_response: String!
+  $response_type: String!
 ) {
-    declineLeaseAgreement(student_id: $student_id, lease_id: $lease_id) {
-        ...LeaseAPIResponseFields
-    }
+  addLandlordResponse(
+    lease_id: $lease_id
+    history_id: $history_id
+    review_response: $review_response
+    response_type: $response_type
+  ) {
+    ...LeaseAPIResponseFields
+  }
 }
 
-mutation AcceptLeaseAgreement(
-    $student_id: String!,
-    $lease_id: String!
-) {
-    acceptLeaseAgreement(student_id: $student_id, lease_id: $lease_id) {
-        ...LeaseAPIResponseFields
-    }
+mutation DeclineLeaseAgreement($student_id: String!, $lease_id: String!) {
+  declineLeaseAgreement(student_id: $student_id, lease_id: $lease_id) {
+    ...LeaseAPIResponseFields
+  }
 }
 
-mutation AcceptOrDeclineStudentInterest (
-    $action: String!,
-    $student_id: String!,
-    $lease_id: String!
-) {
-    acceptOrDeclineStudentInterest (
-        action: $action,
-        student_id: $student_id,
-        lease_id: $lease_id
-    ) {
-        ...LeaseAPIResponseFields
-    }
+mutation AcceptLeaseAgreement($student_id: String!, $lease_id: String!) {
+  acceptLeaseAgreement(student_id: $student_id, lease_id: $lease_id) {
+    ...LeaseAPIResponseFields
+  }
 }
 
-mutation expressInterest (
-    $student_id: String!,
-    $lease_id: String!
+mutation AcceptOrDeclineStudentInterest(
+  $action: String!
+  $student_id: String!
+  $lease_id: String!
 ) {
-    expressInterest (
-        student_id: $student_id,
-        lease_id: $lease_id
-    ) {
-        ...LeaseAPIResponseFields
-    }
+  acceptOrDeclineStudentInterest(
+    action: $action
+    student_id: $student_id
+    lease_id: $lease_id
+  ) {
+    ...LeaseAPIResponseFields
+  }
 }
 
-mutation AddReviewForLease (
-    $lease_id: String!,
-    $student_id: String!,
-    $property_review: String!,
-    $property_rating: Float!,
-    $landlord_review: String!,
-    $landlord_rating: Float!,
-    $property_images: [String!]!
-) {
-    addReviewForLease (
-        lease_id: $lease_id,
-        student_id: $student_id,
-        property_review: $property_review,
-        property_rating: $property_rating,
-        landlord_review: $landlord_review,
-        landlord_rating: $landlord_rating,
-        property_images: $property_images
-    ) {
-        ...LeaseAPIResponseFields
-    }
+mutation expressInterest($student_id: String!, $lease_id: String!) {
+  expressInterest(student_id: $student_id, lease_id: $lease_id) {
+    ...LeaseAPIResponseFields
+  }
 }
 
-mutation ActivateLease (
-    $lease_id: String!,
-    $lease_document_id: String!,
-    $price_per_month: Float!,
-    $lease_start_date: String!,
-    $lease_end_date: String!
+mutation AddReviewForLease(
+  $lease_id: String!
+  $student_id: String!
+  $property_review: String!
+  $property_rating: Float!
+  $landlord_review: String!
+  $landlord_rating: Float!
+  $property_images: [String!]!
 ) {
-    activateLease(
-        lease_id: $lease_id,
-        lease_document_id: $lease_document_id,
-        price_per_month: $price_per_month,
-        lease_start_date: $lease_start_date,
-        lease_end_date: $lease_end_date
-    ) {
-        ...LeaseAPIResponseFields
-    }
+  addReviewForLease(
+    lease_id: $lease_id
+    student_id: $student_id
+    property_review: $property_review
+    property_rating: $property_rating
+    landlord_review: $landlord_review
+    landlord_rating: $landlord_rating
+    property_images: $property_images
+  ) {
+    ...LeaseAPIResponseFields
+  }
 }
 
-mutation UpdateUnoccupiedLeases (
-    $ownership_id: String!,
-    $leases_info: [LeaseUpdateInput!]!
+mutation ActivateLease(
+  $lease_id: String!
+  $lease_document_id: String!
+  $price_per_month: Float!
+  $lease_start_date: String!
+  $lease_end_date: String!
 ) {
-    updateUnoccupiedLeases(ownership_id: $ownership_id, leases_info:$leases_info) {
-        ...LeaseCollectionAPIResponseFields
-    }
+  activateLease(
+    lease_id: $lease_id
+    lease_document_id: $lease_document_id
+    price_per_month: $price_per_month
+    lease_start_date: $lease_start_date
+    lease_end_date: $lease_end_date
+  ) {
+    ...LeaseAPIResponseFields
+  }
+}
+
+mutation UpdateUnoccupiedLeases(
+  $ownership_id: String!
+  $leases_info: [LeaseUpdateInput!]!
+) {
+  updateUnoccupiedLeases(
+    ownership_id: $ownership_id
+    leases_info: $leases_info
+  ) {
+    ...LeaseCollectionAPIResponseFields
+  }
 }
 
 fragment LeaseAPIResponseFields on LeaseAPIResponse {
-    success
-    error
-    data {
-        ...LeaseFields
-    }
+  success
+  error
+  data {
+    ...LeaseFields
+  }
 }
 
 fragment LeaseCollectionAPIResponseFields on LeaseCollectionAPIResponse {
-    success
-    error
-    data {
-        leases {
-            ...LeaseFields
-        }
+  success
+  error
+  data {
+    leases {
+      ...LeaseFields
     }
+  }
 }
 
 fragment LeaseFields on Lease {
-    _id
-    active
-    ownership_id
-    price_per_month
-    occupant_id
-    occupant_doc {
-        ...LeaseOccupant
-    }
-    external_occupant
-    priority {
-        level
-        start_date
-        end_date
-    }
-    lease_document_id
-    lease_availability_start_date
-    lease_availability_end_date
-    lease_history {
-        price
-        student_id
-        start_date
-        end_date
-        review_of_property {
-            rating
-            review
-            response
-        }
-        review_of_landlord {
-            rating
-            review
-            response
-        }
-        property_images {
-            s3_key
-            date_uploaded
-        }
-    }
-    student_interests {
-        student_id
-        date  
-        accepted
-    }
-    students_that_declined {
-        date
-        student_id
-    }
-}
-
-fragment LeaseOccupant on Student {
-    _id
-    first_name
-    phone_number
-    last_name
-    email
-    elevated_privileges
-    auth_info {
-      cas_id
-      institution_id
-    }
-    user_settings {
-      recieve_email_notifications
-      push_subscriptions {
-        endpoint
-        keys {
-          p256dh
-          auth
-        }
-      }
-    }
-    search_status {
-      date_updated
-      searching
-      search_start
-      search_end
-      price_start
-      price_end
-    }
-}
-
-fragment NumberAPIResponseFields on NumberAPIResponse {
-    success
-    error
-    data {
-        value
-    }
-}
-
-fragment LeaseHistoryFields on LeaseHistory {
+  _id
+  active
+  ownership_id
+  price_per_month
+  occupant_id
+  occupant_doc {
+    ...LeaseOccupant
+  }
+  external_occupant
+  priority {
+    level
+    start_date
+    end_date
+  }
+  lease_document_id
+  lease_availability_start_date
+  lease_availability_end_date
+  lease_history {
     price
     student_id
     start_date
     end_date
     review_of_property {
-        rating
-        review
-        response
+      rating
+      review
+      response
     }
     review_of_landlord {
-        rating
-        review
-        response
+      rating
+      review
+      response
     }
     property_images {
-        s3_key
-        date_uploaded
+      s3_key
+      date_uploaded
     }
+  }
+  student_interests {
+    student_id
+    date
+    accepted
+  }
+  students_that_declined {
+    date
+    student_id
+  }
+}
+
+fragment LeaseOccupant on Student {
+  _id
+  first_name
+  phone_number
+  last_name
+  email
+  elevated_privileges
+  auth_info {
+    cas_id
+    institution_id
+  }
+  user_settings {
+    recieve_email_notifications
+    push_subscriptions {
+      endpoint
+      keys {
+        p256dh
+        auth
+      }
+    }
+  }
+  search_status {
+    date_updated
+    searching
+    search_start
+    search_end
+    price_start
+    price_end
+  }
+}
+
+fragment NumberAPIResponseFields on NumberAPIResponse {
+  success
+  error
+  data {
+    value
+  }
+}
+
+fragment LeaseHistoryFields on LeaseHistory {
+  price
+  student_id
+  start_date
+  end_date
+  review_of_property {
+    rating
+    review
+    response
+  }
+  review_of_landlord {
+    rating
+    review
+    response
+  }
+  property_images {
+    s3_key
+    date_uploaded
+  }
 }
 
 fragment LeaseHistorySummaryFields on LeaseHistorySummary {
-    room_no
-    lease_history_id
-    lease_history {
-        ...LeaseHistoryFields
-    }
-    landlord {
-        ...LandlordFields
-    }
-    lease {
-        ...LeaseFields
-    }
-    property {
-        ...PropertyFields
-    }
+  room_no
+  lease_history_id
+  lease_history {
+    ...LeaseHistoryFields
+  }
+  landlord {
+    ...LandlordFields
+  }
+  lease {
+    ...LeaseFields
+  }
+  property {
+    ...PropertyFields
+  }
 }
