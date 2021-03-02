@@ -1,9 +1,14 @@
 import React, {useRef, useEffect, useState} from 'react'
 import {useSpring, motion, useTransform} from 'framer-motion'
 import {RiBookOpenLine} from 'react-icons/ri'
-import Input, {alnumOnly, noSpaces, $and, numbersOnly} from '../components/toolbox/form/Input'
+import Input, {Validators, InputValidatorFlags, alnumOnly, noSpaces, $and, numbersOnly} from '../components/toolbox/form/Input'
 
 import FloatInput from '../components/toolbox/form/FloatInput'
+
+const {
+  numbersOnly: numbersOnlyValidator,
+  minLen: minLenValidator
+} = Validators;
 
 const Testing = () => {
 
@@ -14,8 +19,17 @@ const Testing = () => {
     left: `50%`, top: `50%`,
     transform: `translateX(-50%) translateY(-50%)`
   }}>
-    <FloatInput prefix="#" onChange={(i: number) => {
-    }} />
+
+    <Input
+      label="Input Label"
+      validators={[
+        {errorMsg: "Input values must be numbers", validator: numbersOnlyValidator, flag: InputValidatorFlags.VALIDATOR_WARNING },
+        {errorMsg: "Value must have at least 5 characters", validator: minLenValidator(5) }
+      ]}
+    />
+
+    {/* <FloatInput prefix="$" onChange={(i: number) => {
+    }} /> */}
   </div>)
 }
 

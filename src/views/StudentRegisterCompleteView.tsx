@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import Centered from '../components/toolbox/layout/Centered'
 import Button from '../components/toolbox/form/Button'
-import Input from '../components/toolbox/form/Input'
+import Input, { noSpaces } from '../components/toolbox/form/Input'
 import CommentBubble from '../components/toolbox/misc/CommentBubble'
 import {fetchUser} from '../redux/actions/user'
 import {useMediaQuery} from 'react-responsive'
@@ -177,7 +177,8 @@ const StudentRegisterCompleteView = () => {
       </div>
 
       <div className="padded upper">
-        <Input label="Email" 
+        <Input label="Email"
+          inputFilters={[noSpaces]} 
           icon={<BsAt />}
           onChange={(val) => { let reg2 = regData; reg2.email = val; setRegData(reg2) }}
         />
@@ -185,6 +186,7 @@ const StudentRegisterCompleteView = () => {
 
       <div className="padded upper">
         <Input label="Confirm Email" 
+          inputFilters={[noSpaces]} 
           icon={<BsAt />}
           onChange={(val) => { let reg2 = regData; reg2.confirm_email = val; setRegData(reg2) }}
         />

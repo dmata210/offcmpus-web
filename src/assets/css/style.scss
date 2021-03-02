@@ -419,6 +419,25 @@ body {
   }
 }
 
+.input-field-error-msg {
+  font-size: 0.8rem;
+  padding: 2px 8px;
+
+  .error-icon {
+    margin-right: 4px;
+    font-weight: 600;
+    font-family: khumbh-sans;
+  }
+
+  &.error {
+    color: $red;
+  }
+
+  &.warning {
+    color: #eba338;
+  }
+}
+
 .input-field {
   border: 1px solid $navy;
   height: 42px;
@@ -426,6 +445,23 @@ body {
   position: relative;
   display: flex;
   z-index: 5;
+  transition: border 0.25s;
+
+  &.invalid {
+    &.error {
+      border: 1px solid $red;
+      .label-area {
+        color: $red;
+      }
+    }
+
+    &.warning {
+      border: 1px solid #eba338;
+      .label-area {
+        color: #eba338;
+      }
+    }
+  }
 
   &.focused {
     border-bottom: none;

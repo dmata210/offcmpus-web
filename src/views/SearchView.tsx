@@ -1,14 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
 import ViewWrapper from '../components/ViewWrapper';
-import Slider from '../components/toolbox/form/Slider';
 import RangeSlider, {date,MONTHS_ABRV} from '../components/toolbox/form/RangeSlider';
 import Counter, {positiveOnly, maxVal} from '../components/toolbox/form/Counter';
 import MoreDetails from '../components/toolbox/misc/MoreDetails2'
 import {useNumberCounter} from '../components/hooks/useNumberCounter'
 import Button from '../components/toolbox/form/Button'
-import {useMediaQuery} from 'react-responsive'
-import {HiCheck} from 'react-icons/hi'
-import {motion, useSpring, useTransform} from 'framer-motion'
 import Cookies from 'universal-cookie'
 import {useHistory} from 'react-router'
 import {ReduxState} from '../redux/reducers/all_reducers'
