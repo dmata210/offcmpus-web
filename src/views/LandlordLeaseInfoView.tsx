@@ -7,7 +7,9 @@ import {
 import {useHistory} from 'react-router';
 import {Link} from 'react-router-dom';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
+import { useMediaQuery } from 'react-responsive';
 
+import Popup, {PopupHeader} from '../components/toolbox/misc/Popup'
 import {objectURI} from '../API/S3API'
 import ViewWrapper from '../components/ViewWrapper'
 import Button from '../components/toolbox/form/Button'
@@ -15,12 +17,14 @@ import {ReduxState} from '../redux/reducers/all_reducers'
 import {
     useGetLeaseSummaryLazyQuery,
     useAcceptOrDeclineStudentInterestMutation,
+    useAddLandlordResponseMutation,
     Lease,
     StudentInterest,
     Student,
     Institution,
     Property,
-    LeaseDocument
+    LeaseDocument,
+    LeaseHistory
 } from '../API/queries/types/graphqlFragmentTypes'
 import '@react-pdf-viewer/core/lib/styles/index.css'
 
@@ -63,6 +67,7 @@ const LandlordLeaseInfoView = ({
 
     //============== GRAPHQL ==============
     const [GetLeaseSummary, {data: leaseSummaryResponse}] = useGetLeaseSummaryLazyQuery();
+    const [AddReviewResponse, {data: reviewResponseResponse}] = useAddLandlordResponseMutation();
     
     //============== STATE ==============
     const user = useSelector((state: ReduxState) => state.user);
@@ -73,11 +78,33 @@ const LandlordLeaseInfoView = ({
     const [students, setStudents] = useState<{[key: string]: Student}>({});
     const [institution, setInstitution] = useState<{[key: string]: Institution}>({});
     const [showDoc, setShowDoc] = useState<boolean>(false);
+    const [showResponsePopup, setShowResponsePopup] = useState<boolean>(false);
+    type ReviewResponseInfo = {history_id: string, type: 'landlord' | 'property'};
+    const [reviewResponseInfo, setReviewResponseInfo] = useState<ReviewResponseInfo | null>(null);
+    const [reviewResponse, setReviewResponse] = useState<string>("");
+    const compressedView = useMediaQuery({
+        query: '(max-width: 1440px)'
+    });
 
     //============== HOOKS ==============
     const history = useHistory();
     
     //============== EFFECTS ==============
+    useEffect(() => {
+        if (reviewResponseInfo != null) {
+            setShowResponsePopup(true);
+            setReviewResponse("");
+        }
+    }, [reviewResponseInfo]);
+
+    useEffect(() => {
+        if (reviewResponseResponse && reviewResponseResponse.addLandlordResponse
+            && reviewResponseResponse.addLandlordResponse.data) {
+            setShowResponsePopup(false);
+            setReviewResponse("");
+        }
+    }, [reviewResponseResponse]);
+
     useEffect(() => {
         // get the lease summary
         GetLeaseSummary({
@@ -158,9 +185,124 @@ const LandlordLeaseInfoView = ({
             interest.accepted == undefined);
     }
 
+    const historiesWithReviews = () => {
+        if (!lease || !lease.lease_history) return [];
+        return lease.lease_history.filter((history: LeaseHistory) => 
+            Object.prototype.hasOwnProperty.call(history, 'review_of_landlord')
+            || Object.prototype.hasOwnProperty.call(history, 'review_of_property')
+        );
+    }
+
+    const writeResponse = (history: LeaseHistory, type: 'property' | 'landlord') => {
+        setReviewResponseInfo({
+            history_id: history._id ? history._id : '',
+            type: type
+        });
+    }
+
+    const submitReviewResponse = () => {
+        if (reviewResponseInfo == null) return;
+
+        // TODO add response query
+        AddReviewResponse({
+            variables: {
+                lease_id: lease ? lease._id : '',
+                history_id: reviewResponseInfo ? reviewResponseInfo.history_id : '',
+                response_type: reviewResponseInfo ? reviewResponseInfo.type : '',
+                review_response: reviewResponse
+            }
+        });
+    }
+
+    const getResponseReview = () => {
+        if (reviewResponseInfo == null) return '';
+        if (!lease || !lease.lease_history) return '';
+
+        for (let i = 0; i < lease.lease_history.length; ++i) {
+            if (lease.lease_history[i]._id == reviewResponseInfo.history_id) {
+                if (reviewResponseInfo.type == 'landlord' && lease.lease_history[i].review_of_landlord != undefined) 
+                    return lease.lease_history[i].review_of_landlord!.review;
+                if (reviewResponseInfo.type == 'property' && lease.lease_history[i].review_of_property != undefined) 
+                    return lease.lease_history[i].review_of_property!.review;
+            }
+        }
+
+        return '';
+    }
+
     //============== RENDER ==============
     return (<ViewWrapper>
         <div>
+
+            {/* Review Response Header */}
+            <Popup width={400} height={400} show={showResponsePopup}>
+                <PopupHeader 
+                    withClose={true}
+                    onClose={() => {
+                        setReviewResponseInfo(null);
+                        setShowResponsePopup(false);
+                        setReviewResponse("");
+                    }}
+                >Response to Review</PopupHeader>
+                
+                <div style={{
+                    padding: '0 15px'
+                }}>
+                    <div style={{fontWeight: 600}}>Landlord</div>
+                    <div style={{
+                        marginTop: '15px',
+                        border: '1px solid #9fb0bd',
+                        padding: '5px 15px',
+                        backgroundColor: '#e5ebf0',
+                        borderRadius: '5px'
+                    }}>
+                        <div style={{textTransform: 'uppercase', fontWeight: 600, fontSize: '0.7rem'}}>Review</div>
+                        {getResponseReview()}
+                    </div>
+
+                    <div style={{
+                        marginTop: '15px',
+                        marginLeft: '30px'
+                    }}>
+                        <div style={{textTransform: 'uppercase', fontWeight: 600, fontSize: '0.7rem'}}>Response</div>
+                        <div>
+                            <textarea 
+                                onChange={(e: any) => {
+                                    setReviewResponse(e.target.value);
+                                }}
+                                style={{
+                                    width: '100%', minWidth: '100%', maxWidth: '100%',
+                                    height: '100px',
+                                    padding: '8px 10px',
+                                    boxSizing: 'border-box',
+                                    borderRadius: '5px'
+                                }}
+                            />
+                            <div style={{
+                                color: 'red',
+                                marginTop: '5px', marginBottom: '5px',
+                                fontSize: '0.8rem'
+                            }}>
+                                Error: Response is empty
+                            </div>
+                            <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+                                <Button 
+                                    text="Save Review"
+                                    textColor="white"
+                                    background="#E0777D"
+                                    bold={true}
+                                    transformDisabled={true}
+                                    onClick={() => {
+                                        submitReviewResponse();
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </Popup>
 
             {/* Title */}
             <div>
@@ -194,6 +336,15 @@ const LandlordLeaseInfoView = ({
                             </div>
                         </div>
                     </div>}
+
+                    {compressedView && <StudentInterests
+                        institution={institution}
+                        students={students}
+                        lease={lease}
+                        lease_id={lease_id}
+                        setLease={setLease}
+                        unbounded={true}
+                    />}
                     
                     <div className="container_">
                         <div className="title">Statistics</div>
@@ -375,73 +526,185 @@ const LandlordLeaseInfoView = ({
                         </div>
                     </div>
 
-                </div>
-                <div className="interests-area">
-
-                    
                     <div className="container_">
-                        <div className="title">Student Interests</div>
+                        
+                        <div className="title">Reviews</div>
                         <div className="body">
-
-                            <div>
-                                See the students who have expressed interest in this lease.
+                            <div style={{fontWeight: 600}}>
+                                These are reviews made by previous leasers for this property.
                             </div>
 
-                            {function () {
-                                if (lease == null || lease.student_interests.length == 0) return (<div style={{
-                                    marginTop: `15px`
-                                }}>
+                            {lease && lease.lease_history.length == 0 && <div>
+                                <div style={{marginTop: '15px'}}>
                                     <Empty
                                         description={
                                         <span>
-                                            No interests yet
+                                            No reviews yet
                                         </span>
                                         }
-                                    >
-                                    </Empty>
-                                </div>);
-                                else {
-                                    return /*getUndecidedInterested(lease)*/lease.student_interests
-                                        .filter((interest: StudentInterest) => {
-                                            // filter out the documents where the student cant be found
-                                            // or the institution cant be found
-                                            if (!Object.prototype.hasOwnProperty.call(students, interest.student_id))
-                                                return false;
-                                            
-                                            let student_: Student = students[interest.student_id];
-                                            if (student_.auth_info == undefined || student_.auth_info == null) return false;
-                                            if (student_.auth_info.institution_id == undefined || student_.auth_info.institution_id == null)
-                                                return false;
+                                    />
+                                </div>
+                            </div>}
 
-                                            if (!Object.prototype.hasOwnProperty.call(institution, student_.auth_info.institution_id)) 
-                                                return false;
-                                            return true;
-                                        })
-                                        .map((interest: StudentInterest, i: number) => {
-                                        let student_: Student = students[interest.student_id];
-                                        let institution_: Institution = institution[student_.auth_info!.institution_id!];
-                                        return (<StudentInterestInfo
-                                            lease_id={lease_id}
-                                            key={i}
-                                            status={interest.accepted}
-                                            student={student_}
-                                            institution={institution_}
-                                            onUpdate={(lease: Lease) => {
-                                                setLease(lease);
-                                            }}
-                                        />)
-                                    });
-                                }
-                            }()}
-
+                            <div style={{marginTop: '20px'}}>
+                                {lease && lease.lease_history.length > 0 && <div>
+                                    {historiesWithReviews().map((history: LeaseHistory, i: number) => 
+                                        <Review key={i} writeResponse={writeResponse} history={history} />
+                                    )}
+                                </div>}
+                            </div>
                         </div>
                     </div>
 
                 </div>
+                {!compressedView && <StudentInterests
+                    institution={institution}
+                    students={students}
+                    lease={lease}
+                    lease_id={lease_id}
+                    setLease={setLease}
+                />}
             </div>
 
         </div>
     </ViewWrapper>)
+}
+
+const Review = ({history, writeResponse}: {writeResponse: (history: LeaseHistory, type: 'property' | 'landlord') => void, history: LeaseHistory}) => {
+
+    return (<div className="landlord-lease-review-modal">
+        
+        {history.review_of_property != undefined && <div className="review-area">
+            <div className="head_">PROPERTY REVIEW</div>
+            {history.review_of_property.review}
+
+            <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+                {history.review_of_property.response != undefined && 
+                <div style={{
+                    width: '95%', border: '1px solid #9fb0bd',
+                    padding: '5px 8px', borderRadius: '5px',
+                    marginTop: '10px'
+                }}>
+                    <div style={{
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        fontSize: '0.8rem'
+                    }}>Response</div>
+                    {history.review_of_property.response}
+                </div>}
+                {history.review_of_property.response == undefined && <Button 
+                    text="Write a Response"
+                    textColor="white"
+                    background="#E0777D"
+                    bold={true}
+                    transformDisabled={true}
+                    onClick={() => writeResponse(history, 'property')}
+                />}
+            </div>
+        </div>}
+
+        {history.review_of_landlord != undefined && <div className="review-area">
+            <div className="head_">LANDLORD REVIEW</div>
+            {history.review_of_landlord.review}
+
+            <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+                {history.review_of_landlord.response != undefined && 
+                <div style={{
+                    width: '95%', border: '1px solid #9fb0bd',
+                    padding: '5px 8px', borderRadius: '5px',
+                    marginTop: '10px'
+                }}>
+                    <div style={{
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        fontSize: '0.8rem'
+                    }}>Response</div>
+                    {history.review_of_landlord.response}    
+                </div>}
+                {history.review_of_landlord .response == undefined && <Button 
+                    text="Write a Response"
+                    textColor="white"
+                    background="#E0777D"
+                    bold={true}
+                    transformDisabled={true}
+                    onClick={() => writeResponse(history, 'landlord')}
+                />}
+            </div>
+        </div>}
+
+
+    </div>)
+}
+
+const StudentInterests = ({lease, institution, students, lease_id, setLease, unbounded}: {
+    lease: Lease | null, institution: {[key: string]: Institution},
+    students: {[key: string]: Student},
+    lease_id: string, setLease: Function, unbounded?: boolean
+}) => {
+
+    return (<div className="interests-area" style={{
+        width: unbounded == true ? `100%` : `350px`
+    }}>
+
+                    
+    <div className="container_">
+        <div className="title">Student Interests</div>
+        <div className="body">
+
+            <div>
+                See the students who have expressed interest in this lease.
+            </div>
+
+            {function () {
+                if (lease == null || lease.student_interests.length == 0) return (<div style={{
+                    marginTop: `15px`
+                }}>
+                    <Empty
+                        description={
+                        <span>
+                            No interests yet
+                        </span>
+                        }
+                    />
+                </div>);
+                else {
+                    return /*getUndecidedInterested(lease)*/lease.student_interests
+                        .filter((interest: StudentInterest) => {
+                            // filter out the documents where the student cant be found
+                            // or the institution cant be found
+                            if (!Object.prototype.hasOwnProperty.call(students, interest.student_id))
+                                return false;
+                            
+                            let student_: Student = students[interest.student_id];
+                            if (student_.auth_info == undefined || student_.auth_info == null) return false;
+                            if (student_.auth_info.institution_id == undefined || student_.auth_info.institution_id == null)
+                                return false;
+
+                            if (!Object.prototype.hasOwnProperty.call(institution, student_.auth_info.institution_id)) 
+                                return false;
+                            return true;
+                        })
+                        .map((interest: StudentInterest, i: number) => {
+                        let student_: Student = students[interest.student_id];
+                        let institution_: Institution = institution[student_.auth_info!.institution_id!];
+                        return (<StudentInterestInfo
+                            lease_id={lease_id}
+                            key={i}
+                            status={interest.accepted}
+                            student={student_}
+                            institution={institution_}
+                            onUpdate={(lease: Lease) => {
+                                setLease(lease);
+                            }}
+                        />)
+                    });
+                }
+            }()}
+
+        </div>
+    </div>
+
+</div>);
 }
 
 const StudentInterestInfo = ({

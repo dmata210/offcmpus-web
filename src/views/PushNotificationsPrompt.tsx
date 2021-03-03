@@ -126,7 +126,12 @@ const PushNotificationsPrompt = () => {
                 })
             }
             else {
-                console.error(`Notification permission not granted...`)
+                console.error(`Notification permission not granted...`);
+                alert("Notification permission not granted.");
+                setNotifCookie();
+                history.push('/'); 
+                // They have already declined, so might as well redirect
+                // them away.
             }
 
             // send test notification

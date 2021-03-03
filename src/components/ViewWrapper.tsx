@@ -161,11 +161,11 @@ const ViewWrapper = ({children,
             icon: <FaBell />,
             name: `Notifications`
           },
-          collection: {
-            target: '/collection',
-            icon: <BiCollection />,
-            name: 'Collection'
-          }
+          // collection: {
+          //   target: '/collection',
+          //   icon: <BiCollection />,
+          //   name: 'Collection'
+          // }
         })
       }
 

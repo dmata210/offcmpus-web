@@ -5,7 +5,7 @@ import {Helmet} from "react-helmet";
 
 import Centered from '../components/toolbox/layout/Centered'
 import Logo from '../components/Logo'
-import Input from '../components/toolbox/form/Input'
+import Input, {noSpaces} from '../components/toolbox/form/Input'
 import Button from '../components/toolbox/form/Button'
 import LeftAndRight from '../components/toolbox/layout/LeftAndRight'
 import {useCreateLandlordMutation} from '../API/queries/types/graphqlFragmentTypes'
@@ -198,6 +198,7 @@ const LandlordRegister = () => {
       <div className="padded upper">
         <Input 
           label="email"
+          inputFilters={[noSpaces]}
           onChange={fieldUpdateFunction('email')}
         />
       </div>
@@ -205,6 +206,7 @@ const LandlordRegister = () => {
       <div className="padded upper">
         <Input 
           label="confirm email"
+          inputFilters={[noSpaces]}
           onChange={fieldUpdateFunction('confirm_email')}
         />
       </div>

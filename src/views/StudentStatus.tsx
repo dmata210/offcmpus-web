@@ -6,12 +6,12 @@ import {Helmet} from "react-helmet";
 import {resolveRedirect} from '../components/hooks/usePushRedirect'
 import Centered from '../components/toolbox/layout/Centered'
 import RatioInput from '../components/toolbox/form/RadioInput'
-import DatePicker from '../components/toolbox/form/DatePicker'
 import RangeSlider from '../components/toolbox/form/RangeSlider'
 import Button from '../components/toolbox/form/Button'
 import {useUpdateStudentSearchStatusMutation} from '../API/queries/types/graphqlFragmentTypes'
 import {ReduxState} from '../redux/reducers/all_reducers'
 import {fetchUser} from '../redux/actions/user'
+import {DateRangePicker} from '../components/toolbox/form/DatePicker2'
 
 const StudentStatus = () => {
 
@@ -146,7 +146,7 @@ const StudentStatus = () => {
             {/* Date Picker */}
             {searching == true && <div style={{marginTop: `20px`}}>
                 <div style={{marginBottom: `20px`}}>What time frame are you looking to lease for?</div>
-                <DatePicker type="range" onChange={(start: Date | null, end: Date | null) => {
+                <DateRangePicker  onChange={(start: Date | null, end: Date | null) => {
                     setDateInfo([start, end]);
                 }} />
             </div>}
@@ -173,6 +173,8 @@ const StudentStatus = () => {
                         text="Cancel"
                         textColor="#1E2019"
                         background="#F6F7F9"
+                        bold={true}
+                        transformDisabled={true}
                         onClick={() => resolveRedirect(history)}
                     />     
                 </div> 
@@ -180,6 +182,8 @@ const StudentStatus = () => {
                     <Button 
                         text="Save Status"
                         textColor="white"
+                        bold={true}
+                        transformDisabled={true}
                         background="#55c98b"
                         onClick={() => saveForm()}
                     />     

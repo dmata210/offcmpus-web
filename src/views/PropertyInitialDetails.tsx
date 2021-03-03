@@ -272,7 +272,7 @@ const PropertyInitialDetails = ({property_id}: {property_id: string}) => {
                         [washerQuestion, (x: boolean | null): boolean => x != null, "hasWashingMachine"], 
                         [heatingQuestion, (x: boolean | null): boolean => x != null, "hasHeater"], 
                         [coolingQuestion, (x: boolean | null): boolean => x != null, "hasAC"],
-                        [descriptionAdd, (x: string): boolean => x.length > 50 && x.length < 200, "description"]]
+                        [descriptionAdd, (x: string): boolean => x.length < 200, "description"]]
 
     const questionChangeSpring = useSpring(1, {duration: 500})
 
