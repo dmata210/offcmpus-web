@@ -6,7 +6,7 @@ import {Helmet} from "react-helmet";
 import LandlordAPI from '../API/LandlordAPI'
 import Centered from '../components/toolbox/layout/Centered'
 import Logo from '../components/Logo'
-import Input from '../components/toolbox/form/Input'
+import Input, {useInput, Validators} from '../components/toolbox/form/Input'
 import Button from '../components/toolbox/form/Button'
 import LeftAndRight from '../components/toolbox/layout/LeftAndRight'
 import { BsAt } from "react-icons/bs";
@@ -30,6 +30,8 @@ interface IFormError {
   message: string
 }
 
+const {email: emailValidator, minLen: minLenValidator} = Validators;
+
 const LandlordLogin = () => {
 
   const isMobile = useMediaQuery({ query: '(max-width: 500px)' })
@@ -41,9 +43,27 @@ const LandlordLogin = () => {
   const [formError, setFormError] = useState<IFormError>({
     hasError: false, message: ""
   })
+  const [formValidity, setFormValidity] = useState<{email: boolean, password: boolean}>({email: false, password: false})
   const [loginFields, setLoginFields] = useState<ILoginFields>({
     email: "", password: ""
   })
+
+  const [emailInputState, emailInputView] = useInput({
+    label: "email",
+    icon: <BsAt />,
+    validators:[
+      {errorMsg: "Must input an email", validator: emailValidator}
+    ]
+  });
+
+  const [passwordInputState, passwordInputView] = useInput({
+    label: "password",
+    type: "password",
+    icon: <BiKey />,
+    validators: [
+      {errorMsg: "Password too short", validator: minLenValidator(5)}
+    ]
+  });
 
   useEffect (() => {
 
@@ -60,17 +80,28 @@ const LandlordLogin = () => {
 
   const handleLogin = () => {
 
-    if (loginFields.email.length === 0 || loginFields.password.length === 0) {
+    // if (loginFields.email.length === 0 || loginFields.password.length === 0) {
+    if ((emailInputState as any).value.length === 0 || 
+        (passwordInputState as any).value.length === 0) {
       setFormError({
         hasError: true,
         message: "Fields must not be left empty"
+      })
+    }
+    else if (
+      !(emailInputState as any).valid ||
+      !(passwordInputState as any).valid
+    ) {
+      setFormError({
+        hasError: true,
+        message: "One of the fields has an error"
       })
     }
     else {
       setFormError({
         hasError: false, message: ""
       })
-      LandlordAPI.login(loginFields.email, loginFields.password)
+      LandlordAPI.login((emailInputState as any).value, (passwordInputState as any).value)
       .then(res => {
         if (res.data.success) { 
 
@@ -104,6 +135,9 @@ const LandlordLogin = () => {
 
   const fieldCallback = (field_name: 'email' | 'password') => {
     return (new_value: string) => {
+
+      
+
       let currentFields: any = loginFields
       currentFields[field_name] = new_value
       setLoginFields(currentFields)
@@ -116,6 +150,8 @@ const LandlordLogin = () => {
       message: ''
     })
   }
+
+  const isValid = () => formValidity.email && formValidity.password;
 
   return (<Centered width={isMobile ? 300 : 400} height={500}>
     <div>
@@ -149,19 +185,35 @@ const LandlordLogin = () => {
       />}
 
       <div className="padded upper">
-        <Input 
+        {/* <Input 
           label="email"
           onChange={fieldCallback('email')}
+          onValidate={(valid: boolean) => {
+            let validity = {...formValidity};
+            validity.password = valid;
+            setFormValidity(validity);
+          }}
           icon={<BsAt />}
-        />
+          validators={[
+            {errorMsg: "Must input an email", validator: emailValidator}
+          ]}
+        /> */}
+        {emailInputView}
       </div>
       <div className="padded upper">
-        <Input 
+        {/* <Input 
           label="password"
           type="password"
           icon={<BiKey />}
+          validators={[
+            {errorMsg: "Password too short", validator: minLenValidator(5)}
+          ]}
           onChange={fieldCallback('password')}
-        />
+          onValidate={(valid: boolean) => {
+            console.log(`[password] onValidate recieved => ${valid}`);
+          }}
+        /> */}
+        {passwordInputView}
       </div>
 
       <div className="padded upper">
