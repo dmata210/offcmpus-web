@@ -1,0 +1,37 @@
+mutation StatsStudentAccountCreation($student_id: String!) {
+  Stats_StudentAccountCreation(student_id: $student_id) {
+    v
+  }
+}
+
+mutation StatsStudentLogin($student_id: String!) {
+  Stats_StudentLogin(student_id: $student_id) {
+    v
+  }
+}
+
+mutation StatsLandlordAccountCreation($landlord_id: String!) {
+  Stats_LandlordAccountCreation(landlord_id: $landlord_id) {
+    v
+  }
+}
+
+mutation StatsLandlordLogin($landlord_id: String!) {
+  Stats_LandlordLogin(landlord_id: $landlord_id) {
+    v
+  }
+}
+
+mutation StatsLandlordOpenLease(
+  $landlord_id: String!
+  $property_id: String!
+  $lease_id: String!
+) {
+  Stats_LandlordOpenLease(
+    landlord_id: $landlord_id
+    property_id: $property_id
+    lease_id: $lease_id
+  ) {
+    v
+  }
+}

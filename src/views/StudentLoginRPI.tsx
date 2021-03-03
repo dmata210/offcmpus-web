@@ -7,6 +7,10 @@ import {backendPath} from '../config'
 import queryString from 'query-string'
 import {Helmet} from "react-helmet";
 
+import {
+    useStatsStudentAccountCreationMutation
+} from '../API/queries/types/graphqlFragmentTypes'
+
 const StudentLoginViewRPI = () => {
 
 
@@ -37,6 +41,9 @@ const StudentLoginViewRPI = () => {
             ctxWindow?.close();
             // history.push('/');
             // window.location.reload();
+            
+            // Statistics for login
+
             window.location.href = getRedirect();
             }
             else console.log(`CAS Auth failed`);

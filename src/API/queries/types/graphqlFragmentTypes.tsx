@@ -535,7 +535,7 @@ export type PropertySearchResult = {
   property: Property;
   landlord_first_name: Scalars['String'];
   landlord_last_name: Scalars['String'];
-  price_range: Array<Scalars['Int']>;
+  price_range: Array<Scalars['Float']>;
   lease_count: Scalars['Int'];
   landlord_rating_avg: Scalars['Float'];
   landlord_rating_count: Scalars['Int'];
@@ -864,6 +864,11 @@ export type Mutation = {
   addReviewForLease: LeaseApiResponse;
   updateUnoccupiedLeases: LeaseCollectionApiResponse;
   addNewLeaseDocument: LeaseDocumentApiResponse;
+  Stats_StudentAccountCreation: StatsResponse;
+  Stats_StudentLogin: StatsResponse;
+  Stats_LandlordAccountCreation: StatsResponse;
+  Stats_LandlordLogin: StatsResponse;
+  Stats_LandlordOpenLease: StatsResponse;
 };
 
 
@@ -1091,6 +1096,33 @@ export type MutationAddNewLeaseDocumentArgs = {
   lease_name: Scalars['String'];
 };
 
+
+export type MutationStats_StudentAccountCreationArgs = {
+  student_id: Scalars['String'];
+};
+
+
+export type MutationStats_StudentLoginArgs = {
+  student_id: Scalars['String'];
+};
+
+
+export type MutationStats_LandlordAccountCreationArgs = {
+  landlord_id: Scalars['String'];
+};
+
+
+export type MutationStats_LandlordLoginArgs = {
+  landlord_id: Scalars['String'];
+};
+
+
+export type MutationStats_LandlordOpenLeaseArgs = {
+  lease_id: Scalars['String'];
+  property_id: Scalars['String'];
+  landlord_id: Scalars['String'];
+};
+
 export type LandlordInput = {
   _id?: Maybe<Scalars['String']>;
   first_name?: Maybe<Scalars['String']>;
@@ -1137,6 +1169,11 @@ export type LeaseDocumentApiResponse = {
   success: Scalars['Boolean'];
   error?: Maybe<Scalars['String']>;
   data?: Maybe<LeaseDocument>;
+};
+
+export type StatsResponse = {
+  __typename?: 'StatsResponse';
+  v: Scalars['String'];
 };
 
 export type Subscription = {
@@ -2478,6 +2515,73 @@ export type PropertyWithLeaseFieldsFragment = (
     )> }
   )>> }
   & PropertyFieldsFragment
+);
+
+export type StatsStudentAccountCreationMutationVariables = Exact<{
+  student_id: Scalars['String'];
+}>;
+
+
+export type StatsStudentAccountCreationMutation = (
+  { __typename?: 'Mutation' }
+  & { Stats_StudentAccountCreation: (
+    { __typename?: 'StatsResponse' }
+    & Pick<StatsResponse, 'v'>
+  ) }
+);
+
+export type StatsStudentLoginMutationVariables = Exact<{
+  student_id: Scalars['String'];
+}>;
+
+
+export type StatsStudentLoginMutation = (
+  { __typename?: 'Mutation' }
+  & { Stats_StudentLogin: (
+    { __typename?: 'StatsResponse' }
+    & Pick<StatsResponse, 'v'>
+  ) }
+);
+
+export type StatsLandlordAccountCreationMutationVariables = Exact<{
+  landlord_id: Scalars['String'];
+}>;
+
+
+export type StatsLandlordAccountCreationMutation = (
+  { __typename?: 'Mutation' }
+  & { Stats_LandlordAccountCreation: (
+    { __typename?: 'StatsResponse' }
+    & Pick<StatsResponse, 'v'>
+  ) }
+);
+
+export type StatsLandlordLoginMutationVariables = Exact<{
+  landlord_id: Scalars['String'];
+}>;
+
+
+export type StatsLandlordLoginMutation = (
+  { __typename?: 'Mutation' }
+  & { Stats_LandlordLogin: (
+    { __typename?: 'StatsResponse' }
+    & Pick<StatsResponse, 'v'>
+  ) }
+);
+
+export type StatsLandlordOpenLeaseMutationVariables = Exact<{
+  landlord_id: Scalars['String'];
+  property_id: Scalars['String'];
+  lease_id: Scalars['String'];
+}>;
+
+
+export type StatsLandlordOpenLeaseMutation = (
+  { __typename?: 'Mutation' }
+  & { Stats_LandlordOpenLease: (
+    { __typename?: 'StatsResponse' }
+    & Pick<StatsResponse, 'v'>
+  ) }
 );
 
 export type StudentQueryVariables = Exact<{
@@ -5331,6 +5435,172 @@ export function useUpdatePropertyDetailsMutation(baseOptions?: Apollo.MutationHo
 export type UpdatePropertyDetailsMutationHookResult = ReturnType<typeof useUpdatePropertyDetailsMutation>;
 export type UpdatePropertyDetailsMutationResult = Apollo.MutationResult<UpdatePropertyDetailsMutation>;
 export type UpdatePropertyDetailsMutationOptions = Apollo.BaseMutationOptions<UpdatePropertyDetailsMutation, UpdatePropertyDetailsMutationVariables>;
+export const StatsStudentAccountCreationDocument = gql`
+    mutation StatsStudentAccountCreation($student_id: String!) {
+  Stats_StudentAccountCreation(student_id: $student_id) {
+    v
+  }
+}
+    `;
+export type StatsStudentAccountCreationMutationFn = Apollo.MutationFunction<StatsStudentAccountCreationMutation, StatsStudentAccountCreationMutationVariables>;
+
+/**
+ * __useStatsStudentAccountCreationMutation__
+ *
+ * To run a mutation, you first call `useStatsStudentAccountCreationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStatsStudentAccountCreationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [statsStudentAccountCreationMutation, { data, loading, error }] = useStatsStudentAccountCreationMutation({
+ *   variables: {
+ *      student_id: // value for 'student_id'
+ *   },
+ * });
+ */
+export function useStatsStudentAccountCreationMutation(baseOptions?: Apollo.MutationHookOptions<StatsStudentAccountCreationMutation, StatsStudentAccountCreationMutationVariables>) {
+        return Apollo.useMutation<StatsStudentAccountCreationMutation, StatsStudentAccountCreationMutationVariables>(StatsStudentAccountCreationDocument, baseOptions);
+      }
+export type StatsStudentAccountCreationMutationHookResult = ReturnType<typeof useStatsStudentAccountCreationMutation>;
+export type StatsStudentAccountCreationMutationResult = Apollo.MutationResult<StatsStudentAccountCreationMutation>;
+export type StatsStudentAccountCreationMutationOptions = Apollo.BaseMutationOptions<StatsStudentAccountCreationMutation, StatsStudentAccountCreationMutationVariables>;
+export const StatsStudentLoginDocument = gql`
+    mutation StatsStudentLogin($student_id: String!) {
+  Stats_StudentLogin(student_id: $student_id) {
+    v
+  }
+}
+    `;
+export type StatsStudentLoginMutationFn = Apollo.MutationFunction<StatsStudentLoginMutation, StatsStudentLoginMutationVariables>;
+
+/**
+ * __useStatsStudentLoginMutation__
+ *
+ * To run a mutation, you first call `useStatsStudentLoginMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStatsStudentLoginMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [statsStudentLoginMutation, { data, loading, error }] = useStatsStudentLoginMutation({
+ *   variables: {
+ *      student_id: // value for 'student_id'
+ *   },
+ * });
+ */
+export function useStatsStudentLoginMutation(baseOptions?: Apollo.MutationHookOptions<StatsStudentLoginMutation, StatsStudentLoginMutationVariables>) {
+        return Apollo.useMutation<StatsStudentLoginMutation, StatsStudentLoginMutationVariables>(StatsStudentLoginDocument, baseOptions);
+      }
+export type StatsStudentLoginMutationHookResult = ReturnType<typeof useStatsStudentLoginMutation>;
+export type StatsStudentLoginMutationResult = Apollo.MutationResult<StatsStudentLoginMutation>;
+export type StatsStudentLoginMutationOptions = Apollo.BaseMutationOptions<StatsStudentLoginMutation, StatsStudentLoginMutationVariables>;
+export const StatsLandlordAccountCreationDocument = gql`
+    mutation StatsLandlordAccountCreation($landlord_id: String!) {
+  Stats_LandlordAccountCreation(landlord_id: $landlord_id) {
+    v
+  }
+}
+    `;
+export type StatsLandlordAccountCreationMutationFn = Apollo.MutationFunction<StatsLandlordAccountCreationMutation, StatsLandlordAccountCreationMutationVariables>;
+
+/**
+ * __useStatsLandlordAccountCreationMutation__
+ *
+ * To run a mutation, you first call `useStatsLandlordAccountCreationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStatsLandlordAccountCreationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [statsLandlordAccountCreationMutation, { data, loading, error }] = useStatsLandlordAccountCreationMutation({
+ *   variables: {
+ *      landlord_id: // value for 'landlord_id'
+ *   },
+ * });
+ */
+export function useStatsLandlordAccountCreationMutation(baseOptions?: Apollo.MutationHookOptions<StatsLandlordAccountCreationMutation, StatsLandlordAccountCreationMutationVariables>) {
+        return Apollo.useMutation<StatsLandlordAccountCreationMutation, StatsLandlordAccountCreationMutationVariables>(StatsLandlordAccountCreationDocument, baseOptions);
+      }
+export type StatsLandlordAccountCreationMutationHookResult = ReturnType<typeof useStatsLandlordAccountCreationMutation>;
+export type StatsLandlordAccountCreationMutationResult = Apollo.MutationResult<StatsLandlordAccountCreationMutation>;
+export type StatsLandlordAccountCreationMutationOptions = Apollo.BaseMutationOptions<StatsLandlordAccountCreationMutation, StatsLandlordAccountCreationMutationVariables>;
+export const StatsLandlordLoginDocument = gql`
+    mutation StatsLandlordLogin($landlord_id: String!) {
+  Stats_LandlordLogin(landlord_id: $landlord_id) {
+    v
+  }
+}
+    `;
+export type StatsLandlordLoginMutationFn = Apollo.MutationFunction<StatsLandlordLoginMutation, StatsLandlordLoginMutationVariables>;
+
+/**
+ * __useStatsLandlordLoginMutation__
+ *
+ * To run a mutation, you first call `useStatsLandlordLoginMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStatsLandlordLoginMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [statsLandlordLoginMutation, { data, loading, error }] = useStatsLandlordLoginMutation({
+ *   variables: {
+ *      landlord_id: // value for 'landlord_id'
+ *   },
+ * });
+ */
+export function useStatsLandlordLoginMutation(baseOptions?: Apollo.MutationHookOptions<StatsLandlordLoginMutation, StatsLandlordLoginMutationVariables>) {
+        return Apollo.useMutation<StatsLandlordLoginMutation, StatsLandlordLoginMutationVariables>(StatsLandlordLoginDocument, baseOptions);
+      }
+export type StatsLandlordLoginMutationHookResult = ReturnType<typeof useStatsLandlordLoginMutation>;
+export type StatsLandlordLoginMutationResult = Apollo.MutationResult<StatsLandlordLoginMutation>;
+export type StatsLandlordLoginMutationOptions = Apollo.BaseMutationOptions<StatsLandlordLoginMutation, StatsLandlordLoginMutationVariables>;
+export const StatsLandlordOpenLeaseDocument = gql`
+    mutation StatsLandlordOpenLease($landlord_id: String!, $property_id: String!, $lease_id: String!) {
+  Stats_LandlordOpenLease(
+    landlord_id: $landlord_id
+    property_id: $property_id
+    lease_id: $lease_id
+  ) {
+    v
+  }
+}
+    `;
+export type StatsLandlordOpenLeaseMutationFn = Apollo.MutationFunction<StatsLandlordOpenLeaseMutation, StatsLandlordOpenLeaseMutationVariables>;
+
+/**
+ * __useStatsLandlordOpenLeaseMutation__
+ *
+ * To run a mutation, you first call `useStatsLandlordOpenLeaseMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStatsLandlordOpenLeaseMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [statsLandlordOpenLeaseMutation, { data, loading, error }] = useStatsLandlordOpenLeaseMutation({
+ *   variables: {
+ *      landlord_id: // value for 'landlord_id'
+ *      property_id: // value for 'property_id'
+ *      lease_id: // value for 'lease_id'
+ *   },
+ * });
+ */
+export function useStatsLandlordOpenLeaseMutation(baseOptions?: Apollo.MutationHookOptions<StatsLandlordOpenLeaseMutation, StatsLandlordOpenLeaseMutationVariables>) {
+        return Apollo.useMutation<StatsLandlordOpenLeaseMutation, StatsLandlordOpenLeaseMutationVariables>(StatsLandlordOpenLeaseDocument, baseOptions);
+      }
+export type StatsLandlordOpenLeaseMutationHookResult = ReturnType<typeof useStatsLandlordOpenLeaseMutation>;
+export type StatsLandlordOpenLeaseMutationResult = Apollo.MutationResult<StatsLandlordOpenLeaseMutation>;
+export type StatsLandlordOpenLeaseMutationOptions = Apollo.BaseMutationOptions<StatsLandlordOpenLeaseMutation, StatsLandlordOpenLeaseMutationVariables>;
 export const StudentDocument = gql`
     query Student($id: String!) {
   getStudent(_id: $id) {
