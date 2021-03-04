@@ -4,8 +4,8 @@ mutation StatsStudentAccountCreation {
   }
 }
 
-mutation StatsStudentLogin($student_id: String!) {
-  Stats_StudentLogin(student_id: $student_id) {
+mutation StatsStudentLogin {
+  Stats_StudentLogin {
     v
   }
 }

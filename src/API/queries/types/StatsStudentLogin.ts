@@ -15,7 +15,3 @@ export interface StatsStudentLogin_Stats_StudentLogin {
 export interface StatsStudentLogin {
   Stats_StudentLogin: StatsStudentLogin_Stats_StudentLogin;
 }
-
-export interface StatsStudentLoginVariables {
-  student_id: string;
-}

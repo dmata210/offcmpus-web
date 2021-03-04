@@ -1097,11 +1097,6 @@ export type MutationAddNewLeaseDocumentArgs = {
 };
 
 
-export type MutationStats_StudentLoginArgs = {
-  student_id: Scalars['String'];
-};
-
-
 export type MutationStats_LandlordAccountCreationArgs = {
   landlord_id: Scalars['String'];
 };
@@ -2523,9 +2518,7 @@ export type StatsStudentAccountCreationMutation = (
   ) }
 );
 
-export type StatsStudentLoginMutationVariables = Exact<{
-  student_id: Scalars['String'];
-}>;
+export type StatsStudentLoginMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type StatsStudentLoginMutation = (
@@ -5460,8 +5453,8 @@ export type StatsStudentAccountCreationMutationHookResult = ReturnType<typeof us
 export type StatsStudentAccountCreationMutationResult = Apollo.MutationResult<StatsStudentAccountCreationMutation>;
 export type StatsStudentAccountCreationMutationOptions = Apollo.BaseMutationOptions<StatsStudentAccountCreationMutation, StatsStudentAccountCreationMutationVariables>;
 export const StatsStudentLoginDocument = gql`
-    mutation StatsStudentLogin($student_id: String!) {
-  Stats_StudentLogin(student_id: $student_id) {
+    mutation StatsStudentLogin {
+  Stats_StudentLogin {
     v
   }
 }
@@ -5481,7 +5474,6 @@ export type StatsStudentLoginMutationFn = Apollo.MutationFunction<StatsStudentLo
  * @example
  * const [statsStudentLoginMutation, { data, loading, error }] = useStatsStudentLoginMutation({
  *   variables: {
- *      student_id: // value for 'student_id'
  *   },
  * });
  */

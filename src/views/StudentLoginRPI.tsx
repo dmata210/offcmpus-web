@@ -8,17 +8,26 @@ import queryString from 'query-string'
 import {Helmet} from "react-helmet";
 
 import {
-    useStatsStudentAccountCreationMutation
+    useStatsStudentAccountCreationMutation,
+    useStatsStudentLoginMutation
 } from '../API/queries/types/graphqlFragmentTypes'
 
 const StudentLoginViewRPI = () => {
 
 
     //===================== STATE =====================
-    const [StudentAccountCreation] = useStatsStudentAccountCreationMutation();
+    const [StudentAccountCreation, {data: accountCreationStats}] = useStatsStudentAccountCreationMutation();
+    const [StudentLoginStat] = useStatsStudentLoginMutation();
 
     //===================== EFFECT =====================
-    
+    useEffect(() => {
+
+        if (accountCreationStats && accountCreationStats.Stats_StudentAccountCreation) {
+            StudentLoginStat();
+            window.location.href = getRedirect();
+        }
+    }, [accountCreationStats]);
+
     //===================== FUNCTIONS =====================
     const getRedirect = (): string => {
         let params = queryString.parse(window.location.search);
@@ -51,7 +60,7 @@ const StudentLoginViewRPI = () => {
              * this student.
              */
             StudentAccountCreation({variables:{}});
-            window.location.href = getRedirect();
+            // window.location.href = getRedirect();
             }
             else console.log(`CAS Auth failed`);
         });
