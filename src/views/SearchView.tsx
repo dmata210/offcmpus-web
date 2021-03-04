@@ -25,15 +25,21 @@ import NavIcon from '../assets/svg/001-arrow.svg'
 import {BiNavigation, BiHomeCircle, BiHealth} from 'react-icons/bi'
 import {RiHotelBedLine} from 'react-icons/ri'
 
+import L from 'leaflet'
 import {MapContainer, TileLayer, Marker, Polyline, Popup, useMap} from 'react-leaflet'
 
 function CustomMap({location}: {location: {lat: number, lng: number}}) {
   const map = useMap();
   map.invalidateSize(true);
   map.setView( /* center [latitude, longitude] */ [location.lat, location.lng], /* zoom */ 15);
-  console.log('map center:', map.getCenter())
   return null;
 }
+
+// @ts-ignore
+const CustomMarker: L.Icon<L.IconOptions> = new L.icon({
+    iconUrl: require("../assets/svg/map_icon.svg"),
+    iconSize: [30, 30]
+});
 
 const SearchView = () => {
 
@@ -49,6 +55,7 @@ const SearchView = () => {
     
     const [properties, setProperties] = useState<PropertySearchResult[]>([]);
     const [mapCenter, setMapCenter] = useState<{lat: number, lng: number}>({lat: 0, lng: 0});
+    const [propertyNavigation, setPropertyNavigation] = useState<string | null>(null);
 
     const history = useHistory();
     const cookie = new Cookies ();
@@ -125,9 +132,34 @@ const SearchView = () => {
                 // url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 url={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoieXVzdWZhMiIsImEiOiJja2x2OXBsdnIwbm1uMnVvamk0MzF0b3NvIn0.lL8T7KT_mxsZ2z2xrG4I5A`}
             />
-            <Marker position={getInstituteLocation()}>
+
+            {/* Marker at position of institute */}
+            <Marker position={getInstituteLocation()} icon={CustomMarker}>
                 <Popup>{institute && institute.name}</Popup>
             </Marker>
+
+            {/* Marker at position of property navigation */}
+            {propertyNavigation != null
+            && <Marker position={toLatLong(getCoordinates(propertyNavigation))} icon={CustomMarker}>
+                {/* <Popup>{institute && institute.name}</Popup> */}
+            </Marker>}
+
+            {propertyNavigation != null &&
+            (() => {
+
+                if (institute == null || !institute._id) return <div />
+                let prop: PropertySearchResult | undefined = properties.find(i => i.property._id == propertyNavigation);
+                if (prop == undefined || prop.property.directions == undefined) return <div />;
+
+                let directions_to_inst = prop.property.directions.find(i => i.institution_id = institute._id);
+                if (directions_to_inst == undefined || directions_to_inst.foot_walking_directions == undefined 
+                    || directions_to_inst.foot_walking_directions.length == 0) return <div />
+                return <Polyline 
+                    pathOptions={{ color: '#E0777D' }}
+                    positions={generateCoordsPolyLine(directions_to_inst.foot_walking_directions[0].coordinates)}
+                />
+
+            })()}
 
             {/* {properties.map((res: PropertySearchResult, i: number) => {
                 let property: Property = res.property;
@@ -152,6 +184,49 @@ const SearchView = () => {
                 />)
             })} */}
             </MapContainer>);
+    }
+
+    const toLatLong = (arr: number[] | null) => {
+        if (arr == null) return getInstituteLocation();
+        return {
+            lat: arr[1],
+            lng: arr[0]
+        }
+    }
+
+    /**
+     * @desc Given the id of a property, return the coordinates for the
+     * property if it exists. Otherwise, return null.
+     * @param property_id The id of the property to get the coordinates
+     * for.
+     */
+    const getCoordinates = (property_id: string): number[] | null => {
+
+        if (!institute || !institute._id) return null;
+    
+        for (let i = 0; i < properties.length; ++i) {
+            let property_info: PropertySearchResult = properties[i];
+
+            if (property_info.property._id == property_id) {
+
+                if (property_info.property.directions == null
+                    || property_info.property.directions.length == 0) return null;
+
+                let to_institute: PropertyDirections | undefined = property_info.property.directions.find(d => d.institution_id == institute._id);
+                if (to_institute == undefined) return null;
+
+                // ! Temp: This will only look in the cycling directions
+                // debugger;
+                if (to_institute.cycling_regular_directions && to_institute.cycling_regular_directions.length > 0) {
+                    if (to_institute.cycling_regular_directions[0].coordinates.length == 0) return null;
+                    return to_institute.cycling_regular_directions[0].coordinates[0];//[to_institute.cycling_regular_directions[0].coordinates.length - 1];
+                }
+
+                return null;
+            }
+        }
+        
+        return null;
     }
 
     return (<ViewWrapper
@@ -291,6 +366,21 @@ const SearchView = () => {
                 {properties.map((property: PropertySearchResult, i: number) => 
                     <NewSearchResult 
                         result={property} key={i}
+                        onNavigate={(property_id: string) => {
+                            console.log(`Get navigation: ${property_id}`);
+                            let coords: number[] | null = getCoordinates(property_id);
+                            if (coords != null && coords.length == 2) {
+                                setPropertyNavigation(property_id);
+                                setMapCenter({
+                                    lat: coords[1], lng: coords[0]
+                                });
+                            }
+                        }}
+                        onNavigateInstitute={() => {
+                            if (!institute || !institute._id) return;
+                            setPropertyNavigation(null);
+                            setMapCenter(getInstituteLocation());
+                        }}
                     />
                 )}
             </div>}
@@ -458,8 +548,10 @@ const SearchResult = ({delay, result, user}: {delay: number, result: PropertySea
     </div>);
 }
 
-const NewSearchResult = ({result}: {result: PropertySearchResult}) => {
+const NewSearchResult = ({result, onNavigate, onNavigateInstitute}: 
+    {result: PropertySearchResult, onNavigate: (property_id: string) => void, onNavigateInstitute: () => void}) => {
 
+    const [navOnLocation, setNavOnLocation] = useState<boolean>(false);
     const getPropertyPriceRange = () :string => {
         if (result.price_range.length == 1) return `$${result.price_range[0]}`;
         else return `$${result.price_range[0]}-$${result.price_range[1]}`
@@ -468,7 +560,14 @@ const NewSearchResult = ({result}: {result: PropertySearchResult}) => {
     return (<div className="search-result-container-3">
 
         <div className="image-area-holder">
-            <div className="navigation-icon-holder">
+            <div className="navigation-icon-holder" onClick={() => {
+                if (navOnLocation) {
+                    onNavigateInstitute();
+                } 
+                else onNavigate(result.property._id);
+
+                setNavOnLocation(!navOnLocation);
+            }}>
                 <BiNavigation />    
             </div>
             <div className="image-area">
