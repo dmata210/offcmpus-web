@@ -21,6 +21,8 @@ import {
 import { Empty, Rate } from 'antd';
 import {fetchUser} from '../redux/actions/user'
 import NumberPicker from '../components/toolbox/form/NumberPicker'
+import NavIcon from '../assets/svg/001-arrow.svg'
+import {BiNavigation, BiHomeCircle, BiHealth} from 'react-icons/bi'
 
 import {MapContainer, TileLayer, Marker, Polyline, Popup} from 'react-leaflet'
 
@@ -264,6 +266,7 @@ const SearchView = () => {
             {/* Right Side */}
             {properties.length > 0 &&
             <div className="right-side_">
+                <NewSearchResult />
                 {properties.map((property: PropertySearchResult, i: number) => 
                     <SearchResult user={user}
                     result={property} key={i} delay={i < 8 ? i * 100 : 0} />
@@ -414,35 +417,6 @@ const SearchResult = ({delay, result, user}: {delay: number, result: PropertySea
                     display: `flex`
                 }}>
                     <div style={{marginRight: `5px`}}>
-                        {/* Disable save-property feature */}
-                        {/* <Button 
-                            text={propertySaved() ? `Remove` : `Save`}
-                            background="#848CFF"
-                            bold={true}
-                            textColor="white"
-                            transformDisabled={true}
-                            onClick={() => {
-                                // Do save stuff ...
-                                if (user && user.user) {
-                                    if (propertySaved()) {
-                                        RemoveCollection({
-                                            variables: {
-                                                student_id: user.user._id,
-                                                property_id: result.property._id
-                                            }
-                                        });
-                                    }
-                                    else {
-                                        AddCollection({
-                                            variables: {
-                                                student_id: user.user._id,
-                                                property_id: result.property._id
-                                            }
-                                        });
-                                    }
-                                }
-                            }}
-                        />  */}
                     </div>
                     <div>
                         <Button 
@@ -461,4 +435,80 @@ const SearchResult = ({delay, result, user}: {delay: number, result: PropertySea
 
     </div>);
 }
+
+const NewSearchResult = () => {
+
+    return (<div className="search-result-container-3">
+
+        <div className="image-area-holder">
+            <div className="navigation-icon-holder">
+                <BiNavigation />    
+            </div>
+            <div className="image-area">
+                <img width='100%' src="https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG" />
+            </div>
+        </div>
+
+        <div className="results-content-holder">
+            <div className="propery-address">
+                <span style={{fontWeight: 600, marginRight: '8px'}}>403 South 6th St</span>
+                <span style={{fontSize: '0.7rem'}}>Troy NY, 12180</span>
+            </div>
+
+            {/* Tags area */}
+            <div className="tag-holder">
+                <div className="_tag">Furnished</div>
+                <div className="_tag">Heating</div>
+                <div className="_tag">AC</div>
+                <div className="_tag">Washer</div>
+            </div>
+
+            {/* Landlord area */}
+            <div className="property-info">
+                {/* <span className="_icon"><BiHomeCircle /></span> */}
+                Joey Rooney
+            </div>
+
+            {/* Property Rationg */}
+            <div className="ratings-area_">
+                <div className="rating-container_">
+                    <div className="label_">Landlord Rating</div>
+                    <div className="rating_">
+                        <Rate tooltips={desc} 
+                            disabled value={3.5} 
+                            character={<BiHealth />}
+                        />
+                    </div>
+                </div>
+                <div className="rating-container_">
+                    <div className="label_">Property Rating</div>
+                    <div className="rating_">
+                        <Rate tooltips={desc} 
+                            disabled value={2.5} 
+                            character={<BiHealth />}
+                        />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div className="right-side-container">
+            <div className="price-area"><span className="_price">$400-700</span> /month</div>
+            <div className="action-area">
+                <div style={{width: '100px'}}>
+                    <Button 
+                        text="View"
+                        textColor="white"
+                        background="#E0777D"
+                        bold={true}
+                        transformDisabled={true}
+                    />
+                </div>
+            </div>
+        </div>
+
+    </div>)
+}
+
 export default SearchView
