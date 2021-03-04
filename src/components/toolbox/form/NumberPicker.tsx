@@ -23,7 +23,7 @@ const NumberPicker = ({onChange, minVal, maxVal}:
           onClick={() => setValue(getClampedValue(value - 1))}
         >-</div>
         <div className="number-input-area">
-          <input value={value} />
+          <input value={value} onChange={() => {}} />
         </div>
         <div className="inc-dec-btn right no-select"
           onClick={() => setValue(getClampedValue(value + 1))}

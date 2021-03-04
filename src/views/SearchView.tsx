@@ -25,7 +25,14 @@ import NavIcon from '../assets/svg/001-arrow.svg'
 import {BiNavigation, BiHomeCircle, BiHealth} from 'react-icons/bi'
 import {RiHotelBedLine} from 'react-icons/ri'
 
-import {MapContainer, TileLayer, Marker, Polyline, Popup} from 'react-leaflet'
+import {MapContainer, TileLayer, Marker, Polyline, Popup, useMap} from 'react-leaflet'
+
+function CustomMap({location}: {location: {lat: number, lng: number}}) {
+  const map = useMap()
+  map.setView([location.lat, location.lng], 17);
+  console.log('map center:', map.getCenter())
+  return null;
+}
 
 const SearchView = () => {
 
@@ -39,7 +46,8 @@ const SearchView = () => {
     const [leftFilterWidth, setLeftFilterWidth] = useState<number>(400)
     const [contentStart, setContentStart] = useState<number>(0)
     
-    const [properties, setProperties] = useState<PropertySearchResult[]>([])
+    const [properties, setProperties] = useState<PropertySearchResult[]>([]);
+    const [mapCenter, setMapCenter] = useState<{lat: number, lng: number}>({lat: 0, lng: 0});
 
     const history = useHistory();
     const cookie = new Cookies ();
@@ -48,6 +56,10 @@ const SearchView = () => {
         value: properties.length,
         duration: 1000
     })
+
+    useEffect(() => {
+        setMapCenter(getInstituteLocation());
+    }, [institute]);
 
     useEffect(() => {
         updateFilterWidth ()
@@ -84,7 +96,6 @@ const SearchView = () => {
 
     const getInstituteLocation = () => {
         if (institute && institute.location) {
-            // [institute.location.latitude, institute.location.longitude]
             return {
                 lat: institute.location.latitude,
                 lng: institute.location.longitude
@@ -103,6 +114,42 @@ const SearchView = () => {
         }
 
         return coords;
+    }
+
+    const getMap = () => {
+        return (<MapContainer center={[mapCenter.lat, mapCenter.lng]} zoom={17} scrollWheelZoom={false}>
+            <CustomMap location={mapCenter} />
+            <TileLayer
+                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker position={getInstituteLocation()}>
+                <Popup>{institute && institute.name}</Popup>
+            </Marker>
+
+            {/* {properties.map((res: PropertySearchResult, i: number) => {
+                let property: Property = res.property;
+                if (!property.directions) return (<div key={i} />)
+                let directions_ = property.directions.filter((dir: PropertyDirections) => 
+                    institute && institute._id && dir.institution_id == institute._id);
+                
+                if (directions_.length == 0) return (<div key={i} />)
+                let dir: any[] = [];
+                if (directions_[0].cycling_regular_directions != undefined && directions_[0].cycling_regular_directions.length > 0) 
+                    dir = directions_[0].cycling_regular_directions[0].coordinates;
+                
+                else if (directions_[0].driving_car_directions != undefined && directions_[0].driving_car_directions.length > 0) 
+                    dir = directions_[0].driving_car_directions[0].coordinates;
+
+                else if (directions_[0].foot_walking_directions != undefined && directions_[0].foot_walking_directions.length > 0) 
+                    dir = directions_[0].foot_walking_directions[0].coordinates;
+
+                return (<Polyline key={i}
+                    pathOptions={{ color: 'purple' }}
+                    positions={ generateCoordsPolyLine(dir) }
+                />)
+            })} */}
+            </MapContainer>);
     }
 
     return (<ViewWrapper
@@ -221,39 +268,10 @@ const SearchView = () => {
 
                 <div className="map-box" style={{}}>
                     {/* React Leaflet Resource: https://blog.logrocket.com/how-to-use-react-leaflet/ */}
-                    <MapContainer center={getInstituteLocation()} zoom={17} scrollWheelZoom={false}>
-                    <TileLayer
-                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <Marker position={getInstituteLocation()}>
-                        <Popup>Troy Placeholder</Popup>
-                    </Marker>
-
-                    {/* Put the coordinates information */}
-                    {properties.map((res: PropertySearchResult, i: number) => {
-                        let property: Property = res.property;
-                        if (!property.directions) return (<div key={i} />)
-                        let directions_ = property.directions.filter((dir: PropertyDirections) => 
-                            institute && institute._id && dir.institution_id == institute._id);
-                        
-                        if (directions_.length == 0) return (<div key={i} />)
-                        let dir: any[] = [];
-                        if (directions_[0].cycling_regular_directions != undefined && directions_[0].cycling_regular_directions.length > 0) 
-                            dir = directions_[0].cycling_regular_directions[0].coordinates;
-                        
-                        else if (directions_[0].driving_car_directions != undefined && directions_[0].driving_car_directions.length > 0) 
-                            dir = directions_[0].driving_car_directions[0].coordinates;
-
-                        else if (directions_[0].foot_walking_directions != undefined && directions_[0].foot_walking_directions.length > 0) 
-                            dir = directions_[0].foot_walking_directions[0].coordinates;
-
-                        return (<Polyline key={i}
-                            pathOptions={{ color: 'purple' }}
-                            positions={ generateCoordsPolyLine(dir) }
-                        />)
-                    })}
-                    </MapContainer>
+                    {getMap()}
+                    {/* <MapContainer center={[mapCenter.lat, mapCenter.lng]} zoom={17}>
+                        <CustomMap location={mapCenter} />
+                    </MapContainer> */}
                 </div>
             </div>
 
@@ -481,10 +499,6 @@ const NewSearchResult = ({result}: {result: PropertySearchResult}) => {
                     return amentities.map((amenity: string, i: number) => 
                         <div key={i} className="_tag">{amenity}</div>)
                 }()}
-                {/* <div className="_tag">Furnished</div>
-                <div className="_tag">Heating</div>
-                <div className="_tag">AC</div>
-                <div className="_tag">Washer</div> */}
             </div>
 
             {/* Landlord area */}
@@ -508,7 +522,7 @@ const NewSearchResult = ({result}: {result: PropertySearchResult}) => {
                     <div className="label_">Property Rating</div>
                     <div className="rating_">
                         <Rate tooltips={desc} 
-                            disabled value={result.property_rating_count * 5} 
+                            disabled value={result.property_rating_avg * 5} 
                             character={<BiHealth />}
                         />
                     </div>

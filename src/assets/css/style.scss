@@ -6229,12 +6229,14 @@ a.subtle-link {
       line-height: 30px;
       cursor: pointer;
       box-shadow: 0px 0px 12px rgba(132, 140, 255, 0.3);
-      transition: box-shadow 0.25s;
+      transition: box-shadow 0.25s, transform 0.25s;
       color: white;
       font-size: 1.2rem;
+      transform: rotate(0deg);
 
       &:hover {
         box-shadow: 0px 0px 17px rgba(132, 140, 255, 0.55);
+        transform: rotate(30deg);
       }
 
       img {
