@@ -13,6 +13,7 @@ import {
   useGetPropertyOwnedByLandlordLazyQuery,
   useAddNewLeaseDocumentMutation,
   useGetLeaseDocumentsForLandlordLazyQuery,
+  useStatsLandlordOpenLeaseMutation,
   useActivateLeaseMutation,
   Ownership,
   Property,
@@ -35,6 +36,7 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
   const user = useSelector((state: ReduxState) => state.user);
 
   // graph-ql react query hooks
+  const [StatsOpenLease] = useStatsLandlordOpenLeaseMutation();
   const [GetProperty, {data: propertyResponse}] = useGetPropertyOwnedByLandlordLazyQuery();
   const [GetOwnership, {data: getOwnershipResponse}] = useGetOwnershipForPropertyLazyQuery();
   const [GetLeases, {data: getLeasesResponse}] = useGetLeasesAndOccupantsLazyQuery();
@@ -379,6 +381,15 @@ const NewLeaseView = ({property_id}: {property_id: string}) => {
   useEffect(() => {
     if (activateLeaseResponse && activateLeaseResponse.activateLease) {
       if (activateLeaseResponse.activateLease.success && activateLeaseResponse.activateLease.data) {
+
+        // Collects stats for the lease being opened.
+        StatsOpenLease({
+          variables: {
+            property_id,
+            lease_id: targetLeaseId == undefined ? '' : targetLeaseId
+          }
+        });
+
         history.push(`/landlord/property/lease/priority/${property_id}?lease=${targetLeaseId}`);
       }
         
