@@ -20,6 +20,7 @@ import {
 } from '../API/queries/types/graphqlFragmentTypes'
 import { Empty, Rate } from 'antd';
 import {fetchUser} from '../redux/actions/user'
+import NumberPicker from '../components/toolbox/form/NumberPicker'
 
 import {MapContainer, TileLayer, Marker, Polyline, Popup} from 'react-leaflet'
 
@@ -163,7 +164,8 @@ const SearchView = () => {
                     {/* # of Rooms & Distance Counters */}
                     <div className="filter-bottom-counters">
                         <div className="inline-form-input" style={{
-                            padding: `10px`
+                            padding: `10px`,
+                            width: "45%"
                         }}>
                             <div className="input-label_">
                                 <span style={{marginRight: `5px`}}>Rooms</span>
@@ -175,20 +177,26 @@ const SearchView = () => {
                                 </div>
                             </div>
                             <div className="input-area_">
-                                <Counter
+                                {/* <Counter
                                     restrictions={[positiveOnly, maxVal(4, {inclusive: true})]}
                                     onChange={(val: number) => {}}
+                                /> */}
+                                <NumberPicker 
+                                    minVal={1}
+                                    maxVal={15}
+                                    onChange={(val: number) => {}} 
                                 />
                             </div>
                         </div>
 
                         <div className="inline-form-input right" style={{
-                            padding: `10px`
+                            padding: `10px`,
+                            flexGrow: 1
                         }}>
                             <div className="input-label_">
                                 <span style={{marginRight: `5px`}}>Distance (mi.)</span>
                                 <div style={{
-                                    display: 'inline-block'
+                                    display: 'inline-block',
                                 }}>
                                     <MoreDetails 
                                         width={150}
@@ -197,10 +205,9 @@ const SearchView = () => {
                                 </div>
                             </div>
                             <div className="input-area_">
-                                <Counter
-                                    restrictions={[positiveOnly, maxVal(40, {inclusive: true})]}
-                                    onChange={(val: number) => {}}
-                                    incrementBy={5}
+                                <NumberPicker 
+                                    minVal={1}
+                                    onChange={(val: number) => {}} 
                                 />
                             </div>
                         </div>

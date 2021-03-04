@@ -3088,8 +3088,8 @@ body {
 
   .inline-form-input {
     display: flex;
-    width: 50%;
     padding: 0;
+    justify-content: space-between;
 
     &.right {
       justify-content: flex-end;
@@ -3103,10 +3103,6 @@ body {
 
       margin-top: 0;
     }
-
-    // .input-area_ {
-
-    // }
   }
 }
 
@@ -6053,5 +6049,61 @@ a.subtle-link {
 
   &.selected {
     background-color: $navy;
+  }
+}
+
+.number-input-2 {
+  display: flex;
+
+  .inc-dec-btn {
+    width: 30px;
+    height: 30px;
+    background-color: $navy;
+    cursor: pointer;
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    line-height: 30px;
+    font-size: 1.1rem;
+    transition: box-shadow 0.25s;
+
+    &.left {
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+      box-shadow: -5px 0px 10px rgba(59, 67, 83, 0.15);
+
+      &:hover {
+        box-shadow: -5px 0px 15px rgba(59, 67, 83, 0.25);
+      }
+    }
+
+    &.right {
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
+      box-shadow: 5px 0px 10px rgba(59, 67, 83, 0.15);
+
+      &:hover {
+        box-shadow: 5px 0px 15px rgba(59, 67, 83, 0.25);
+      }
+    }
+  }
+
+  .number-input-area {
+    border-top: 1px solid $navy;
+    border-bottom: 1px solid $navy;
+    width: 50px;
+    height: 30px;
+    box-sizing: border-box;
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      background-color: none;
+      border: none;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0);
+      outline: none;
+      text-align: center;
+    }
   }
 }

@@ -2,6 +2,7 @@ import React, {useRef, useEffect, useState} from 'react'
 import {useSpring, motion, useTransform} from 'framer-motion'
 import {RiBookOpenLine} from 'react-icons/ri'
 import Input, {Validators, InputValidatorFlags, alnumOnly, noSpaces, $and, numbersOnly} from '../components/toolbox/form/Input'
+import NumberPicker from '../components/toolbox/form/NumberPicker'
 
 import FloatInput from '../components/toolbox/form/FloatInput'
 
@@ -20,16 +21,9 @@ const Testing = () => {
     transform: `translateX(-50%) translateY(-50%)`
   }}>
 
-    <Input
-      label="Input Label"
-      validators={[
-        {errorMsg: "Input values must be numbers", validator: numbersOnlyValidator, flag: InputValidatorFlags.VALIDATOR_WARNING },
-        {errorMsg: "Value must have at least 5 characters", validator: minLenValidator(5) }
-      ]}
+    <NumberPicker
+      onChange={(val: number) => {}}
     />
-
-    {/* <FloatInput prefix="$" onChange={(i: number) => {
-    }} /> */}
   </div>)
 }
 
