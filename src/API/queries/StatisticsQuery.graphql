@@ -10,8 +10,8 @@ mutation StatsStudentLogin {
   }
 }
 
-mutation StatsLandlordAccountCreation($landlord_id: String!) {
-  Stats_LandlordAccountCreation(landlord_id: $landlord_id) {
+mutation StatsLandlordAccountCreation {
+  Stats_LandlordAccountCreation {
     v
   }
 }

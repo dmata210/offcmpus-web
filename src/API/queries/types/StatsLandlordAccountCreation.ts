@@ -15,7 +15,3 @@ export interface StatsLandlordAccountCreation_Stats_LandlordAccountCreation {
 export interface StatsLandlordAccountCreation {
   Stats_LandlordAccountCreation: StatsLandlordAccountCreation_Stats_LandlordAccountCreation;
 }
-
-export interface StatsLandlordAccountCreationVariables {
-  landlord_id: string;
-}

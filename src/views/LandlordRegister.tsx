@@ -8,7 +8,10 @@ import Logo from '../components/Logo'
 import Input, {noSpaces} from '../components/toolbox/form/Input'
 import Button from '../components/toolbox/form/Button'
 import LeftAndRight from '../components/toolbox/layout/LeftAndRight'
-import {useCreateLandlordMutation} from '../API/queries/types/graphqlFragmentTypes'
+import {
+  useCreateLandlordMutation,
+  useStatsLandlordAccountCreationMutation
+  } from '../API/queries/types/graphqlFragmentTypes'
 import Error from '../components/toolbox/form/Error'
 import LandlordAPI from '../API/LandlordAPI'
 
@@ -33,6 +36,7 @@ const LandlordRegister = () => {
 
   const dispatch = useDispatch()
   const user = useSelector((state: any) => state.user)
+  const [LandlordAccountCreation] = useStatsLandlordAccountCreationMutation();
   const [createLandlord, {data: landlordCreationResponse, loading: createLandlordLoading}] = useCreateLandlordMutation()
   const isMobile = useMediaQuery({ query: '(max-width: 500px)' })
   const isSmallScreen = useMediaQuery({ query: '(max-width: 800px)'})
@@ -50,6 +54,7 @@ const LandlordRegister = () => {
     if (landlordCreationResponse) {
 
       if (landlordCreationResponse.createLandlord.success) {
+
         // history.push('/')
         // log user in after registering
         LandlordAPI.login(
@@ -58,6 +63,8 @@ const LandlordRegister = () => {
         )
         .then(res => {
           if (res.data.success) { 
+            // Track stats for landlord creation
+            LandlordAccountCreation();
             dispatch(fetchUser(user, {update: true}))
           }
         })
