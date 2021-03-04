@@ -29,6 +29,7 @@ import {MapContainer, TileLayer, Marker, Polyline, Popup, useMap} from 'react-le
 
 function CustomMap({location}: {location: {lat: number, lng: number}}) {
   const map = useMap()
+  map.invalidateSize(true);
   map.setView([location.lat, location.lng], 17);
   console.log('map center:', map.getCenter())
   return null;

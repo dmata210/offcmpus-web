@@ -19,6 +19,7 @@ import { useGetPropertySummaryLazyQuery,
     PropertySummary, 
     PropertyDetails} from '../API/queries/types/graphqlFragmentTypes'
 import {IoMdQrScanner} from 'react-icons/io'
+import {BiHealth} from 'react-icons/bi'
 
 import {fetchUser} from '../redux/actions/user'
 import { ReduxState } from '../redux/reducers/all_reducers';
@@ -443,7 +444,9 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                 {/* Property Review 1st */}
                 <div style={{fontWeight: 600, padding: `5px 0`}}>Review the Property</div>
                 <div>
-                    <Rate tooltips={desc} onChange={(val) => {
+                    <Rate 
+                        character={<BiHealth />}
+                        tooltips={desc} onChange={(val) => {
                         let old_review = {...updatedReview};
                         old_review.property.rating = val / 5.0;
                         setUpdatedReview(old_review);
@@ -493,7 +496,9 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                 {/* Property Review 1st */}
                 <div style={{fontWeight: 600, padding: `5px 0`}}>Review the Landlord</div>
                 <div>
-                    <Rate tooltips={desc} onChange={(val) => {
+                    <Rate 
+                        character={<BiHealth />}
+                        tooltips={desc} onChange={(val) => {
                         let old_review = {...updatedReview};
                         old_review.landlord.rating = val / 5.0;
                         setUpdatedReview(old_review);
@@ -846,7 +851,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                             <div className="ratings_">
                                 <div className="header">Property Score</div>
                                 <div>
-                                    <Rate disabled value={getAveragePropertyReviewScale() * 5} />
+                                    <Rate character={<BiHealth />} disabled value={getAveragePropertyReviewScale() * 5} />
                                 </div>
                                 <div>of 0 Reviews</div>
 
@@ -854,7 +859,7 @@ const StudentPropertyInfoView = ({ property_id }: {property_id: string}) => {
                             <div className="ratings_">
                                 <div className="header">Landlord Score</div>
                                 <div>
-                                    <Rate disabled value={getAverageLandlordReviewScale() * 5} />
+                                    <Rate character={<BiHealth />} disabled value={getAverageLandlordReviewScale() * 5} />
                                 </div>
                                 <div>of 0 Reviews</div>
                             </div>
@@ -1028,7 +1033,9 @@ const ReviewResponse = ({lease_history, reviewFor}: {lease_history: LeaseHistory
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: `5px`}}>
                 <div style={{fontWeight: 600}}>Leased {new Date(lease_history.end_date).getFullYear()}</div>
                 <div>
-                    <Rate disabled value={
+                    <Rate 
+                        character={<BiHealth />}
+                        disabled value={
                         reviewFor == 'property'?
                         lease_history.review_of_property!.rating * 5
                         : lease_history.review_of_landlord!.rating * 5

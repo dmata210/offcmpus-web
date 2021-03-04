@@ -3182,10 +3182,10 @@ body {
     .map-box {
       z-index: 1;
       position: relative;
-      transform: translateY(-10px);
+      transform: translateY(-5px);
       flex-grow: 1;
       margin: 0 10px;
-      border-radius: 3px;
+      border-radius: 5px;
       overflow: hidden;
     }
   }
