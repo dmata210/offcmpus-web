@@ -28,9 +28,9 @@ import {RiHotelBedLine} from 'react-icons/ri'
 import {MapContainer, TileLayer, Marker, Polyline, Popup, useMap} from 'react-leaflet'
 
 function CustomMap({location}: {location: {lat: number, lng: number}}) {
-  const map = useMap()
+  const map = useMap();
   map.invalidateSize(true);
-  map.setView([location.lat, location.lng], 17);
+  map.setView( /* center [latitude, longitude] */ [location.lat, location.lng], /* zoom */ 15);
   console.log('map center:', map.getCenter())
   return null;
 }
@@ -118,11 +118,12 @@ const SearchView = () => {
     }
 
     const getMap = () => {
-        return (<MapContainer center={[mapCenter.lat, mapCenter.lng]} zoom={17} scrollWheelZoom={false}>
+        return (<MapContainer center={[mapCenter.lat, mapCenter.lng]} scrollWheelZoom={false}>
             <CustomMap location={mapCenter} />
             <TileLayer
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                // url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoieXVzdWZhMiIsImEiOiJja2x2OXBsdnIwbm1uMnVvamk0MzF0b3NvIn0.lL8T7KT_mxsZ2z2xrG4I5A`}
             />
             <Marker position={getInstituteLocation()}>
                 <Popup>{institute && institute.name}</Popup>
