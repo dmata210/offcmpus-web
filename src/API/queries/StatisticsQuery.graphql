@@ -16,22 +16,14 @@ mutation StatsLandlordAccountCreation {
   }
 }
 
-mutation StatsLandlordLogin($landlord_id: String!) {
-  Stats_LandlordLogin(landlord_id: $landlord_id) {
+mutation StatsLandlordLogin {
+  Stats_LandlordLogin {
     v
   }
 }
 
-mutation StatsLandlordOpenLease(
-  $landlord_id: String!
-  $property_id: String!
-  $lease_id: String!
-) {
-  Stats_LandlordOpenLease(
-    landlord_id: $landlord_id
-    property_id: $property_id
-    lease_id: $lease_id
-  ) {
+mutation StatsLandlordOpenLease($property_id: String!, $lease_id: String!) {
+  Stats_LandlordOpenLease(property_id: $property_id, lease_id: $lease_id) {
     v
   }
 }

@@ -15,7 +15,3 @@ export interface StatsLandlordLogin_Stats_LandlordLogin {
 export interface StatsLandlordLogin {
   Stats_LandlordLogin: StatsLandlordLogin_Stats_LandlordLogin;
 }
-
-export interface StatsLandlordLoginVariables {
-  landlord_id: string;
-}

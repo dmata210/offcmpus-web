@@ -1097,15 +1097,9 @@ export type MutationAddNewLeaseDocumentArgs = {
 };
 
 
-export type MutationStats_LandlordLoginArgs = {
-  landlord_id: Scalars['String'];
-};
-
-
 export type MutationStats_LandlordOpenLeaseArgs = {
   lease_id: Scalars['String'];
   property_id: Scalars['String'];
-  landlord_id: Scalars['String'];
 };
 
 export type LandlordInput = {
@@ -2535,9 +2529,7 @@ export type StatsLandlordAccountCreationMutation = (
   ) }
 );
 
-export type StatsLandlordLoginMutationVariables = Exact<{
-  landlord_id: Scalars['String'];
-}>;
+export type StatsLandlordLoginMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type StatsLandlordLoginMutation = (
@@ -2549,7 +2541,6 @@ export type StatsLandlordLoginMutation = (
 );
 
 export type StatsLandlordOpenLeaseMutationVariables = Exact<{
-  landlord_id: Scalars['String'];
   property_id: Scalars['String'];
   lease_id: Scalars['String'];
 }>;
@@ -5508,8 +5499,8 @@ export type StatsLandlordAccountCreationMutationHookResult = ReturnType<typeof u
 export type StatsLandlordAccountCreationMutationResult = Apollo.MutationResult<StatsLandlordAccountCreationMutation>;
 export type StatsLandlordAccountCreationMutationOptions = Apollo.BaseMutationOptions<StatsLandlordAccountCreationMutation, StatsLandlordAccountCreationMutationVariables>;
 export const StatsLandlordLoginDocument = gql`
-    mutation StatsLandlordLogin($landlord_id: String!) {
-  Stats_LandlordLogin(landlord_id: $landlord_id) {
+    mutation StatsLandlordLogin {
+  Stats_LandlordLogin {
     v
   }
 }
@@ -5529,7 +5520,6 @@ export type StatsLandlordLoginMutationFn = Apollo.MutationFunction<StatsLandlord
  * @example
  * const [statsLandlordLoginMutation, { data, loading, error }] = useStatsLandlordLoginMutation({
  *   variables: {
- *      landlord_id: // value for 'landlord_id'
  *   },
  * });
  */
@@ -5540,12 +5530,8 @@ export type StatsLandlordLoginMutationHookResult = ReturnType<typeof useStatsLan
 export type StatsLandlordLoginMutationResult = Apollo.MutationResult<StatsLandlordLoginMutation>;
 export type StatsLandlordLoginMutationOptions = Apollo.BaseMutationOptions<StatsLandlordLoginMutation, StatsLandlordLoginMutationVariables>;
 export const StatsLandlordOpenLeaseDocument = gql`
-    mutation StatsLandlordOpenLease($landlord_id: String!, $property_id: String!, $lease_id: String!) {
-  Stats_LandlordOpenLease(
-    landlord_id: $landlord_id
-    property_id: $property_id
-    lease_id: $lease_id
-  ) {
+    mutation StatsLandlordOpenLease($property_id: String!, $lease_id: String!) {
+  Stats_LandlordOpenLease(property_id: $property_id, lease_id: $lease_id) {
     v
   }
 }
@@ -5565,7 +5551,6 @@ export type StatsLandlordOpenLeaseMutationFn = Apollo.MutationFunction<StatsLand
  * @example
  * const [statsLandlordOpenLeaseMutation, { data, loading, error }] = useStatsLandlordOpenLeaseMutation({
  *   variables: {
- *      landlord_id: // value for 'landlord_id'
  *      property_id: // value for 'property_id'
  *      lease_id: // value for 'lease_id'
  *   },

@@ -17,7 +17,6 @@ export interface StatsLandlordOpenLease {
 }
 
 export interface StatsLandlordOpenLeaseVariables {
-  landlord_id: string;
   property_id: string;
   lease_id: string;
 }
