@@ -4,8 +4,8 @@ query Student($id: String!) {
   }
 }
 
-query GetStudentNotifications ($student_id: String!) {
-  getStudentNotifications (student_id: $student_id) {
+query GetStudentNotifications($student_id: String!) {
+  getStudentNotifications(student_id: $student_id) {
     success
     error
     data {
@@ -24,12 +24,9 @@ query GetStudentNotifications ($student_id: String!) {
   }
 }
 
-mutation MarkAsSeen(
-  $student_id: String!,
-  $notification_id: String!
-) {
+mutation MarkAsSeen($student_id: String!, $notification_id: String!) {
   markStudentNotificationAsSeen(
-    student_id: $student_id,
+    student_id: $student_id
     notification_id: $notification_id
   ) {
     success
@@ -50,32 +47,55 @@ mutation MarkAsSeen(
   }
 }
 
-mutation UpdateStudent($id: String!, $first_name: String!,
-$last_name: String!, $email: String!) {
-  updateStudent(_id:$id, new_student:{first_name: $first_name, last_name: $last_name,
-  email: $email}) {
+mutation SaveConveniencePreferences($preferences: [String!]!) {
+  saveConveniencePreferences(preferences: $preferences) {
     ...StudentAPIResponseFields
   }
 }
 
-mutation ConfirmStudentEmail($email: String!, $confirm_key: String!) {
-  confirmStudentEmail (
-    email:$email,
-    confirm_key:$confirm_key
+mutation UpdateStudent(
+  $id: String!
+  $first_name: String!
+  $last_name: String!
+  $email: String!
+) {
+  updateStudent(
+    _id: $id
+    new_student: {
+      first_name: $first_name
+      last_name: $last_name
+      email: $email
+    }
   ) {
     ...StudentAPIResponseFields
   }
 }
 
-mutation UpdateStudentSearchStatus($id: String!, $searching: Boolean!, $search_start: String,
-  $search_end: String, $price_start: Float, $price_end: Float) {
-
-    updateStudentSearchStatus(id: $id, searching: $searching, 
-    search_start: $search_start, search_end: $search_end,
-    price_start: $price_start, price_end: $price_end) {
-      ...StudentAPIResponseFields
-    }
+mutation ConfirmStudentEmail($email: String!, $confirm_key: String!) {
+  confirmStudentEmail(email: $email, confirm_key: $confirm_key) {
+    ...StudentAPIResponseFields
   }
+}
+
+mutation UpdateStudentSearchStatus(
+  $id: String!
+  $searching: Boolean!
+  $search_start: String
+  $search_end: String
+  $price_start: Float
+  $price_end: Float
+) {
+  updateStudentSearchStatus(
+    id: $id
+    searching: $searching
+    search_start: $search_start
+    search_end: $search_end
+    price_start: $price_start
+    price_end: $price_end
+  ) {
+    ...StudentAPIResponseFields
+  }
+}
 
 fragment StudentAPIResponseFields on StudentAPIResponse {
   data {

@@ -62,6 +62,7 @@ import StudentAcceptedLeaseInfoView from './views/StudentAcceptedLeaseInfoView'
 import StudentLoginViewRPI from './views/StudentLoginRPI'
 import LandlordForgotPasswordView from './views/LandlordForgotPasswordView'
 import LandlordPasswordResetView from './views/LandlordPasswordResetView'
+import StudentConvenience from './views/StudentConvenienceView'
 
 import Testing from './views/Testing'
 
@@ -120,6 +121,7 @@ const Routes = () => {
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/search" component={SearchView_} />
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/collection" component={CollectionView} />
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/s/status" component={StudentStatus} />
+        <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/s/convenience" component={StudentConvenience} />
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/feed" component={StudentFeed} />
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/info/property/:id" component={({ match }) => (<StudentPropertyInfoView property_id={match.params.id} />)} />
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/notifications" component={StudentNotificationsView} />

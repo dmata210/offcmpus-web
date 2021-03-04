@@ -286,6 +286,8 @@ export type Student = {
   search_status?: Maybe<SearchStatus>;
   notifications?: Maybe<Array<StudentNotification>>;
   accepted_leases?: Maybe<Array<AcceptedLeaseInfo>>;
+  convenience_tags?: Maybe<Array<Scalars['String']>>;
+  conveinence_setup?: Maybe<Scalars['Boolean']>;
 };
 
 /** Cas Auth Information */
@@ -839,6 +841,7 @@ export type Mutation = {
   resetPassword: LandlordApiResponse;
   confirmLandlordEmail: LandlordApiResponse;
   setLandlordOnboarded: LandlordApiResponse;
+  saveConveniencePreferences: StudentApiResponse;
   markStudentNotificationAsSeen: StudentNotificationApiResponse;
   updateStudentSearchStatus: StudentApiResponse;
   addPropertyToStudentCollection: PropertyCollectionEntriesApiResponse;
@@ -903,6 +906,11 @@ export type MutationConfirmLandlordEmailArgs = {
 
 export type MutationSetLandlordOnboardedArgs = {
   landlord_id: Scalars['String'];
+};
+
+
+export type MutationSaveConveniencePreferencesArgs = {
+  preferences: Array<Scalars['String']>;
 };
 
 
@@ -2613,6 +2621,19 @@ export type MarkAsSeenMutation = (
         )> }
       )> }
     )> }
+  ) }
+);
+
+export type SaveConveniencePreferencesMutationVariables = Exact<{
+  preferences: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+
+export type SaveConveniencePreferencesMutation = (
+  { __typename?: 'Mutation' }
+  & { saveConveniencePreferences: (
+    { __typename?: 'StudentAPIResponse' }
+    & StudentApiResponseFieldsFragment
   ) }
 );
 
@@ -5692,6 +5713,38 @@ export function useMarkAsSeenMutation(baseOptions?: Apollo.MutationHookOptions<M
 export type MarkAsSeenMutationHookResult = ReturnType<typeof useMarkAsSeenMutation>;
 export type MarkAsSeenMutationResult = Apollo.MutationResult<MarkAsSeenMutation>;
 export type MarkAsSeenMutationOptions = Apollo.BaseMutationOptions<MarkAsSeenMutation, MarkAsSeenMutationVariables>;
+export const SaveConveniencePreferencesDocument = gql`
+    mutation SaveConveniencePreferences($preferences: [String!]!) {
+  saveConveniencePreferences(preferences: $preferences) {
+    ...StudentAPIResponseFields
+  }
+}
+    ${StudentApiResponseFieldsFragmentDoc}`;
+export type SaveConveniencePreferencesMutationFn = Apollo.MutationFunction<SaveConveniencePreferencesMutation, SaveConveniencePreferencesMutationVariables>;
+
+/**
+ * __useSaveConveniencePreferencesMutation__
+ *
+ * To run a mutation, you first call `useSaveConveniencePreferencesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveConveniencePreferencesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveConveniencePreferencesMutation, { data, loading, error }] = useSaveConveniencePreferencesMutation({
+ *   variables: {
+ *      preferences: // value for 'preferences'
+ *   },
+ * });
+ */
+export function useSaveConveniencePreferencesMutation(baseOptions?: Apollo.MutationHookOptions<SaveConveniencePreferencesMutation, SaveConveniencePreferencesMutationVariables>) {
+        return Apollo.useMutation<SaveConveniencePreferencesMutation, SaveConveniencePreferencesMutationVariables>(SaveConveniencePreferencesDocument, baseOptions);
+      }
+export type SaveConveniencePreferencesMutationHookResult = ReturnType<typeof useSaveConveniencePreferencesMutation>;
+export type SaveConveniencePreferencesMutationResult = Apollo.MutationResult<SaveConveniencePreferencesMutation>;
+export type SaveConveniencePreferencesMutationOptions = Apollo.BaseMutationOptions<SaveConveniencePreferencesMutation, SaveConveniencePreferencesMutationVariables>;
 export const UpdateStudentDocument = gql`
     mutation UpdateStudent($id: String!, $first_name: String!, $last_name: String!, $email: String!) {
   updateStudent(

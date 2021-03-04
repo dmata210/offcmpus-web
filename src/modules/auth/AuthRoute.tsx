@@ -101,6 +101,7 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
 
     // if this is a student, check the institution id
     if (user && user.user && user.type && user.type == "student") {
+      console.log(`Top of Auth Route!!`);
 
       // if the student does not have all their information, redirect them to complete registration
       if (!Object.prototype.hasOwnProperty.call(user.user, 'first_name')
@@ -110,6 +111,12 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
       || user.user.last_name == undefined
       || user.user.email == undefined ) {
         history.push('/student/register/complete');
+      }
+
+      // if the student has not specified conveinece tags yet,
+      // take them to the view to configure this
+      else if (user.user.conveinence_setup == false) {
+        pushRedirect(history, '/s/convenience', '/');
       }
       
       // check when the student last updated their status.
