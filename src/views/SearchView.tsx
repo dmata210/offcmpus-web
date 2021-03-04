@@ -23,7 +23,7 @@ import {fetchUser} from '../redux/actions/user'
 import NumberPicker from '../components/toolbox/form/NumberPicker'
 import NavIcon from '../assets/svg/001-arrow.svg'
 import {BiNavigation, BiHomeCircle, BiHealth} from 'react-icons/bi'
-import {RiHotelBedLine} from 'react-icons/ri'
+import {RiHotelBedLine, RiWalkFill, RiCarFill, RiBikeLine} from 'react-icons/ri'
 
 import L from 'leaflet'
 import {MapContainer, TileLayer, Marker, Polyline, Popup, useMap} from 'react-leaflet'
@@ -38,7 +38,7 @@ function CustomMap({location}: {location: {lat: number, lng: number}}) {
 // @ts-ignore
 const CustomMarker: L.Icon<L.IconOptions> = new L.icon({
     iconUrl: require("../assets/svg/map_icon.svg"),
-    iconSize: [30, 30]
+    iconSize: [60, 60]
 });
 
 const SearchView = () => {
@@ -56,6 +56,7 @@ const SearchView = () => {
     const [properties, setProperties] = useState<PropertySearchResult[]>([]);
     const [mapCenter, setMapCenter] = useState<{lat: number, lng: number}>({lat: 0, lng: 0});
     const [propertyNavigation, setPropertyNavigation] = useState<string | null>(null);
+    const [navMode, setNavMode] = useState<'walk' | 'bike' | 'car'>('walk');
 
     const history = useHistory();
     const cookie = new Cookies ();
@@ -217,9 +218,24 @@ const SearchView = () => {
 
                 // ! Temp: This will only look in the cycling directions
                 // debugger;
-                if (to_institute.cycling_regular_directions && to_institute.cycling_regular_directions.length > 0) {
-                    if (to_institute.cycling_regular_directions[0].coordinates.length == 0) return null;
-                    return to_institute.cycling_regular_directions[0].coordinates[0];//[to_institute.cycling_regular_directions[0].coordinates.length - 1];
+
+                if (navMode == 'bike') {
+                    if (to_institute.cycling_regular_directions && to_institute.cycling_regular_directions.length > 0) {
+                        if (to_institute.cycling_regular_directions[0].coordinates.length == 0) return null;
+                        return to_institute.cycling_regular_directions[0].coordinates[0];
+                    }
+                }
+                else if (navMode == 'walk') {
+                    if (to_institute.foot_walking_directions && to_institute.foot_walking_directions.length > 0) {
+                        if (to_institute.foot_walking_directions[0].coordinates.length == 0) return null;
+                        return to_institute.foot_walking_directions[0].coordinates[0];
+                    }
+                }
+                else if (navMode == 'car') {
+                    if (to_institute.driving_car_directions && to_institute.driving_car_directions.length > 0) {
+                        if (to_institute.driving_car_directions[0].coordinates.length == 0) return null;
+                        return to_institute.driving_car_directions[0].coordinates[0];
+                    }
                 }
 
                 return null;
@@ -344,6 +360,11 @@ const SearchView = () => {
                 </div>
 
                 <div className="map-box" style={{}}>
+                    <div className="map-ctrl-box">
+                        <div onClick={() => setNavMode('walk')} className={`map-btn ${navMode == 'walk' ? 'active' : ''}`}><RiWalkFill /></div>
+                        <div onClick={() => setNavMode('bike')} className={`map-btn ${navMode == 'bike' ? 'active' : ''}`}><RiBikeLine /></div>
+                        <div onClick={() => setNavMode('car')} className={`map-btn ${navMode == 'car' ? 'active' : ''}`}><RiCarFill /></div>
+                    </div>
                     {/* React Leaflet Resource: https://blog.logrocket.com/how-to-use-react-leaflet/ */}
                     {getMap()}
                     {/* <MapContainer center={[mapCenter.lat, mapCenter.lng]} zoom={17}>
@@ -371,8 +392,10 @@ const SearchView = () => {
                             let coords: number[] | null = getCoordinates(property_id);
                             if (coords != null && coords.length == 2) {
                                 setPropertyNavigation(property_id);
+
+                                let schoolCoords = getInstituteLocation();
                                 setMapCenter({
-                                    lat: coords[1], lng: coords[0]
+                                    lat: (schoolCoords.lat + coords[1]) / 2, lng: (schoolCoords.lng + coords[0])/2
                                 });
                             }
                         }}
@@ -559,7 +582,7 @@ const NewSearchResult = ({result, onNavigate, onNavigateInstitute}:
 
     return (<div className="search-result-container-3">
 
-        <div className="image-area-holder">
+        <div className="image-area-holder no-select">
             <div className="navigation-icon-holder" onClick={() => {
                 if (navOnLocation) {
                     onNavigateInstitute();
