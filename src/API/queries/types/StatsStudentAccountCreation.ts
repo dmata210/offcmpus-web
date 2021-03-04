@@ -15,7 +15,3 @@ export interface StatsStudentAccountCreation_Stats_StudentAccountCreation {
 export interface StatsStudentAccountCreation {
   Stats_StudentAccountCreation: StatsStudentAccountCreation_Stats_StudentAccountCreation;
 }
-
-export interface StatsStudentAccountCreationVariables {
-  student_id: string;
-}

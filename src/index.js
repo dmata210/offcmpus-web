@@ -159,7 +159,8 @@ const Routes = () => {
 config()
 
 const _client = new ApolloClient({
-  uri: backendPath('/graphql')
+  uri: backendPath('/graphql'),
+  credentials: 'include'
 })
 
 ReactDOM.render(

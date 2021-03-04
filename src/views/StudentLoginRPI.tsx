@@ -15,6 +15,7 @@ const StudentLoginViewRPI = () => {
 
 
     //===================== STATE =====================
+    const [StudentAccountCreation] = useStatsStudentAccountCreationMutation();
 
     //===================== EFFECT =====================
     
@@ -43,7 +44,13 @@ const StudentLoginViewRPI = () => {
             // window.location.reload();
             
             // Statistics for login
-
+            /**
+             * If the student has already been registered, this
+             * gql stats query won't record anything.
+             * Otherwise, it will create a new stat object for
+             * this student.
+             */
+            StudentAccountCreation({variables:{}});
             window.location.href = getRedirect();
             }
             else console.log(`CAS Auth failed`);

@@ -1,5 +1,5 @@
-mutation StatsStudentAccountCreation($student_id: String!) {
-  Stats_StudentAccountCreation(student_id: $student_id) {
+mutation StatsStudentAccountCreation {
+  Stats_StudentAccountCreation {
     v
   }
 }
