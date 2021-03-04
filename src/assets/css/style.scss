@@ -6123,19 +6123,34 @@ a.subtle-link {
     justify-content: space-between;
 
     .price-area {
-      text-align: right;
-      padding: 5px 8px;
-      font-weight: 600;
-      font-size: 1rem;
+      .price__ {
+        text-align: right;
+        padding: 5px 10px 5px 0;
+        font-weight: 600;
+        font-size: 1rem;
 
-      ._price {
-        color: $green;
+        ._price {
+          color: $green;
+        }
+      }
+      .lease-available-area {
+        text-align: right;
+        display: flex;
+        justify-content: flex-end;
+        padding-right: 10px;
+
+        ._icon {
+          color: $pink;
+          margin-right: 4px;
+          display: block;
+          transform: translateY(-3px);
+        }
       }
     }
 
     .action-area {
       text-align: right;
-      padding: 5px 8px;
+      padding: 5px 10px 5px 0;
       display: flex;
       justify-content: flex-end;
     }

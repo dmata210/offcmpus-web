@@ -23,6 +23,7 @@ import {fetchUser} from '../redux/actions/user'
 import NumberPicker from '../components/toolbox/form/NumberPicker'
 import NavIcon from '../assets/svg/001-arrow.svg'
 import {BiNavigation, BiHomeCircle, BiHealth} from 'react-icons/bi'
+import {RiHotelBedLine} from 'react-icons/ri'
 
 import {MapContainer, TileLayer, Marker, Polyline, Popup} from 'react-leaflet'
 
@@ -266,10 +267,11 @@ const SearchView = () => {
             {/* Right Side */}
             {properties.length > 0 &&
             <div className="right-side_">
-                <NewSearchResult />
+                {/* <NewSearchResult result={properties[0]} /> */}
                 {properties.map((property: PropertySearchResult, i: number) => 
-                    <SearchResult user={user}
-                    result={property} key={i} delay={i < 8 ? i * 100 : 0} />
+                    <NewSearchResult 
+                        result={property} key={i}
+                    />
                 )}
             </div>}
 
@@ -436,7 +438,12 @@ const SearchResult = ({delay, result, user}: {delay: number, result: PropertySea
     </div>);
 }
 
-const NewSearchResult = () => {
+const NewSearchResult = ({result}: {result: PropertySearchResult}) => {
+
+    const getPropertyPriceRange = () :string => {
+        if (result.price_range.length == 1) return `$${result.price_range[0]}`;
+        else return `$${result.price_range[0]}-$${result.price_range[1]}`
+    }
 
     return (<div className="search-result-container-3">
 
@@ -451,22 +458,38 @@ const NewSearchResult = () => {
 
         <div className="results-content-holder">
             <div className="propery-address">
-                <span style={{fontWeight: 600, marginRight: '8px'}}>403 South 6th St</span>
-                <span style={{fontSize: '0.7rem'}}>Troy NY, 12180</span>
+
+                {/* Address */}
+                <span style={{fontWeight: 600, marginRight: '8px'}}>
+                    {result.property.address_line.toLowerCase()}
+                    {/* Address Line 2 */}
+                    {result.property.address_line_2 && result.property.address_line_2 != ""
+                    && result.property.address_line_2.toLowerCase()}
+                </span>
+                <span style={{fontSize: '0.7rem'}}>{result.property.city.toLowerCase()} {result.property.state}, {result.property.zip}</span>
             </div>
 
             {/* Tags area */}
             <div className="tag-holder">
-                <div className="_tag">Furnished</div>
+                {function () {
+                    let amentities: string[] = [];
+                    if (result.property.details && result.property.details.furnished) amentities.push("Furnished");
+                    if (result.property.details && result.property.details.has_heater) amentities.push("Heating");
+                    if (result.property.details && result.property.details.has_ac) amentities.push("AC");
+                    if (result.property.details && result.property.details.has_washer) amentities.push("Washer");
+
+                    return amentities.map((amenity: string, i: number) => 
+                        <div key={i} className="_tag">{amenity}</div>)
+                }()}
+                {/* <div className="_tag">Furnished</div>
                 <div className="_tag">Heating</div>
                 <div className="_tag">AC</div>
-                <div className="_tag">Washer</div>
+                <div className="_tag">Washer</div> */}
             </div>
 
             {/* Landlord area */}
             <div className="property-info">
-                {/* <span className="_icon"><BiHomeCircle /></span> */}
-                Joey Rooney
+                {result.landlord_first_name} {result.landlord_last_name}
             </div>
 
             {/* Property Rationg */}
@@ -475,26 +498,34 @@ const NewSearchResult = () => {
                     <div className="label_">Landlord Rating</div>
                     <div className="rating_">
                         <Rate tooltips={desc} 
-                            disabled value={3.5} 
+                            disabled value={result.landlord_rating_avg * 5} 
                             character={<BiHealth />}
                         />
                     </div>
+                    <div style={{transform: `translateX(-30px)`, fontSize: '0.7rem'}}>({result.landlord_rating_count})</div>
                 </div>
                 <div className="rating-container_">
                     <div className="label_">Property Rating</div>
                     <div className="rating_">
                         <Rate tooltips={desc} 
-                            disabled value={2.5} 
+                            disabled value={result.property_rating_count * 5} 
                             character={<BiHealth />}
                         />
                     </div>
+                    <div style={{transform: `translateX(-30px)`, fontSize: '0.7rem'}}>({result.property_rating_count})</div>
                 </div>
             </div>
 
         </div>
 
-        <div className="right-side-container">
-            <div className="price-area"><span className="_price">$400-700</span> /month</div>
+        <div className="right-side-container">{/*RiHotelBedLine*/}
+            <div className="price-area">
+                <div className="price__"><span className="_price">{getPropertyPriceRange()}</span> /month</div>
+                <div className="lease-available-area">
+                    <span className="_icon"><RiHotelBedLine /></span>
+                    <span>{result.lease_count} leases available</span>    
+                </div>
+            </div>
             <div className="action-area">
                 <div style={{width: '100px'}}>
                     <Button 
@@ -503,6 +534,7 @@ const NewSearchResult = () => {
                         background="#E0777D"
                         bold={true}
                         transformDisabled={true}
+                        link_to={`/info/property/${result.property._id}`}
                     />
                 </div>
             </div>
