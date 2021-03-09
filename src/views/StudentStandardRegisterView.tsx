@@ -49,20 +49,15 @@ const StudentStandardRegister = () => {
         if (createStudentResponse && createStudentResponse.createStudent) {
             if (createStudentResponse.createStudent.success) {
 
-                // Run statistics for logged in user
-                StudentAccountCreation({variables:{}});
-
                 // Log the student in
                 StudentAPI.login(
                     formInfo.preferred_email_set ? formInfo.preferred_login_email : formInfo.school_email,
                     formInfo.password
                 ).then(res => {
-
-                    console.log(res.data);
-                    console.log("Successful? ", res.data.success == true);
                     if (res.data.success == true) {
 
                         // run student login stat
+                        StudentAccountCreation({variables:{}});
                         StudentLoginStat();
 
                         dispatch(fetchUser(user, {update: true}))
