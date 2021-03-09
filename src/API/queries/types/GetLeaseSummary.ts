@@ -115,7 +115,7 @@ export interface GetLeaseSummary_getLeaseSummary_data_students {
   _id: string;
   first_name: string;
   last_name: string;
-  email: string;
+  email: string | null;
   phone_number: string | null;
   auth_info: GetLeaseSummary_getLeaseSummary_data_students_auth_info | null;
 }

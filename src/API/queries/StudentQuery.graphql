@@ -24,6 +24,22 @@ query GetStudentNotifications($student_id: String!) {
   }
 }
 
+mutation CreateStudent(
+  $first_name: String!
+  $last_name: String!
+  $email: String!
+  $preferred_email: String
+) {
+  createStudent(
+    first_name: $first_name
+    last_name: $last_name
+    email: $email
+    preferred_email: $preferred_email
+  ) {
+    ...StudentAPIResponseFields
+  }
+}
+
 mutation MarkAsSeen($student_id: String!, $notification_id: String!) {
   markStudentNotificationAsSeen(
     student_id: $student_id
@@ -102,7 +118,6 @@ fragment StudentAPIResponseFields on StudentAPIResponse {
     _id
     first_name
     last_name
-    email
     elevated_privileges
     auth_info {
       cas_id

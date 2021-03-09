@@ -295,7 +295,7 @@ const LandingAction = () => {
         textColor="white"
         background="#3B4353"
         options={[
-          {option: "Student", onClick: () => history.push('/student/login')},
+          {option: "Student", onClick: () => history.push('/student/standard/register')},
           {option: "Landlord", onClick: () => history.push('/landlord/register')}
         ]}
       />
@@ -305,7 +305,7 @@ const LandingAction = () => {
       textColor="white"
       background="#E0777D"
       options={[
-        {option: "Student", onClick: () => history.push('/student/login')},
+        {option: "Student", onClick: () => history.push('/student/standard/login')},
         {option: "Landlord", onClick: () => history.push('/landlord/login')}
       ]}
     />

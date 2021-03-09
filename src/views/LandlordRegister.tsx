@@ -163,7 +163,7 @@ const LandlordRegister = () => {
 
       <Helmet>
           <meta charSet="utf-8" />
-          <title>offcmpus | Landlord Register</title>
+          <title>offcmpus | Landlord Registration</title>
       </Helmet>
 
       {/* Header */}
@@ -177,7 +177,7 @@ const LandlordRegister = () => {
           lineHeight: '45px',
           marginLeft: '10px'
         }}>
-          Landlord Register
+          Landlord Registration
         </div>
       </div>
 

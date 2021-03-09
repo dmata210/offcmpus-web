@@ -46,7 +46,6 @@ export interface UpdateStudent_updateStudent_data {
   _id: string;
   first_name: string;
   last_name: string;
-  email: string;
   elevated_privileges: string[] | null;
   auth_info: UpdateStudent_updateStudent_data_auth_info | null;
   user_settings: UpdateStudent_updateStudent_data_user_settings | null;

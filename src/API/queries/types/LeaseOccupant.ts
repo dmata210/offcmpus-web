@@ -47,7 +47,7 @@ export interface LeaseOccupant {
   first_name: string;
   phone_number: string | null;
   last_name: string;
-  email: string;
+  email: string | null;
   elevated_privileges: string[] | null;
   auth_info: LeaseOccupant_auth_info | null;
   user_settings: LeaseOccupant_user_settings | null;

@@ -47,7 +47,7 @@ export interface AcceptLeaseAgreement_acceptLeaseAgreement_data_occupant_doc {
   first_name: string;
   phone_number: string | null;
   last_name: string;
-  email: string;
+  email: string | null;
   elevated_privileges: string[] | null;
   auth_info: AcceptLeaseAgreement_acceptLeaseAgreement_data_occupant_doc_auth_info | null;
   user_settings: AcceptLeaseAgreement_acceptLeaseAgreement_data_occupant_doc_user_settings | null;

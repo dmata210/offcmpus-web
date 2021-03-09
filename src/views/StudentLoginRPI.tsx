@@ -6,7 +6,7 @@ import urlencode from 'urlencode'
 import {backendPath} from '../config'
 import queryString from 'query-string'
 import {Helmet} from "react-helmet";
-
+import {useHistory} from 'react-router';
 import {
     useStatsStudentAccountCreationMutation,
     useStatsStudentLoginMutation
@@ -18,6 +18,8 @@ const StudentLoginViewRPI = () => {
     //===================== STATE =====================
     const [StudentAccountCreation, {data: accountCreationStats}] = useStatsStudentAccountCreationMutation();
     const [StudentLoginStat] = useStatsStudentLoginMutation();
+    const history = useHistory();
+    const [mode, setMode] = useState<'login' | 'register'>('login');
 
     //===================== EFFECT =====================
     useEffect(() => {
@@ -28,10 +30,19 @@ const StudentLoginViewRPI = () => {
         }
     }, [accountCreationStats]);
 
+    useEffect(() => {
+        let params = queryString.parse(window.location.search);
+
+        console.log('params: ', params);
+        if (Object.prototype.hasOwnProperty.call(params, 'register')
+            && params.register == 'true') {
+                setMode('register');
+        }
+    }, []);
+
     //===================== FUNCTIONS =====================
     const getRedirect = (): string => {
         let params = queryString.parse(window.location.search);
-
         if (Object.prototype.hasOwnProperty.call(params, `redirect`)) {
             return params.redirect as string;
         }
@@ -118,6 +129,17 @@ const StudentLoginViewRPI = () => {
                     background="#3B4353"
                     onClick={() => handleRpiCasLogin()}
                 />
+                
+                {/* <div style={{marginTop: '10px'}}>
+                    <Button 
+                        text={`${mode == 'register' ? 'Register' : 'Login'} with Email`}
+                        textColor="white"
+                        bold={true}
+                        transformDisabled={true}
+                        background="#E0777D"
+                        onClick={() => {history.push(`/student/standard/${mode}`)}}
+                    />
+                </div> */}
             </div>
 
         </div>
