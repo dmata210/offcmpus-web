@@ -35,7 +35,7 @@ const RadioInput = ({question, options, onChange}: RadioInputProps) => {
                     k = (k + 1) % 2;
                 }
 
-                return question_row.map(p => <div className="option-row">{p}</div>)
+                return question_row.map((p, i: number) => <div key={i} className="option-row">{p}</div>)
             })()}
 
         </div>

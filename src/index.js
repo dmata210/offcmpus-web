@@ -64,6 +64,7 @@ import LandlordForgotPasswordView from './views/LandlordForgotPasswordView'
 import LandlordPasswordResetView from './views/LandlordPasswordResetView'
 import StudentConvenience from './views/StudentConvenienceView'
 import StudentStandardRegisterView from './views/StudentStandardRegisterView'
+import StudentStandardLoginView from './views/StudentStandardLoginView'
 
 import Testing from './views/Testing'
 
@@ -113,6 +114,7 @@ const Routes = () => {
         <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/login" component={LandlordLoginView} />
         <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/login" component={StudentLoginViewRPI} />
         <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/standard/register" component={StudentStandardRegisterView} />
+        <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/standard/login" component={StudentStandardLoginView} />
         <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/register" component={LandlordRegisterView} />
         <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/forgot-password" component={LandlordForgotPasswordView} />
         <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/password-reset/:reset_key" component={({ match }) => <LandlordPasswordResetView reset_key={match.params.reset_key} />} />

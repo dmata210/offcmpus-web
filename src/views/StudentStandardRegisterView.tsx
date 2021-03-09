@@ -5,8 +5,12 @@ import Input, {Validators, noSpaces} from '../components/toolbox/form/Input'
 import Checkbox from '../components/toolbox/form/Checkbox'
 import Button from '../components/toolbox/form/Button'
 import { Alert } from 'antd';
-
+import StudentAPI from '../API/StudentAPI'
+import {useDispatch, useSelector} from 'react-redux'
+import {fetchUser} from '../redux/actions/user'
 import {useCreateStudentMutation} from '../API/queries/types/graphqlFragmentTypes'
+import { ReduxState } from '../redux/reducers/all_reducers';
+import { cloneWith } from 'lodash';
 
 const {email} = Validators;
 
@@ -24,6 +28,7 @@ type StudentRegFormInfo = {
 
 const StudentStandardRegister = () => {
 
+    const dispatch = useDispatch()
     const [CreateStudent, {data: createStudentResponse}] = useCreateStudentMutation();
 
     const [_forceUpdate, _setForceUpdate] = useState<boolean>(false);
@@ -33,16 +38,27 @@ const StudentStandardRegister = () => {
         password_confirm: "", password: ""
     });
     const [error, setError] = useState<string | null>(null);
+    const user = useSelector((state: ReduxState) => state.user);
 
     useEffect(() => {
         if (createStudentResponse && createStudentResponse.createStudent) {
             if (createStudentResponse.createStudent.success) {
 
                 // Log the student in
-                // StudentAPI.login(
-                //     ,
-                //     formInfo
-                // );
+                StudentAPI.login(
+                    formInfo.preferred_email_set ? formInfo.preferred_login_email : formInfo.school_email,
+                    formInfo.password
+                ).then(res => {
+
+                    console.log(res.data);
+                    console.log("Successful? ", res.data.success == true);
+                    if (res.data.success == true) {
+                        dispatch(fetchUser(user, {update: true}))
+                    }
+                    else {
+                        setError("Could not register. Please try again.");
+                    }
+                });
             }
             else {
                 if (createStudentResponse.createStudent.error) 
