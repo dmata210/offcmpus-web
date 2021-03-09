@@ -274,9 +274,11 @@ export type Student = {
   __typename?: 'Student';
   _id: Scalars['ID'];
   first_name: Scalars['String'];
+  date_registered?: Maybe<Scalars['String']>;
   last_name: Scalars['String'];
   email?: Maybe<Scalars['String']>;
   edu_email?: Maybe<Scalars['String']>;
+  password?: Maybe<Scalars['String']>;
   phone_number?: Maybe<Scalars['String']>;
   auth_info?: Maybe<CasAuthInfo>;
   saved_collection?: Maybe<Array<Scalars['String']>>;
@@ -846,6 +848,7 @@ export type Mutation = {
   setLandlordOnboarded: LandlordApiResponse;
   saveConveniencePreferences: StudentApiResponse;
   createStudent: StudentApiResponse;
+  resendStudentEmailConfirmation: StudentApiResponse;
   markStudentNotificationAsSeen: StudentNotificationApiResponse;
   updateStudentSearchStatus: StudentApiResponse;
   addPropertyToStudentCollection: PropertyCollectionEntriesApiResponse;
@@ -2609,6 +2612,17 @@ export type GetStudentNotificationsQuery = (
         )> }
       )> }
     )> }
+  ) }
+);
+
+export type ResendStudentEmailConfirmationMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ResendStudentEmailConfirmationMutation = (
+  { __typename?: 'Mutation' }
+  & { resendStudentEmailConfirmation: (
+    { __typename?: 'StudentAPIResponse' }
+    & StudentApiResponseFieldsFragment
   ) }
 );
 
@@ -5692,6 +5706,37 @@ export function useGetStudentNotificationsLazyQuery(baseOptions?: Apollo.LazyQue
 export type GetStudentNotificationsQueryHookResult = ReturnType<typeof useGetStudentNotificationsQuery>;
 export type GetStudentNotificationsLazyQueryHookResult = ReturnType<typeof useGetStudentNotificationsLazyQuery>;
 export type GetStudentNotificationsQueryResult = Apollo.QueryResult<GetStudentNotificationsQuery, GetStudentNotificationsQueryVariables>;
+export const ResendStudentEmailConfirmationDocument = gql`
+    mutation ResendStudentEmailConfirmation {
+  resendStudentEmailConfirmation {
+    ...StudentAPIResponseFields
+  }
+}
+    ${StudentApiResponseFieldsFragmentDoc}`;
+export type ResendStudentEmailConfirmationMutationFn = Apollo.MutationFunction<ResendStudentEmailConfirmationMutation, ResendStudentEmailConfirmationMutationVariables>;
+
+/**
+ * __useResendStudentEmailConfirmationMutation__
+ *
+ * To run a mutation, you first call `useResendStudentEmailConfirmationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useResendStudentEmailConfirmationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [resendStudentEmailConfirmationMutation, { data, loading, error }] = useResendStudentEmailConfirmationMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useResendStudentEmailConfirmationMutation(baseOptions?: Apollo.MutationHookOptions<ResendStudentEmailConfirmationMutation, ResendStudentEmailConfirmationMutationVariables>) {
+        return Apollo.useMutation<ResendStudentEmailConfirmationMutation, ResendStudentEmailConfirmationMutationVariables>(ResendStudentEmailConfirmationDocument, baseOptions);
+      }
+export type ResendStudentEmailConfirmationMutationHookResult = ReturnType<typeof useResendStudentEmailConfirmationMutation>;
+export type ResendStudentEmailConfirmationMutationResult = Apollo.MutationResult<ResendStudentEmailConfirmationMutation>;
+export type ResendStudentEmailConfirmationMutationOptions = Apollo.BaseMutationOptions<ResendStudentEmailConfirmationMutation, ResendStudentEmailConfirmationMutationVariables>;
 export const CreateStudentDocument = gql`
     mutation CreateStudent($first_name: String!, $last_name: String!, $email: String!, $password: String!, $preferred_email: String) {
   createStudent(

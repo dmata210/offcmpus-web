@@ -24,6 +24,12 @@ query GetStudentNotifications($student_id: String!) {
   }
 }
 
+mutation ResendStudentEmailConfirmation {
+  resendStudentEmailConfirmation {
+    ...StudentAPIResponseFields
+  }
+}
+
 mutation CreateStudent(
   $first_name: String!
   $last_name: String!

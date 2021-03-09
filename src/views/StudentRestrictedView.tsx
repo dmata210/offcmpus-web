@@ -1,8 +1,31 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Centered from '../components/toolbox/layout/Centered'
 import Button from '../components/toolbox/form/Button'
+import {Alert} from 'antd'
+import {
+    useResendStudentEmailConfirmationMutation
+} from '../API/queries/types/graphqlFragmentTypes'
+import {ReduxState} from '../redux/reducers/all_reducers'
+import {useSelector} from 'react-redux'
 
 const StudentRestrictedView = () => {
+
+    const user = useSelector((state: ReduxState) => state.user);
+    const [ResentConfirmation, {data: resendCOnfirmationResponse}] = useResendStudentEmailConfirmationMutation();
+    const [sent, setSent] = useState<boolean>(false);
+
+    const handleResendConfirmation = () => {
+        ResentConfirmation();
+    }
+
+    useEffect(() => {
+        // TODO handle state change stuff
+        if (resendCOnfirmationResponse
+            && resendCOnfirmationResponse.resendStudentEmailConfirmation
+            && resendCOnfirmationResponse.resendStudentEmailConfirmation.success) {
+                setSent(true);
+            }
+    }, [resendCOnfirmationResponse]);
 
     return (<Centered width={400} height={400}>
         <div>
@@ -29,9 +52,18 @@ const StudentRestrictedView = () => {
                         background="#3B4353"
                         bold={true}
                         transformDisabled={true}
+                        onClick={handleResendConfirmation}
                     />
                 </div>
             </div>
+
+            {sent && <div style={{marginTop: '15px'}}>
+                <Alert
+                    message="Email Confirmation Resent!"
+                    description={`Successfully resent email confirmation to ${user && user.user && user.user.email ? user.user.email : ''}`}
+                    type="success"
+                />
+            </div>}
         </div>
     </Centered>)
 }
