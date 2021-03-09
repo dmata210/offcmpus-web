@@ -47,7 +47,7 @@ export interface expressInterest_expressInterest_data_occupant_doc {
   first_name: string;
   phone_number: string | null;
   last_name: string;
-  email: string;
+  email: string | null;
   elevated_privileges: string[] | null;
   auth_info: expressInterest_expressInterest_data_occupant_doc_auth_info | null;
   user_settings: expressInterest_expressInterest_data_occupant_doc_user_settings | null;

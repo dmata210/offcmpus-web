@@ -7,6 +7,10 @@ const StudentAPI = {
     first_name: first_name,
     last_name: last_name,
     email: email
+  }),
+
+  login: (email: string, password: string): Promise<any> => API.post('/auth/local-auth', {
+    email: email, password: password, auth_type: 'student'
   })
 }
 

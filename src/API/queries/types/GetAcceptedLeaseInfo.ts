@@ -87,7 +87,7 @@ export interface GetAcceptedLeaseInfo_getAcceptedLeaseInfo_data_lease_occupant_d
   first_name: string;
   phone_number: string | null;
   last_name: string;
-  email: string;
+  email: string | null;
   elevated_privileges: string[] | null;
   auth_info: GetAcceptedLeaseInfo_getAcceptedLeaseInfo_data_lease_occupant_doc_auth_info | null;
   user_settings: GetAcceptedLeaseInfo_getAcceptedLeaseInfo_data_lease_occupant_doc_user_settings | null;

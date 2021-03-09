@@ -19,6 +19,7 @@ import {fetchUser} from '../redux/actions/user'
 import queryString from 'query-string'
 import urlencode from 'urlencode'
 import Cookies from 'universal-cookie'
+import {useStatsLandlordLoginMutation} from '../API/queries/types/graphqlFragmentTypes'
 
 interface ILoginFields {
   email: string
@@ -34,6 +35,7 @@ const {email: emailValidator, minLen: minLenValidator} = Validators;
 
 const LandlordLogin = () => {
 
+  const [LandlordLoginStats] = useStatsLandlordLoginMutation();
   const isMobile = useMediaQuery({ query: '(max-width: 500px)' })
 
   const history = useHistory()
@@ -105,6 +107,7 @@ const LandlordLogin = () => {
       .then(res => {
         if (res.data.success) { 
 
+          LandlordLoginStats();
           handleRedirect ();
           dispatch(fetchUser(user, {update: true}))
         }

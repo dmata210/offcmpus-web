@@ -4,23 +4,38 @@ import {useSelector} from 'react-redux'
 import {useHistory} from 'react-router'
 import {shouldPromptToEnableNotifications} from './PushNotificationsPrompt'
 import {Helmet} from "react-helmet";
+import {StudentConfirmPrompt} from '../components/StudentConformationPrompt';
 
 import ViewWrapper from '../components/ViewWrapper'
 import Button from '../components/toolbox/form/Button'
 import Popup, {PopupHeader} from '../components/toolbox/misc/Popup'
 import {ReduxState} from '../redux/reducers/all_reducers'
+import {useStudentEmailConfirmedMutation} from '../API/queries/types/graphqlFragmentTypes'
 
 const StudentFeed = () => {
+
+    const [CheckEmailConfirmed, {data: emailConfirmedResponse}] = useStudentEmailConfirmedMutation();
 
     const history = useHistory()
     const user = useSelector((state: ReduxState) => state.user)
     const [showPropertyPopup, setShowPropertyPopup] = useState<boolean>(false)
     const [popupTab, setPopupTab] = useState<number>(0)
+    const [emailConfirmed, setEmailConfirmed] = useState<boolean>(true);
 
     const showPropertyInfo = () => {
         setShowPropertyPopup(true);
         setPopupTab(0);
     }
+
+    useEffect(() => {
+        CheckEmailConfirmed();
+    }, []);
+
+    useEffect(() => {
+        if (emailConfirmedResponse && emailConfirmedResponse.studentEmailConfirmed) {
+            setEmailConfirmed(emailConfirmedResponse.studentEmailConfirmed.success);
+        }
+    }, [emailConfirmedResponse]);
 
     useEffect(() => {
 
@@ -80,6 +95,8 @@ const StudentFeed = () => {
                 <div className="section-header-2" style={{height: `30px`, marginBottom: `16px`}}>
                     <div className="title-area">Your Feed</div>
                 </div>
+
+                {!emailConfirmed && <StudentConfirmPrompt />}
 
                 {/* Feed Entries */}
                 {(function(){

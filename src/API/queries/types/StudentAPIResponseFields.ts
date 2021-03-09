@@ -46,7 +46,6 @@ export interface StudentAPIResponseFields_data {
   _id: string;
   first_name: string;
   last_name: string;
-  email: string;
   elevated_privileges: string[] | null;
   auth_info: StudentAPIResponseFields_data_auth_info | null;
   user_settings: StudentAPIResponseFields_data_user_settings | null;

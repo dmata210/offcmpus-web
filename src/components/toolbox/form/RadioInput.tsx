@@ -28,6 +28,7 @@ const RadioInput = ({question, options, onChange}: RadioInputProps) => {
                     if (k == 0) question_row.push([]);
 
                     let el = <div 
+                        key={k}
                         onClick={() => setSelected(i)}
                         className={`option-item ${selected == i ? 'selected' : ''} ${k == 0 ? 'left' : 'right'}`}>{options[i]}</div>;
 
@@ -35,7 +36,7 @@ const RadioInput = ({question, options, onChange}: RadioInputProps) => {
                     k = (k + 1) % 2;
                 }
 
-                return question_row.map(p => <div className="option-row">{p}</div>)
+                return question_row.map((p, i: number) => <div key={i} className="option-row">{p}</div>)
             })()}
 
         </div>

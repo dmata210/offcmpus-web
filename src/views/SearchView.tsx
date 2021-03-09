@@ -13,6 +13,7 @@ import {Helmet} from "react-helmet";
 import {
     useSearchForPropertiesLazyQuery, 
     useAddCollectionMutation,
+    useStudentEmailConfirmedMutation,
     useRemoveCollectionMutation,
     Property, 
     PropertySearchResult,
@@ -20,12 +21,33 @@ import {
 } from '../API/queries/types/graphqlFragmentTypes'
 import { Empty, Rate } from 'antd';
 import {fetchUser} from '../redux/actions/user'
+import NumberPicker from '../components/toolbox/form/NumberPicker'
+import NavIcon from '../assets/svg/001-arrow.svg'
+import {BiNavigation, BiHomeCircle, BiHealth} from 'react-icons/bi'
+import {RiHotelBedLine, RiWalkFill, RiCarFill, RiBikeLine} from 'react-icons/ri'
+import {StudentConfirmPrompt} from '../components/StudentConformationPrompt'
 
-import {MapContainer, TileLayer, Marker, Polyline, Popup} from 'react-leaflet'
+import L from 'leaflet'
+import {MapContainer, TileLayer, Marker, Polyline, Popup, useMap} from 'react-leaflet'
+
+function CustomMap({location}: {location: {lat: number, lng: number}}) {
+  const map = useMap();
+  map.invalidateSize(true);
+  map.setView( /* center [latitude, longitude] */ [location.lat, location.lng], /* zoom */ 15);
+  return null;
+}
+
+// @ts-ignore
+const CustomMarker: L.Icon<L.IconOptions> = new L.icon({
+    iconUrl: require("../assets/svg/map_icon.svg"),
+    iconSize: [60, 60]
+});
 
 const SearchView = () => {
 
+    const [CheckEmailConfirmed, {data: emailConfirmedResponse}] = useStudentEmailConfirmedMutation();
     const [SearchForProps, {data: searchResponse}] = useSearchForPropertiesLazyQuery();
+    const [emailConfirmed, setEmailConfirmed] = useState<boolean>(true);
 
     const user = useSelector((state: ReduxState) => state.user);
     const institute = useSelector((state: ReduxState) => state.institution);
@@ -35,7 +57,10 @@ const SearchView = () => {
     const [leftFilterWidth, setLeftFilterWidth] = useState<number>(400)
     const [contentStart, setContentStart] = useState<number>(0)
     
-    const [properties, setProperties] = useState<PropertySearchResult[]>([])
+    const [properties, setProperties] = useState<PropertySearchResult[]>([]);
+    const [mapCenter, setMapCenter] = useState<{lat: number, lng: number}>({lat: 0, lng: 0});
+    const [propertyNavigation, setPropertyNavigation] = useState<string | null>(null);
+    const [navMode, setNavMode] = useState<'walk' | 'bike' | 'car'>('walk');
 
     const history = useHistory();
     const cookie = new Cookies ();
@@ -46,7 +71,18 @@ const SearchView = () => {
     })
 
     useEffect(() => {
-        updateFilterWidth ()
+        setMapCenter(getInstituteLocation());
+    }, [institute]);
+
+    useEffect(() => {
+        if (emailConfirmedResponse && emailConfirmedResponse.studentEmailConfirmed) {
+            setEmailConfirmed(emailConfirmedResponse.studentEmailConfirmed.success);
+        }
+    }, [emailConfirmedResponse]);
+
+    useEffect(() => {
+        CheckEmailConfirmed();
+        updateFilterWidth ();
         window.addEventListener(`resize`, updateFilterWidth)
 
         // execute search queries
@@ -80,7 +116,6 @@ const SearchView = () => {
 
     const getInstituteLocation = () => {
         if (institute && institute.location) {
-            // [institute.location.latitude, institute.location.longitude]
             return {
                 lat: institute.location.latitude,
                 lng: institute.location.longitude
@@ -99,6 +134,126 @@ const SearchView = () => {
         }
 
         return coords;
+    }
+
+    const getMap = () => {
+        return (<MapContainer center={[mapCenter.lat, mapCenter.lng]} scrollWheelZoom={false}>
+            <CustomMap location={mapCenter} />
+            <TileLayer
+                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                // url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoieXVzdWZhMiIsImEiOiJja2x2OXBsdnIwbm1uMnVvamk0MzF0b3NvIn0.lL8T7KT_mxsZ2z2xrG4I5A`}
+            />
+
+            {/* Marker at position of institute */}
+            <Marker position={getInstituteLocation()} icon={CustomMarker}>
+                <Popup>{institute && institute.name}</Popup>
+            </Marker>
+
+            {/* Marker at position of property navigation */}
+            {propertyNavigation != null
+            && <Marker position={toLatLong(getCoordinates(propertyNavigation))} icon={CustomMarker}>
+                {/* <Popup>{institute && institute.name}</Popup> */}
+            </Marker>}
+
+            {propertyNavigation != null &&
+            (() => {
+
+                if (institute == null || !institute._id) return <div />
+                let prop: PropertySearchResult | undefined = properties.find(i => i.property._id == propertyNavigation);
+                if (prop == undefined || prop.property.directions == undefined) return <div />;
+
+                let directions_to_inst = prop.property.directions.find(i => i.institution_id = institute._id);
+                if (directions_to_inst == undefined || directions_to_inst.foot_walking_directions == undefined 
+                    || directions_to_inst.foot_walking_directions.length == 0) return <div />
+                return <Polyline 
+                    pathOptions={{ color: '#E0777D' }}
+                    positions={generateCoordsPolyLine(directions_to_inst.foot_walking_directions[0].coordinates)}
+                />
+
+            })()}
+
+            {/* {properties.map((res: PropertySearchResult, i: number) => {
+                let property: Property = res.property;
+                if (!property.directions) return (<div key={i} />)
+                let directions_ = property.directions.filter((dir: PropertyDirections) => 
+                    institute && institute._id && dir.institution_id == institute._id);
+                
+                if (directions_.length == 0) return (<div key={i} />)
+                let dir: any[] = [];
+                if (directions_[0].cycling_regular_directions != undefined && directions_[0].cycling_regular_directions.length > 0) 
+                    dir = directions_[0].cycling_regular_directions[0].coordinates;
+                
+                else if (directions_[0].driving_car_directions != undefined && directions_[0].driving_car_directions.length > 0) 
+                    dir = directions_[0].driving_car_directions[0].coordinates;
+
+                else if (directions_[0].foot_walking_directions != undefined && directions_[0].foot_walking_directions.length > 0) 
+                    dir = directions_[0].foot_walking_directions[0].coordinates;
+
+                return (<Polyline key={i}
+                    pathOptions={{ color: 'purple' }}
+                    positions={ generateCoordsPolyLine(dir) }
+                />)
+            })} */}
+            </MapContainer>);
+    }
+
+    const toLatLong = (arr: number[] | null) => {
+        if (arr == null) return getInstituteLocation();
+        return {
+            lat: arr[1],
+            lng: arr[0]
+        }
+    }
+
+    /**
+     * @desc Given the id of a property, return the coordinates for the
+     * property if it exists. Otherwise, return null.
+     * @param property_id The id of the property to get the coordinates
+     * for.
+     */
+    const getCoordinates = (property_id: string): number[] | null => {
+
+        if (!institute || !institute._id) return null;
+    
+        for (let i = 0; i < properties.length; ++i) {
+            let property_info: PropertySearchResult = properties[i];
+
+            if (property_info.property._id == property_id) {
+
+                if (property_info.property.directions == null
+                    || property_info.property.directions.length == 0) return null;
+
+                let to_institute: PropertyDirections | undefined = property_info.property.directions.find(d => d.institution_id == institute._id);
+                if (to_institute == undefined) return null;
+
+                // ! Temp: This will only look in the cycling directions
+                // debugger;
+
+                if (navMode == 'bike') {
+                    if (to_institute.cycling_regular_directions && to_institute.cycling_regular_directions.length > 0) {
+                        if (to_institute.cycling_regular_directions[0].coordinates.length == 0) return null;
+                        return to_institute.cycling_regular_directions[0].coordinates[0];
+                    }
+                }
+                else if (navMode == 'walk') {
+                    if (to_institute.foot_walking_directions && to_institute.foot_walking_directions.length > 0) {
+                        if (to_institute.foot_walking_directions[0].coordinates.length == 0) return null;
+                        return to_institute.foot_walking_directions[0].coordinates[0];
+                    }
+                }
+                else if (navMode == 'car') {
+                    if (to_institute.driving_car_directions && to_institute.driving_car_directions.length > 0) {
+                        if (to_institute.driving_car_directions[0].coordinates.length == 0) return null;
+                        return to_institute.driving_car_directions[0].coordinates[0];
+                    }
+                }
+
+                return null;
+            }
+        }
+        
+        return null;
     }
 
     return (<ViewWrapper
@@ -163,7 +318,8 @@ const SearchView = () => {
                     {/* # of Rooms & Distance Counters */}
                     <div className="filter-bottom-counters">
                         <div className="inline-form-input" style={{
-                            padding: `10px`
+                            padding: `10px`,
+                            width: "45%"
                         }}>
                             <div className="input-label_">
                                 <span style={{marginRight: `5px`}}>Rooms</span>
@@ -175,20 +331,26 @@ const SearchView = () => {
                                 </div>
                             </div>
                             <div className="input-area_">
-                                <Counter
+                                {/* <Counter
                                     restrictions={[positiveOnly, maxVal(4, {inclusive: true})]}
                                     onChange={(val: number) => {}}
+                                /> */}
+                                <NumberPicker 
+                                    minVal={1}
+                                    maxVal={15}
+                                    onChange={(val: number) => {}} 
                                 />
                             </div>
                         </div>
 
                         <div className="inline-form-input right" style={{
-                            padding: `10px`
+                            padding: `10px`,
+                            flexGrow: 1
                         }}>
                             <div className="input-label_">
                                 <span style={{marginRight: `5px`}}>Distance (mi.)</span>
                                 <div style={{
-                                    display: 'inline-block'
+                                    display: 'inline-block',
                                 }}>
                                     <MoreDetails 
                                         width={150}
@@ -197,10 +359,9 @@ const SearchView = () => {
                                 </div>
                             </div>
                             <div className="input-area_">
-                                <Counter
-                                    restrictions={[positiveOnly, maxVal(40, {inclusive: true})]}
-                                    onChange={(val: number) => {}}
-                                    incrementBy={5}
+                                <NumberPicker 
+                                    minVal={1}
+                                    onChange={(val: number) => {}} 
                                 />
                             </div>
                         </div>
@@ -210,40 +371,16 @@ const SearchView = () => {
                 </div>
 
                 <div className="map-box" style={{}}>
+                    <div className="map-ctrl-box">
+                        <div onClick={() => setNavMode('walk')} className={`map-btn ${navMode == 'walk' ? 'active' : ''}`}><RiWalkFill /></div>
+                        <div onClick={() => setNavMode('bike')} className={`map-btn ${navMode == 'bike' ? 'active' : ''}`}><RiBikeLine /></div>
+                        <div onClick={() => setNavMode('car')} className={`map-btn ${navMode == 'car' ? 'active' : ''}`}><RiCarFill /></div>
+                    </div>
                     {/* React Leaflet Resource: https://blog.logrocket.com/how-to-use-react-leaflet/ */}
-                    <MapContainer center={getInstituteLocation()} zoom={17} scrollWheelZoom={false}>
-                    <TileLayer
-                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <Marker position={getInstituteLocation()}>
-                        <Popup>Troy Placeholder</Popup>
-                    </Marker>
-
-                    {/* Put the coordinates information */}
-                    {properties.map((res: PropertySearchResult, i: number) => {
-                        let property: Property = res.property;
-                        if (!property.directions) return (<div key={i} />)
-                        let directions_ = property.directions.filter((dir: PropertyDirections) => 
-                            institute && institute._id && dir.institution_id == institute._id);
-                        
-                        if (directions_.length == 0) return (<div key={i} />)
-                        let dir: any[] = [];
-                        if (directions_[0].cycling_regular_directions != undefined && directions_[0].cycling_regular_directions.length > 0) 
-                            dir = directions_[0].cycling_regular_directions[0].coordinates;
-                        
-                        else if (directions_[0].driving_car_directions != undefined && directions_[0].driving_car_directions.length > 0) 
-                            dir = directions_[0].driving_car_directions[0].coordinates;
-
-                        else if (directions_[0].foot_walking_directions != undefined && directions_[0].foot_walking_directions.length > 0) 
-                            dir = directions_[0].foot_walking_directions[0].coordinates;
-
-                        return (<Polyline key={i}
-                            pathOptions={{ color: 'purple' }}
-                            positions={ generateCoordsPolyLine(dir) }
-                        />)
-                    })}
-                    </MapContainer>
+                    {getMap()}
+                    {/* <MapContainer center={[mapCenter.lat, mapCenter.lng]} zoom={17}>
+                        <CustomMap location={mapCenter} />
+                    </MapContainer> */}
                 </div>
             </div>
 
@@ -257,9 +394,30 @@ const SearchView = () => {
             {/* Right Side */}
             {properties.length > 0 &&
             <div className="right-side_">
+                {!emailConfirmed && <StudentConfirmPrompt />}
+
+                {/* <NewSearchResult result={properties[0]} /> */}
                 {properties.map((property: PropertySearchResult, i: number) => 
-                    <SearchResult user={user}
-                    result={property} key={i} delay={i < 8 ? i * 100 : 0} />
+                    <NewSearchResult 
+                        result={property} key={i}
+                        onNavigate={(property_id: string) => {
+                            console.log(`Get navigation: ${property_id}`);
+                            let coords: number[] | null = getCoordinates(property_id);
+                            if (coords != null && coords.length == 2) {
+                                setPropertyNavigation(property_id);
+
+                                let schoolCoords = getInstituteLocation();
+                                setMapCenter({
+                                    lat: (schoolCoords.lat + coords[1]) / 2, lng: (schoolCoords.lng + coords[0])/2
+                                });
+                            }
+                        }}
+                        onNavigateInstitute={() => {
+                            if (!institute || !institute._id) return;
+                            setPropertyNavigation(null);
+                            setMapCenter(getInstituteLocation());
+                        }}
+                    />
                 )}
             </div>}
 
@@ -407,35 +565,6 @@ const SearchResult = ({delay, result, user}: {delay: number, result: PropertySea
                     display: `flex`
                 }}>
                     <div style={{marginRight: `5px`}}>
-                        {/* Disable save-property feature */}
-                        {/* <Button 
-                            text={propertySaved() ? `Remove` : `Save`}
-                            background="#848CFF"
-                            bold={true}
-                            textColor="white"
-                            transformDisabled={true}
-                            onClick={() => {
-                                // Do save stuff ...
-                                if (user && user.user) {
-                                    if (propertySaved()) {
-                                        RemoveCollection({
-                                            variables: {
-                                                student_id: user.user._id,
-                                                property_id: result.property._id
-                                            }
-                                        });
-                                    }
-                                    else {
-                                        AddCollection({
-                                            variables: {
-                                                student_id: user.user._id,
-                                                property_id: result.property._id
-                                            }
-                                        });
-                                    }
-                                }
-                            }}
-                        />  */}
                     </div>
                     <div>
                         <Button 
@@ -453,5 +582,115 @@ const SearchResult = ({delay, result, user}: {delay: number, result: PropertySea
         </div>
 
     </div>);
+}
+
+const NewSearchResult = ({result, onNavigate, onNavigateInstitute}: 
+    {result: PropertySearchResult, onNavigate: (property_id: string) => void, onNavigateInstitute: () => void}) => {
+
+    const [navOnLocation, setNavOnLocation] = useState<boolean>(false);
+    const getPropertyPriceRange = () :string => {
+        if (result.price_range.length == 1) return `$${result.price_range[0]}`;
+        else return `$${result.price_range[0]}-$${result.price_range[1]}`
+    }
+
+    return (<div className="search-result-container-3">
+
+        <div className="image-area-holder no-select">
+            <div className="navigation-icon-holder" onClick={() => {
+                if (navOnLocation) {
+                    onNavigateInstitute();
+                } 
+                else onNavigate(result.property._id);
+
+                setNavOnLocation(!navOnLocation);
+            }}>
+                <BiNavigation />    
+            </div>
+            <div className="image-area">
+                <img width='100%' src="https://pix.idxre.com/pix/clientPhotos3/0_11523444_201900119.JPG" />
+            </div>
+        </div>
+
+        <div className="results-content-holder">
+            <div className="propery-address">
+
+                {/* Address */}
+                <span style={{fontWeight: 600, marginRight: '8px'}}>
+                    {result.property.address_line.toLowerCase()}
+                    {/* Address Line 2 */}
+                    {result.property.address_line_2 && result.property.address_line_2 != ""
+                    && result.property.address_line_2.toLowerCase()}
+                </span>
+                <span style={{fontSize: '0.7rem'}}>{result.property.city.toLowerCase()} {result.property.state}, {result.property.zip}</span>
+            </div>
+
+            {/* Tags area */}
+            <div className="tag-holder">
+                {function () {
+                    let amentities: string[] = [];
+                    if (result.property.details && result.property.details.furnished) amentities.push("Furnished");
+                    if (result.property.details && result.property.details.has_heater) amentities.push("Heating");
+                    if (result.property.details && result.property.details.has_ac) amentities.push("AC");
+                    if (result.property.details && result.property.details.has_washer) amentities.push("Washer");
+
+                    return amentities.map((amenity: string, i: number) => 
+                        <div key={i} className="_tag">{amenity}</div>)
+                }()}
+            </div>
+
+            {/* Landlord area */}
+            <div className="property-info">
+                {result.landlord_first_name} {result.landlord_last_name}
+            </div>
+
+            {/* Property Rationg */}
+            <div className="ratings-area_">
+                <div className="rating-container_">
+                    <div className="label_">Landlord Rating</div>
+                    <div className="rating_">
+                        <Rate tooltips={desc} 
+                            disabled value={result.landlord_rating_avg * 5} 
+                            character={<BiHealth />}
+                        />
+                    </div>
+                    <div style={{transform: `translateX(-30px)`, fontSize: '0.7rem'}}>({result.landlord_rating_count})</div>
+                </div>
+                <div className="rating-container_">
+                    <div className="label_">Property Rating</div>
+                    <div className="rating_">
+                        <Rate tooltips={desc} 
+                            disabled value={result.property_rating_avg * 5} 
+                            character={<BiHealth />}
+                        />
+                    </div>
+                    <div style={{transform: `translateX(-30px)`, fontSize: '0.7rem'}}>({result.property_rating_count})</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div className="right-side-container">{/*RiHotelBedLine*/}
+            <div className="price-area">
+                <div className="price__"><span className="_price">{getPropertyPriceRange()}</span> /month</div>
+                <div className="lease-available-area">
+                    <span className="_icon"><RiHotelBedLine /></span>
+                    <span>{result.lease_count} leases available</span>    
+                </div>
+            </div>
+            <div className="action-area">
+                <div style={{width: '100px'}}>
+                    <Button 
+                        text="View"
+                        textColor="white"
+                        background="#E0777D"
+                        bold={true}
+                        transformDisabled={true}
+                        link_to={`/info/property/${result.property._id}`}
+                    />
+                </div>
+            </div>
+        </div>
+
+    </div>)
 }
 export default SearchView

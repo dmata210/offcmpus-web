@@ -1,0 +1,29 @@
+mutation StatsStudentAccountCreation {
+  Stats_StudentAccountCreation {
+    v
+  }
+}
+
+mutation StatsStudentLogin {
+  Stats_StudentLogin {
+    v
+  }
+}
+
+mutation StatsLandlordAccountCreation {
+  Stats_LandlordAccountCreation {
+    v
+  }
+}
+
+mutation StatsLandlordLogin {
+  Stats_LandlordLogin {
+    v
+  }
+}
+
+mutation StatsLandlordOpenLease($property_id: String!, $lease_id: String!) {
+  Stats_LandlordOpenLease(property_id: $property_id, lease_id: $lease_id) {
+    v
+  }
+}

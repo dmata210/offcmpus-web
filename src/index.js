@@ -62,6 +62,10 @@ import StudentAcceptedLeaseInfoView from './views/StudentAcceptedLeaseInfoView'
 import StudentLoginViewRPI from './views/StudentLoginRPI'
 import LandlordForgotPasswordView from './views/LandlordForgotPasswordView'
 import LandlordPasswordResetView from './views/LandlordPasswordResetView'
+import StudentConvenience from './views/StudentConvenienceView'
+import StudentStandardRegisterView from './views/StudentStandardRegisterView'
+import StudentStandardLoginView from './views/StudentStandardLoginView'
+import StudentRestrictedView from './views/StudentRestrictedView'
 
 import Testing from './views/Testing'
 
@@ -110,6 +114,8 @@ const Routes = () => {
         <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/auth-cas" component={StudentCASAuth} />
         <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/login" component={LandlordLoginView} />
         <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/login" component={StudentLoginViewRPI} />
+        <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/standard/register" component={StudentStandardRegisterView} />
+        <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/student/standard/login" component={StudentStandardLoginView} />
         <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/register" component={LandlordRegisterView} />
         <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/forgot-password" component={LandlordForgotPasswordView} />
         <AuthRoute accessLevel={AccessLevels.UNAUTH} exact path="/landlord/password-reset/:reset_key" component={({ match }) => <LandlordPasswordResetView reset_key={match.params.reset_key} />} />
@@ -120,12 +126,14 @@ const Routes = () => {
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/search" component={SearchView_} />
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/collection" component={CollectionView} />
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/s/status" component={StudentStatus} />
+        <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/s/convenience" component={StudentConvenience} />
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/feed" component={StudentFeed} />
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/info/property/:id" component={({ match }) => (<StudentPropertyInfoView property_id={match.params.id} />)} />
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/notifications" component={StudentNotificationsView} />
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/lease/:id" component={({ match }) => (<StudentLeaseAgreementView lease_id={match.params.id} />)} />
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/accepted_leases" component={StudentAcceptedLeasesView} />
         <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/lease/info/:lease_id/:history_id" component={({ match }) => <StudentAcceptedLeaseInfoView lease_id={match.params.lease_id} history_id={match.params.history_id} />} />
+        <AuthRoute accessLevel={AccessLevels.STUDENT} exact path="/student/restricted" component={StudentRestrictedView} />
 
         {/* Mod Console (Ownership Reviewer) */}
         <AuthRoute accessLevel={AccessLevels.OWNERSHIP_REVIEWER} exact path="/ownership/review" component={OwnershipReview} />
@@ -159,7 +167,8 @@ const Routes = () => {
 config()
 
 const _client = new ApolloClient({
-  uri: backendPath('/graphql')
+  uri: backendPath('/graphql'),
+  credentials: 'include'
 })
 
 ReactDOM.render(

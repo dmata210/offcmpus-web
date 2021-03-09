@@ -49,7 +49,7 @@ export interface UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_occup
   first_name: string;
   phone_number: string | null;
   last_name: string;
-  email: string;
+  email: string | null;
   elevated_privileges: string[] | null;
   auth_info: UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_occupant_doc_auth_info | null;
   user_settings: UpdateUnoccupiedLeases_updateUnoccupiedLeases_data_leases_occupant_doc_user_settings | null;

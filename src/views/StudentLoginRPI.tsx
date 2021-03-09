@@ -6,18 +6,43 @@ import urlencode from 'urlencode'
 import {backendPath} from '../config'
 import queryString from 'query-string'
 import {Helmet} from "react-helmet";
+import {useHistory} from 'react-router';
+import {
+    useStatsStudentAccountCreationMutation,
+    useStatsStudentLoginMutation
+} from '../API/queries/types/graphqlFragmentTypes'
 
 const StudentLoginViewRPI = () => {
 
 
     //===================== STATE =====================
+    const [StudentAccountCreation, {data: accountCreationStats}] = useStatsStudentAccountCreationMutation();
+    const [StudentLoginStat] = useStatsStudentLoginMutation();
+    const history = useHistory();
+    const [mode, setMode] = useState<'login' | 'register'>('login');
 
     //===================== EFFECT =====================
-    
+    useEffect(() => {
+
+        if (accountCreationStats && accountCreationStats.Stats_StudentAccountCreation) {
+            StudentLoginStat();
+            window.location.href = getRedirect();
+        }
+    }, [accountCreationStats]);
+
+    useEffect(() => {
+        let params = queryString.parse(window.location.search);
+
+        console.log('params: ', params);
+        if (Object.prototype.hasOwnProperty.call(params, 'register')
+            && params.register == 'true') {
+                setMode('register');
+        }
+    }, []);
+
     //===================== FUNCTIONS =====================
     const getRedirect = (): string => {
         let params = queryString.parse(window.location.search);
-
         if (Object.prototype.hasOwnProperty.call(params, `redirect`)) {
             return params.redirect as string;
         }
@@ -37,7 +62,16 @@ const StudentLoginViewRPI = () => {
             ctxWindow?.close();
             // history.push('/');
             // window.location.reload();
-            window.location.href = getRedirect();
+            
+            // Statistics for login
+            /**
+             * If the student has already been registered, this
+             * gql stats query won't record anything.
+             * Otherwise, it will create a new stat object for
+             * this student.
+             */
+            StudentAccountCreation({variables:{}});
+            // window.location.href = getRedirect();
             }
             else console.log(`CAS Auth failed`);
         });
@@ -95,6 +129,17 @@ const StudentLoginViewRPI = () => {
                     background="#3B4353"
                     onClick={() => handleRpiCasLogin()}
                 />
+                
+                {/* <div style={{marginTop: '10px'}}>
+                    <Button 
+                        text={`${mode == 'register' ? 'Register' : 'Login'} with Email`}
+                        textColor="white"
+                        bold={true}
+                        transformDisabled={true}
+                        background="#E0777D"
+                        onClick={() => {history.push(`/student/standard/${mode}`)}}
+                    />
+                </div> */}
             </div>
 
         </div>

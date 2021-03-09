@@ -14,7 +14,10 @@ import _ from 'lodash'
 import {fetchUser, setInstitution} from '../../redux/actions/user'
 import {ReduxState} from '../../redux/reducers/all_reducers'
 import {useDispatch, useSelector} from 'react-redux'
-import {useGetInstitutionLazyQuery} from '../../API/queries/types/graphqlFragmentTypes'
+import {
+  useGetInstitutionLazyQuery,
+  useStudentAccessShouldBeRestrictedLazyQuery
+} from '../../API/queries/types/graphqlFragmentTypes'
 
 const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
 
@@ -59,6 +62,7 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
 
   const [institutionId, setInstitutionId] = useState<string | null>(null)
   const [getInstitution, {data: instutionData, loading: institutionLoading}] = useGetInstitutionLazyQuery({variables: {id: institutionId == null ? "" : institutionId}})
+  const [CheckStudentRestricted, {data: studentRestrictedResponse}] = useStudentAccessShouldBeRestrictedLazyQuery({ fetchPolicy: 'no-cache' });
 
   useEffect(() => {
 
@@ -78,7 +82,21 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
     // get the user if the user does not exist
     dispatch(fetchUser(user, {update: false}))
 
-  }, [dispatch, user])
+    if (user && user.type == 'student') {
+      CheckStudentRestricted();
+    }
+
+  }, [dispatch, user]);
+
+  useEffect(() => {
+    if (studentRestrictedResponse && studentRestrictedResponse.studentAccessShouldBeRestricted) {
+      
+      // if success == true, then the student should be restricted from the app
+      if (studentRestrictedResponse.studentAccessShouldBeRestricted.success) {
+        history.push('/student/restricted');
+      }
+    }
+  }, [studentRestrictedResponse]);
 
   useEffect(() => {
 
@@ -101,6 +119,7 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
 
     // if this is a student, check the institution id
     if (user && user.user && user.type && user.type == "student") {
+      console.log(`Top of Auth Route!!`);
 
       // if the student does not have all their information, redirect them to complete registration
       if (!Object.prototype.hasOwnProperty.call(user.user, 'first_name')
@@ -110,6 +129,12 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
       || user.user.last_name == undefined
       || user.user.email == undefined ) {
         history.push('/student/register/complete');
+      }
+
+      // if the student has not specified conveinece tags yet,
+      // take them to the view to configure this
+      else if (user.user.conveinence_setup == false) {
+        pushRedirect(history, '/s/convenience', '/');
       }
       
       // check when the student last updated their status.
@@ -153,7 +178,8 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
   // be redirected back to this page.
   const getLoginRedirectLink = (): string => {
     let redirect_path: string = urlencode(window.location.pathname);
-    return `/student/login?redirect=${redirect_path}`
+    // return `/student/login?redirect=${redirect_path}`
+    return `/student/standard/login?redirect=${redirect_path}`
   }
 
   const getLandlordLoginRedirectLink = (): string => {
