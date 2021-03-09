@@ -28,6 +28,7 @@ const RadioInput = ({question, options, onChange}: RadioInputProps) => {
                     if (k == 0) question_row.push([]);
 
                     let el = <div 
+                        key={k}
                         onClick={() => setSelected(i)}
                         className={`option-item ${selected == i ? 'selected' : ''} ${k == 0 ? 'left' : 'right'}`}>{options[i]}</div>;
 
