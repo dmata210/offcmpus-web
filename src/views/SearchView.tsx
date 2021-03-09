@@ -24,6 +24,7 @@ import NumberPicker from '../components/toolbox/form/NumberPicker'
 import NavIcon from '../assets/svg/001-arrow.svg'
 import {BiNavigation, BiHomeCircle, BiHealth} from 'react-icons/bi'
 import {RiHotelBedLine, RiWalkFill, RiCarFill, RiBikeLine} from 'react-icons/ri'
+import {StudentConfirmPrompt} from '../components/StudentConformationPrompt'
 
 import L from 'leaflet'
 import {MapContainer, TileLayer, Marker, Polyline, Popup, useMap} from 'react-leaflet'
@@ -682,20 +683,4 @@ const NewSearchResult = ({result, onNavigate, onNavigateInstitute}:
 
     </div>)
 }
-
-const StudentConfirmPrompt = () => {
-
-    return (<div className="student-confirm-prompt">
-        <div className="header_">Confirm Your Email</div>
-        <div className="body_">
-            You must confirm your email within 24-hours to continue
-            using this service. You will have restricted access until
-            your <span className="code">.edu</span> email has been confirmed.
-        </div>
-        <div className="btn-area">
-            <div className="_btn1_">Resend Confirmation Email</div>
-        </div>
-    </div>)
-}
-
 export default SearchView

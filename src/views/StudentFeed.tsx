@@ -4,6 +4,7 @@ import {useSelector} from 'react-redux'
 import {useHistory} from 'react-router'
 import {shouldPromptToEnableNotifications} from './PushNotificationsPrompt'
 import {Helmet} from "react-helmet";
+import {StudentConfirmPrompt} from '../components/StudentConformationPrompt';
 
 import ViewWrapper from '../components/ViewWrapper'
 import Button from '../components/toolbox/form/Button'
@@ -80,6 +81,8 @@ const StudentFeed = () => {
                 <div className="section-header-2" style={{height: `30px`, marginBottom: `16px`}}>
                     <div className="title-area">Your Feed</div>
                 </div>
+
+                <StudentConfirmPrompt />
 
                 {/* Feed Entries */}
                 {(function(){
