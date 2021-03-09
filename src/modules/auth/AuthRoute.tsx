@@ -126,6 +126,12 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
         pushRedirect(history, '/s/status', '/');
       }
 
+      // TODO create condition to check if the student has confirmed their account within 24 hrs.
+      // If not, force them into restricted view.
+      else if (true) {
+        history.push('/student/restricted');
+      }
+
       if (user.user && user.user.auth_info && user.user.auth_info.institution_id) {
         let institution_id: string | null = user.user.auth_info.institution_id
         setInstitutionId(institution_id)
