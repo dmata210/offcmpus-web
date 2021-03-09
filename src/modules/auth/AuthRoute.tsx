@@ -160,7 +160,8 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
   // be redirected back to this page.
   const getLoginRedirectLink = (): string => {
     let redirect_path: string = urlencode(window.location.pathname);
-    return `/student/login?redirect=${redirect_path}`
+    // return `/student/login?redirect=${redirect_path}`
+    return `/student/standard/login?redirect=${redirect_path}`
   }
 
   const getLandlordLoginRedirectLink = (): string => {

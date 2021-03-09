@@ -12,6 +12,7 @@ import { ReduxState } from '../redux/reducers/all_reducers';
 import {
     useStatsStudentLoginMutation
 } from '../API/queries/types/graphqlFragmentTypes'
+import queryString from 'query-string'
 
 const {email} = Validators;
 
@@ -25,6 +26,15 @@ const StudentStandardLogin = () => {
     const [error, setError] = useState<string | null>(null);
     const user = useSelector((state: ReduxState) => state.user);
     const dispatch = useDispatch();
+
+    const getRedirect = (): string => {
+        let params = queryString.parse(window.location.search);
+        if (Object.prototype.hasOwnProperty.call(params, `redirect`)) {
+            return params.redirect as string;
+        }
+        // default redirect
+        else return `/`;
+    }
 
     const handleLogin = () => {
         if (loginInfo.email == "" || loginInfo.password == "") {
@@ -47,7 +57,8 @@ const StudentStandardLogin = () => {
             if (res.data.success) {
                 StudentLoginStat();
                 // do fetch user stuff
-                dispatch(fetchUser(user, {update: true}))
+                dispatch(fetchUser(user, {update: true}));
+                window.location.href = getRedirect();
             }
             else {
                 setError("Problem logging in");
