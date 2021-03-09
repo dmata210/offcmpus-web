@@ -67,5 +67,6 @@ export interface CreateStudentVariables {
   first_name: string;
   last_name: string;
   email: string;
+  password: string;
   preferred_email?: string | null;
 }

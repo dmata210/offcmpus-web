@@ -1,9 +1,12 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Centered from '../components/toolbox/layout/Centered'
 import Logo from '../components/Logo'
 import Input, {Validators, noSpaces} from '../components/toolbox/form/Input'
 import Checkbox from '../components/toolbox/form/Checkbox'
 import Button from '../components/toolbox/form/Button'
+import { Alert } from 'antd';
+
+import {useCreateStudentMutation} from '../API/queries/types/graphqlFragmentTypes'
 
 const {email} = Validators;
 
@@ -14,21 +17,108 @@ type StudentRegFormInfo = {
     school_email_confirm: string,
     preferred_email_set: boolean,
     preferred_login_email: string,
-    preferred_email_confirm: string
+    preferred_email_confirm: string,
+    password: string,
+    password_confirm: string
 }
 
 const StudentStandardRegister = () => {
 
+    const [CreateStudent, {data: createStudentResponse}] = useCreateStudentMutation();
+
+    const [_forceUpdate, _setForceUpdate] = useState<boolean>(false);
     const [formInfo, setFormInfo] = useState<StudentRegFormInfo>({
         first_name: "", last_name: "", school_email: "", school_email_confirm: "",
-        preferred_email_set: false, preferred_login_email: "", preferred_email_confirm: ""
+        preferred_email_set: false, preferred_login_email: "", preferred_email_confirm: "",
+        password_confirm: "", password: ""
     });
+    const [error, setError] = useState<string | null>(null);
 
-    const handleRegistration = () => {
-        
+    useEffect(() => {
+        if (createStudentResponse && createStudentResponse.createStudent) {
+            if (createStudentResponse.createStudent.success) {
+
+                // Log the student in
+                // StudentAPI.login(
+                //     ,
+                //     formInfo
+                // );
+            }
+            else {
+                if (createStudentResponse.createStudent.error) 
+                    setError(createStudentResponse.createStudent.error);
+            }
+        }
+    }, [createStudentResponse]);
+
+    const forceUpdate = () => {
+        _setForceUpdate(!_forceUpdate);
     }
 
-    return (<Centered width={400} height={600}>
+    const handleRegistration = () => {
+        // verify form
+        if (formInfo.first_name == "" 
+        || formInfo.last_name == ""
+        || formInfo.school_email == ""
+        || formInfo.password == ""
+        || (formInfo.preferred_email_set && formInfo.preferred_login_email == "")) {
+
+            // ! Show error: invalid form
+            setError("Fields are empty");
+            return;
+        }
+
+        // check that the school email is an edu email
+        if (!eduValidator(formInfo.school_email)) {
+
+            // ! Show error: invalid school email
+            setError("Invalid school email");
+            return;
+        }
+
+        // check that the emails are in email format
+        if (!email(formInfo.school_email) 
+        || (formInfo.preferred_email_set && !email(formInfo.preferred_login_email))) {
+
+            // ! Show error: emails are not in email format
+            setError("Invalid email format");
+            return ;
+        }
+
+        // check confirm emails
+        if (
+            (formInfo.school_email != formInfo.school_email_confirm)
+            || (formInfo.preferred_login_email != formInfo.preferred_email_confirm)
+        ) {
+            // ! Show error: emails do not match
+            setError("Emails do not match");
+            return;
+        }
+
+        // check that passwords match
+        if (
+            formInfo.password != formInfo.password_confirm
+        ) {
+            setError("Passwords do not match");
+            return;
+        }
+
+        // Create the student!
+        setError(null);
+        CreateStudent({
+            variables: {
+                first_name: formInfo.first_name,
+                last_name: formInfo.last_name,
+                email: formInfo.school_email,
+                password: formInfo.password,
+                ...(formInfo.preferred_email_set ? 
+                    {preferred_email: formInfo.preferred_login_email} : {})
+            }
+        });
+
+    }
+
+    return (<Centered width={400} height={800}>
         <div>
             
         <div style={{display: 'flex'}} className="padded upper">
@@ -45,12 +135,20 @@ const StudentStandardRegister = () => {
             </div>
         </div>
 
+        {error != null && <div style={{marginTop: '20px'}}>
+        <Alert
+            message="Registration Failed"
+            description={error}
+            type="error"
+        />
+        </div>}
+
         <div style={{marginTop: '20px'}}>
             <div style={{marginBottom: '15px'}}>
                 <Input 
                     label="First Name"
                     onChange={(val: string) => {
-                        let form = {...formInfo};
+                        let form = formInfo;
                         form.first_name = val;
                         setFormInfo(form);
                     }}
@@ -60,8 +158,33 @@ const StudentStandardRegister = () => {
                 <Input 
                     label="Last Name"
                     onChange={(val: string) => {
-                        let form = {...formInfo};
+                        let form = formInfo;
                         form.last_name = val;
+                        setFormInfo(form);
+                    }}
+                />
+            </div>
+        </div>
+
+        <div style={{marginTop: '20px'}}>
+            <div style={{marginBottom: '15px'}}>
+                <Input 
+                    label="Password"
+                    type="password"
+                    onChange={(val: string) => {
+                        let form = formInfo;
+                        form.password = val;
+                        setFormInfo(form);
+                    }}
+                />
+            </div>
+            <div style={{marginBottom: '15px'}}>
+                <Input 
+                    label="Confirm Password"
+                    type="password"
+                    onChange={(val: string) => {
+                        let form = formInfo;
+                        form.password_confirm = val;
                         setFormInfo(form);
                     }}
                 />
@@ -77,7 +200,7 @@ const StudentStandardRegister = () => {
                         {validator: eduValidator, errorMsg: "Email must be a .edu"}
                     ]}
                     onChange={(val: string) => {
-                        let form = {...formInfo};
+                        let form = formInfo;
                         form.school_email = val;
                         setFormInfo(form);
                     }}
@@ -87,7 +210,7 @@ const StudentStandardRegister = () => {
                 <Input 
                     label="Confirm School Email"
                     onChange={(val: string) => {
-                        let form = {...formInfo};
+                        let form = formInfo;
                         form.school_email_confirm = val;
                         setFormInfo(form);
                     }}
@@ -113,11 +236,10 @@ const StudentStandardRegister = () => {
                 <Input 
                     label="Preferred Login Email"
                     validators={[
-                        {validator: email, errorMsg: "Email expected"},
-                        {validator: eduValidator, errorMsg: "Email must be a .edu"}
+                        {validator: email, errorMsg: "Email expected"}
                     ]}
                     onChange={(val: string) => {
-                        let form = {...formInfo};
+                        let form = formInfo;
                         form.preferred_login_email = val;
                         setFormInfo(form);
                     }}
@@ -128,7 +250,7 @@ const StudentStandardRegister = () => {
                     label="Confirm Preferred Login Email"
                     
                     onChange={(val: string) => {
-                        let form = {...formInfo};
+                        let form = formInfo;
                         form.preferred_email_confirm = val;
                         setFormInfo(form);
                     }}
@@ -160,7 +282,7 @@ const StudentStandardRegister = () => {
                 background="#E0777D"
                 bold={true}
                 transformDisabled={true}
-                onClick={handleRegistration}
+                onClick={() => handleRegistration()}
             />
             </div>
         </div>

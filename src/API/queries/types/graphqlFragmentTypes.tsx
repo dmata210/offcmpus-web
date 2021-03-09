@@ -920,6 +920,7 @@ export type MutationSaveConveniencePreferencesArgs = {
 
 export type MutationCreateStudentArgs = {
   preferred_email?: Maybe<Scalars['String']>;
+  password: Scalars['String'];
   email: Scalars['String'];
   last_name: Scalars['String'];
   first_name: Scalars['String'];
@@ -2615,6 +2616,7 @@ export type CreateStudentMutationVariables = Exact<{
   first_name: Scalars['String'];
   last_name: Scalars['String'];
   email: Scalars['String'];
+  password: Scalars['String'];
   preferred_email?: Maybe<Scalars['String']>;
 }>;
 
@@ -5691,11 +5693,12 @@ export type GetStudentNotificationsQueryHookResult = ReturnType<typeof useGetStu
 export type GetStudentNotificationsLazyQueryHookResult = ReturnType<typeof useGetStudentNotificationsLazyQuery>;
 export type GetStudentNotificationsQueryResult = Apollo.QueryResult<GetStudentNotificationsQuery, GetStudentNotificationsQueryVariables>;
 export const CreateStudentDocument = gql`
-    mutation CreateStudent($first_name: String!, $last_name: String!, $email: String!, $preferred_email: String) {
+    mutation CreateStudent($first_name: String!, $last_name: String!, $email: String!, $password: String!, $preferred_email: String) {
   createStudent(
     first_name: $first_name
     last_name: $last_name
     email: $email
+    password: $password
     preferred_email: $preferred_email
   ) {
     ...StudentAPIResponseFields
@@ -5720,6 +5723,7 @@ export type CreateStudentMutationFn = Apollo.MutationFunction<CreateStudentMutat
  *      first_name: // value for 'first_name'
  *      last_name: // value for 'last_name'
  *      email: // value for 'email'
+ *      password: // value for 'password'
  *      preferred_email: // value for 'preferred_email'
  *   },
  * });

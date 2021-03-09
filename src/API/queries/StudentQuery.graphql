@@ -28,12 +28,14 @@ mutation CreateStudent(
   $first_name: String!
   $last_name: String!
   $email: String!
+  $password: String!
   $preferred_email: String
 ) {
   createStudent(
     first_name: $first_name
     last_name: $last_name
     email: $email
+    password: $password
     preferred_email: $preferred_email
   ) {
     ...StudentAPIResponseFields
