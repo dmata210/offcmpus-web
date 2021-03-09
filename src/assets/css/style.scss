@@ -6298,3 +6298,45 @@ a.subtle-link {
     }
   }
 }
+
+.student-confirm-prompt {
+  background-color: #848cff;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  color: white;
+
+  .header_ {
+    font-weight: 600;
+    padding: 8px 10px 0px 10px;
+  }
+
+  .body_ {
+    padding: 0px 10px 0px 10px;
+
+    .code {
+      background-color: rgba(0, 0, 0, 0.1);
+      font-family: monospace;
+      padding: 0 6px 0 4px;
+      border-radius: 3px;
+    }
+  }
+
+  .btn-area {
+    padding: 0 10px 8px;
+    display: flex;
+
+    ._btn1_ {
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 0px 5px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      border-radius: 5px;
+      transition: background 0.25s, opacity 0.25s;
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+    }
+  }
+}
