@@ -24,6 +24,12 @@ query GetStudentNotifications($student_id: String!) {
   }
 }
 
+mutation StudentEmailConfirmed {
+  studentEmailConfirmed {
+    ...StudentAPIResponseFields
+  }
+}
+
 mutation ResendStudentEmailConfirmation {
   resendStudentEmailConfirmation {
     ...StudentAPIResponseFields

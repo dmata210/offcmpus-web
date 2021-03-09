@@ -13,6 +13,7 @@ import {Helmet} from "react-helmet";
 import {
     useSearchForPropertiesLazyQuery, 
     useAddCollectionMutation,
+    useStudentEmailConfirmedMutation,
     useRemoveCollectionMutation,
     Property, 
     PropertySearchResult,
@@ -44,7 +45,9 @@ const CustomMarker: L.Icon<L.IconOptions> = new L.icon({
 
 const SearchView = () => {
 
+    const [CheckEmailConfirmed, {data: emailConfirmedResponse}] = useStudentEmailConfirmedMutation();
     const [SearchForProps, {data: searchResponse}] = useSearchForPropertiesLazyQuery();
+    const [emailConfirmed, setEmailConfirmed] = useState<boolean>(true);
 
     const user = useSelector((state: ReduxState) => state.user);
     const institute = useSelector((state: ReduxState) => state.institution);
@@ -72,7 +75,14 @@ const SearchView = () => {
     }, [institute]);
 
     useEffect(() => {
-        updateFilterWidth ()
+        if (emailConfirmedResponse && emailConfirmedResponse.studentEmailConfirmed) {
+            setEmailConfirmed(emailConfirmedResponse.studentEmailConfirmed.success);
+        }
+    }, [emailConfirmedResponse]);
+
+    useEffect(() => {
+        CheckEmailConfirmed();
+        updateFilterWidth ();
         window.addEventListener(`resize`, updateFilterWidth)
 
         // execute search queries
@@ -384,7 +394,7 @@ const SearchView = () => {
             {/* Right Side */}
             {properties.length > 0 &&
             <div className="right-side_">
-                <StudentConfirmPrompt />
+                {!emailConfirmed && <StudentConfirmPrompt />}
 
                 {/* <NewSearchResult result={properties[0]} /> */}
                 {properties.map((property: PropertySearchResult, i: number) => 

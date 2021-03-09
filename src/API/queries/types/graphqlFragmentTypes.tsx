@@ -848,6 +848,7 @@ export type Mutation = {
   setLandlordOnboarded: LandlordApiResponse;
   saveConveniencePreferences: StudentApiResponse;
   createStudent: StudentApiResponse;
+  studentEmailConfirmed: StudentApiResponse;
   resendStudentEmailConfirmation: StudentApiResponse;
   markStudentNotificationAsSeen: StudentNotificationApiResponse;
   updateStudentSearchStatus: StudentApiResponse;
@@ -2612,6 +2613,17 @@ export type GetStudentNotificationsQuery = (
         )> }
       )> }
     )> }
+  ) }
+);
+
+export type StudentEmailConfirmedMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type StudentEmailConfirmedMutation = (
+  { __typename?: 'Mutation' }
+  & { studentEmailConfirmed: (
+    { __typename?: 'StudentAPIResponse' }
+    & StudentApiResponseFieldsFragment
   ) }
 );
 
@@ -5706,6 +5718,37 @@ export function useGetStudentNotificationsLazyQuery(baseOptions?: Apollo.LazyQue
 export type GetStudentNotificationsQueryHookResult = ReturnType<typeof useGetStudentNotificationsQuery>;
 export type GetStudentNotificationsLazyQueryHookResult = ReturnType<typeof useGetStudentNotificationsLazyQuery>;
 export type GetStudentNotificationsQueryResult = Apollo.QueryResult<GetStudentNotificationsQuery, GetStudentNotificationsQueryVariables>;
+export const StudentEmailConfirmedDocument = gql`
+    mutation StudentEmailConfirmed {
+  studentEmailConfirmed {
+    ...StudentAPIResponseFields
+  }
+}
+    ${StudentApiResponseFieldsFragmentDoc}`;
+export type StudentEmailConfirmedMutationFn = Apollo.MutationFunction<StudentEmailConfirmedMutation, StudentEmailConfirmedMutationVariables>;
+
+/**
+ * __useStudentEmailConfirmedMutation__
+ *
+ * To run a mutation, you first call `useStudentEmailConfirmedMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStudentEmailConfirmedMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [studentEmailConfirmedMutation, { data, loading, error }] = useStudentEmailConfirmedMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useStudentEmailConfirmedMutation(baseOptions?: Apollo.MutationHookOptions<StudentEmailConfirmedMutation, StudentEmailConfirmedMutationVariables>) {
+        return Apollo.useMutation<StudentEmailConfirmedMutation, StudentEmailConfirmedMutationVariables>(StudentEmailConfirmedDocument, baseOptions);
+      }
+export type StudentEmailConfirmedMutationHookResult = ReturnType<typeof useStudentEmailConfirmedMutation>;
+export type StudentEmailConfirmedMutationResult = Apollo.MutationResult<StudentEmailConfirmedMutation>;
+export type StudentEmailConfirmedMutationOptions = Apollo.BaseMutationOptions<StudentEmailConfirmedMutation, StudentEmailConfirmedMutationVariables>;
 export const ResendStudentEmailConfirmationDocument = gql`
     mutation ResendStudentEmailConfirmation {
   resendStudentEmailConfirmation {

@@ -128,7 +128,7 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
 
       // TODO create condition to check if the student has confirmed their account within 24 hrs.
       // If not, force them into restricted view.
-      else if (true) {
+      else if (false) {
         history.push('/student/restricted');
       }
 
