@@ -10,7 +10,10 @@ import {useDispatch, useSelector} from 'react-redux'
 import {fetchUser} from '../redux/actions/user'
 import {useCreateStudentMutation} from '../API/queries/types/graphqlFragmentTypes'
 import { ReduxState } from '../redux/reducers/all_reducers';
-
+import {
+    useStatsStudentAccountCreationMutation,
+    useStatsStudentLoginMutation
+} from '../API/queries/types/graphqlFragmentTypes'
 const {email} = Validators;
 
 type StudentRegFormInfo = {
@@ -26,6 +29,9 @@ type StudentRegFormInfo = {
 }
 
 const StudentStandardRegister = () => {
+
+    const [StudentAccountCreation, {data: accountCreationStats}] = useStatsStudentAccountCreationMutation();
+    const [StudentLoginStat] = useStatsStudentLoginMutation();
 
     const dispatch = useDispatch()
     const [CreateStudent, {data: createStudentResponse}] = useCreateStudentMutation();
@@ -43,6 +49,9 @@ const StudentStandardRegister = () => {
         if (createStudentResponse && createStudentResponse.createStudent) {
             if (createStudentResponse.createStudent.success) {
 
+                // Run statistics for logged in user
+                StudentAccountCreation({variables:{}});
+
                 // Log the student in
                 StudentAPI.login(
                     formInfo.preferred_email_set ? formInfo.preferred_login_email : formInfo.school_email,
@@ -52,6 +61,10 @@ const StudentStandardRegister = () => {
                     console.log(res.data);
                     console.log("Successful? ", res.data.success == true);
                     if (res.data.success == true) {
+
+                        // run student login stat
+                        StudentLoginStat();
+
                         dispatch(fetchUser(user, {update: true}))
                     }
                     else {

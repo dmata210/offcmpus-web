@@ -9,10 +9,15 @@ import StudentAPI from '../API/StudentAPI'
 import {useDispatch, useSelector} from 'react-redux'
 import {fetchUser} from '../redux/actions/user'
 import { ReduxState } from '../redux/reducers/all_reducers';
+import {
+    useStatsStudentLoginMutation
+} from '../API/queries/types/graphqlFragmentTypes'
 
 const {email} = Validators;
 
 const StudentStandardLogin = () => {
+
+    const [StudentLoginStat] = useStatsStudentLoginMutation();
 
     const [loginInfo, setLoginInfo] = useState<{email: string, password: string}>({
         email: '', password: ''
@@ -40,6 +45,7 @@ const StudentStandardLogin = () => {
             loginInfo.password
         ).then(res => {
             if (res.data.success) {
+                StudentLoginStat();
                 // do fetch user stuff
                 dispatch(fetchUser(user, {update: true}))
             }
