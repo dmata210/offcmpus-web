@@ -4,6 +4,12 @@ query Student($id: String!) {
   }
 }
 
+query StudentAccessShouldBeRestricted {
+  studentAccessShouldBeRestricted {
+    ...StudentAPIResponseFields
+  }
+}
+
 query GetStudentNotifications($student_id: String!) {
   getStudentNotifications(student_id: $student_id) {
     success

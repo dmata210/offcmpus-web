@@ -21,6 +21,7 @@ export type Query = {
   getStudent: StudentApiResponse;
   getStudentSavedCollection: PropertyCollectionEntriesApiResponse;
   getStudentNotifications: StudentNotificationApiResponse;
+  studentAccessShouldBeRestricted: StudentApiResponse;
   getProperty: PropertyApiResponse;
   getPropertyForOwnership: PropertyApiResponse;
   getPropertyOwnedByLandlord: PropertyApiResponse;
@@ -2587,6 +2588,17 @@ export type StudentQueryVariables = Exact<{
 export type StudentQuery = (
   { __typename?: 'Query' }
   & { getStudent: (
+    { __typename?: 'StudentAPIResponse' }
+    & StudentApiResponseFieldsFragment
+  ) }
+);
+
+export type StudentAccessShouldBeRestrictedQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type StudentAccessShouldBeRestrictedQuery = (
+  { __typename?: 'Query' }
+  & { studentAccessShouldBeRestricted: (
     { __typename?: 'StudentAPIResponse' }
     & StudentApiResponseFieldsFragment
   ) }
@@ -5671,6 +5683,38 @@ export function useStudentLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<St
 export type StudentQueryHookResult = ReturnType<typeof useStudentQuery>;
 export type StudentLazyQueryHookResult = ReturnType<typeof useStudentLazyQuery>;
 export type StudentQueryResult = Apollo.QueryResult<StudentQuery, StudentQueryVariables>;
+export const StudentAccessShouldBeRestrictedDocument = gql`
+    query StudentAccessShouldBeRestricted {
+  studentAccessShouldBeRestricted {
+    ...StudentAPIResponseFields
+  }
+}
+    ${StudentApiResponseFieldsFragmentDoc}`;
+
+/**
+ * __useStudentAccessShouldBeRestrictedQuery__
+ *
+ * To run a query within a React component, call `useStudentAccessShouldBeRestrictedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useStudentAccessShouldBeRestrictedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useStudentAccessShouldBeRestrictedQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useStudentAccessShouldBeRestrictedQuery(baseOptions?: Apollo.QueryHookOptions<StudentAccessShouldBeRestrictedQuery, StudentAccessShouldBeRestrictedQueryVariables>) {
+        return Apollo.useQuery<StudentAccessShouldBeRestrictedQuery, StudentAccessShouldBeRestrictedQueryVariables>(StudentAccessShouldBeRestrictedDocument, baseOptions);
+      }
+export function useStudentAccessShouldBeRestrictedLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<StudentAccessShouldBeRestrictedQuery, StudentAccessShouldBeRestrictedQueryVariables>) {
+          return Apollo.useLazyQuery<StudentAccessShouldBeRestrictedQuery, StudentAccessShouldBeRestrictedQueryVariables>(StudentAccessShouldBeRestrictedDocument, baseOptions);
+        }
+export type StudentAccessShouldBeRestrictedQueryHookResult = ReturnType<typeof useStudentAccessShouldBeRestrictedQuery>;
+export type StudentAccessShouldBeRestrictedLazyQueryHookResult = ReturnType<typeof useStudentAccessShouldBeRestrictedLazyQuery>;
+export type StudentAccessShouldBeRestrictedQueryResult = Apollo.QueryResult<StudentAccessShouldBeRestrictedQuery, StudentAccessShouldBeRestrictedQueryVariables>;
 export const GetStudentNotificationsDocument = gql`
     query GetStudentNotifications($student_id: String!) {
   getStudentNotifications(student_id: $student_id) {

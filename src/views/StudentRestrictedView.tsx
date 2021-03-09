@@ -3,20 +3,38 @@ import Centered from '../components/toolbox/layout/Centered'
 import Button from '../components/toolbox/form/Button'
 import {Alert} from 'antd'
 import {
+    useStudentAccessShouldBeRestrictedLazyQuery,
     useResendStudentEmailConfirmationMutation
 } from '../API/queries/types/graphqlFragmentTypes'
 import {ReduxState} from '../redux/reducers/all_reducers'
 import {useSelector} from 'react-redux'
+import {useHistory} from 'react-router'
 
 const StudentRestrictedView = () => {
 
+    const history = useHistory();
     const user = useSelector((state: ReduxState) => state.user);
     const [ResentConfirmation, {data: resendCOnfirmationResponse}] = useResendStudentEmailConfirmationMutation();
     const [sent, setSent] = useState<boolean>(false);
+    const [CheckAccessRestricted, {data: accessRestrictedResponse}] = useStudentAccessShouldBeRestrictedLazyQuery();
 
     const handleResendConfirmation = () => {
         ResentConfirmation();
     }
+
+    useEffect(() => {
+        CheckAccessRestricted();
+    }, []);
+
+    useEffect(() => {
+        if (accessRestrictedResponse && accessRestrictedResponse.studentAccessShouldBeRestricted) {
+            
+            // if they should not be restricted access, then send them back to the home page
+            if (!accessRestrictedResponse.studentAccessShouldBeRestricted.success) {
+                history.push('/');
+            }
+        }
+    }, [accessRestrictedResponse]);
 
     useEffect(() => {
         // TODO handle state change stuff

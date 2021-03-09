@@ -14,7 +14,10 @@ import _ from 'lodash'
 import {fetchUser, setInstitution} from '../../redux/actions/user'
 import {ReduxState} from '../../redux/reducers/all_reducers'
 import {useDispatch, useSelector} from 'react-redux'
-import {useGetInstitutionLazyQuery} from '../../API/queries/types/graphqlFragmentTypes'
+import {
+  useGetInstitutionLazyQuery,
+  useStudentAccessShouldBeRestrictedLazyQuery
+} from '../../API/queries/types/graphqlFragmentTypes'
 
 const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
 
@@ -59,6 +62,7 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
 
   const [institutionId, setInstitutionId] = useState<string | null>(null)
   const [getInstitution, {data: instutionData, loading: institutionLoading}] = useGetInstitutionLazyQuery({variables: {id: institutionId == null ? "" : institutionId}})
+  const [CheckStudentRestricted, {data: studentRestrictedResponse}] = useStudentAccessShouldBeRestrictedLazyQuery({ fetchPolicy: 'no-cache' });
 
   useEffect(() => {
 
@@ -78,7 +82,21 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
     // get the user if the user does not exist
     dispatch(fetchUser(user, {update: false}))
 
-  }, [dispatch, user])
+    if (user && user.type == 'student') {
+      CheckStudentRestricted();
+    }
+
+  }, [dispatch, user]);
+
+  useEffect(() => {
+    if (studentRestrictedResponse && studentRestrictedResponse.studentAccessShouldBeRestricted) {
+      
+      // if success == true, then the student should be restricted from the app
+      if (studentRestrictedResponse.studentAccessShouldBeRestricted.success) {
+        history.push('/student/restricted');
+      }
+    }
+  }, [studentRestrictedResponse]);
 
   useEffect(() => {
 
@@ -124,12 +142,6 @@ const AuthRoute = ({component: Component, accessLevel, ...rest}: any) => {
       else if (!user.user.search_status 
         || new Date().getTime() - new Date(user.user.search_status.date_updated).getTime() >= 1000 * 60 * 60 * 24 * 30) {
         pushRedirect(history, '/s/status', '/');
-      }
-
-      // TODO create condition to check if the student has confirmed their account within 24 hrs.
-      // If not, force them into restricted view.
-      else if (false) {
-        history.push('/student/restricted');
       }
 
       if (user.user && user.user.auth_info && user.user.auth_info.institution_id) {
