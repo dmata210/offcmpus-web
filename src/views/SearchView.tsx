@@ -421,17 +421,21 @@ const SearchView = () => {
                 )}
             </div>}
 
+
             {properties.length == 0 &&
-            <div style={{
-                textAlign: `center`,
-                margin: `0 auto`,
-                paddingTop: `150px`
-            }}>
-                <Empty
-                    description={
-                    <span>No properties could be found</span>
-                    }
-                />
+            <div>
+                {!emailConfirmed && <StudentConfirmPrompt />}
+                <div style={{
+                    textAlign: `center`,
+                    margin: `0 auto`,
+                    paddingTop: `150px`
+                }}>
+                    <Empty
+                        description={
+                        <span>No properties could be found</span>
+                        }
+                    />
+                </div>
             </div>}
 
         </div>

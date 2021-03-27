@@ -1,5 +1,6 @@
 import React, {useRef} from 'react'
 import {Link} from 'react-router-dom'
+import {motion, useSpring, useTransform} from 'framer-motion'
 
 interface ButtonInterface {
   text?: string
@@ -20,6 +21,10 @@ interface ButtonInterface {
 
 const Button = ({ text, disabled, disabledBackground, transformDisabled, icon, bold, width, large, border, link_to, iconLocation, onClick, textColor, background }: ButtonInterface) => {
 
+  const xMouseSpring = useSpring(0, {duration: 10, bounce: 0, damping: 0});
+
+  const effectContainerRef = useRef<HTMLDivElement>(null);
+  const effectRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLDivElement>(null)
   const bgColor = (): string => {
     if (disabled == true) {
@@ -69,6 +74,27 @@ const Button = ({ text, disabled, disabledBackground, transformDisabled, icon, b
     window.removeEventListener(`mouseout`, endTransforms)
   }
 
+  const handleEffectMotion = (e: any) => {
+    // console.log(e.clientX, e.clientY);
+    if (effectContainerRef == null || effectContainerRef.current == null) return;
+    if (effectRef == null || effectRef.current == null) return;
+
+    // get the bounding rect
+    let bounds = effectContainerRef.current.getBoundingClientRect();
+    let b2 = effectRef.current.getBoundingClientRect();
+    let x_ = e.clientX - bounds.left;
+    xMouseSpring.set(x_ - (b2.width / 2));
+
+    // move x pos
+    // effectRef.current.animate([
+    //   {transform: `translateX(${x_}px)`}
+    //   // {left: `${x_}px`}
+    // ], {
+    //   duration: 100,
+    //   iterations: 1
+    // });
+  }
+
   return (<React.Fragment>
 
   {link_to ? <Link to={link_to}><div 
@@ -87,6 +113,15 @@ const Button = ({ text, disabled, disabledBackground, transformDisabled, icon, b
       padding: large ? `8px 20px` : `6px 20px`
     }}
   >
+
+    <div ref={effectContainerRef} className="effect-holder" onMouseMove={handleEffectMotion}>
+      <motion.div ref={effectRef} 
+        style={{
+          translateX: xMouseSpring
+        }}
+      />
+    </div>
+
     <div className="button-holder">{
       getIconLocation() == "left" &&
       <div className={`icon-area ${getIconLocation()}`}>
@@ -120,6 +155,13 @@ const Button = ({ text, disabled, disabledBackground, transformDisabled, icon, b
       padding: large ? `8px 20px` : `6px 20px`
     }}
   >
+    <div ref={effectContainerRef} className="effect-holder" onMouseMove={handleEffectMotion}>
+      <motion.div ref={effectRef} 
+        style={{
+          translateX: xMouseSpring
+        }}
+      />
+    </div>
     <div className="button-holder">{
       getIconLocation() == "left" &&
       <div className={`icon-area ${getIconLocation()}`}>

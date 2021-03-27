@@ -3,7 +3,7 @@ import {useMediaQuery} from 'react-responsive'
 import {useSelector} from 'react-redux'
 import {useHistory} from 'react-router'
 import {Helmet} from "react-helmet";
-
+import {Alert} from 'antd';
 import {
   useVerifyAddressLazyQuery,
   useCreateOwnershipMutation
@@ -99,7 +99,7 @@ const LandlordNewProperty = () => {
       else {
         setFormError({
           hasError: true,
-          message: "Invalid address provided. Please provide an existing address."
+          message: "An error occurred. Please try again."
         })
       }
     }
@@ -114,7 +114,6 @@ const LandlordNewProperty = () => {
         history.push(`/landlord/ownership-documents/${ownershipData.createOwnershipReview.data?._id}`)
       }
       else {
-        console.error(`Error creating ownership`)
         setFormError({
           hasError: true,
           message: `${ownershipData.createOwnershipReview.error}`
@@ -158,7 +157,6 @@ const LandlordNewProperty = () => {
       let landlord_info = user.user
       // check that the landlord information is present
       if (landlord_info == null) {
-        console.error(`Landlord info is null`)
         setFormError({
           hasError: true,
           message: "Landlord information could not be found"
@@ -229,7 +227,15 @@ const LandlordNewProperty = () => {
         <div className="title-area">Property Registration</div>
       </div>
 
-      {/* First And Last Name */}
+      {formError.hasError &&
+        <div style={{marginBottom: '15px'}}>
+        <Alert
+          message="Error"
+          description={formError.message}
+          type="error"
+        />
+      </div>
+      }
 
       <div>
         <Input label="Primary Address Line" 
@@ -287,11 +293,6 @@ const LandlordNewProperty = () => {
           />
         </div>
       </div>
-
-      {formError.hasError && <div className="error-line error">
-        <span className="icon-holder"><HiX /></span> Error: {formError.message}
-      </div>}
-      
       <div className="padded upper" style={{width: "30%", float: "left"}}>
         <Button 
           onClick={() => {

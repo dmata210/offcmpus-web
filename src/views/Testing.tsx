@@ -3,8 +3,8 @@ import {useSpring, motion, useTransform} from 'framer-motion'
 import {RiBookOpenLine} from 'react-icons/ri'
 import Input, {Validators, InputValidatorFlags, alnumOnly, noSpaces, $and, numbersOnly} from '../components/toolbox/form/Input'
 import NumberPicker from '../components/toolbox/form/NumberPicker'
+import Button from '../components/toolbox/form/Button'
 
-import FloatInput from '../components/toolbox/form/FloatInput'
 
 const {
   numbersOnly: numbersOnlyValidator,
@@ -21,9 +21,19 @@ const Testing = () => {
     transform: `translateX(-50%) translateY(-50%)`
   }}>
 
-    <NumberPicker
+    {/* <NumberPicker
       onChange={(val: number) => {}}
-    />
+    /> */}
+    <div style={{width: `100px`}}>
+      <Button 
+        text="Sample"
+        bold={true}
+        transformDisabled={true}
+        textColor="white"
+        background="#E0777D"
+      />
+    </div>
+
   </div>)
 }
 
